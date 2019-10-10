@@ -23,10 +23,10 @@ int main()
         printf("Unable to load font.\n");
     }
 
-    Texture *texture = getTexture("apple");
+    std::unique_ptr<Texture> texture = getTexture("apple");
     TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
-    Texture *textTexture = NULL;
+    std::unique_ptr<Texture> textTexture;
 
     bool quit = false;
     SDL_Event e;
@@ -57,10 +57,10 @@ int main()
         fpsSStream << std::fixed << "Avg FPS: " << frameCount / (timerGetTicks(fpsTimer) / 1000.f);
         freeTexture(textTexture);
         textTexture = createTextureFromText(fpsSStream.str(), color, font, renderer);
-        renderTexture(textTexture, renderer, (800 / 2) - textTexture->width / 2, (640 / 6));
+        renderTexture(textTexture.get(), renderer, (800 / 2) - textTexture->width / 2, (640 / 6));
 
         // Render sprite
-        renderTexture(texture, renderer, (800 / 2) - texture->width / 2, (640 / 2) - texture->height / 2);
+        renderTexture(texture.get(), renderer, (800 / 2) - texture->width / 2, (640 / 2) - texture->height / 2);
 
         // Draw
         SDL_RenderPresent(renderer);
