@@ -40,8 +40,9 @@ TileSet::TileSet(std::string textureKey, int tileWidth, int tileHeight, int numT
         for (int j = 0; j < numberOfTileRows; j++)
         {
             SDL_Rect box = {(i * tileWidth), (j * tileHeight), tileWidth, tileHeight};
-            Tile tile(box, box, texture);
-            mTiles.push_back(tile);
+            printf("Tile index %lu clip %d %d %d %d\n", mTiles.size(), box.x, box.y, box.w, box.h);
+            std::unique_ptr<Tile> tile = std::make_unique<Tile>(Tile(box, box, texture));
+            mTiles.push_back(std::move(tile));
         }
     }
     printf("Tiles for %s loaded!\n", textureKey.c_str());
@@ -49,8 +50,8 @@ TileSet::TileSet(std::string textureKey, int tileWidth, int tileHeight, int numT
 
 void TileSet::render(SDL_Renderer *renderer, int x, int y)
 {
-    for (Tile tile : mTiles)
+    for (auto &tile : mTiles)
     {
-        tile.render(renderer, x, y);
+        tile->render(renderer, x + tile->mBox.x, y + tile->mBox.y);
     }
 }

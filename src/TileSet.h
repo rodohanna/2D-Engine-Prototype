@@ -1,5 +1,5 @@
-#ifndef TILEMAP_h_
-#define TILEMAP_h_
+#ifndef TILESET_h_
+#define TILESET_h_
 #include <SDL2/SDL.h>
 #include <vector>
 #include <string>
@@ -9,7 +9,7 @@ struct TileSet
 {
     TileSet(std::string textureKey, int tileWidth, int tileHeight, int numTiles = 0);
     void render(SDL_Renderer *renderer, int x = 0, int y = 0);
-    std::vector<Tile> mTiles;
+    std::vector<std::unique_ptr<Tile>> mTiles;
     int mWidth, mHeight;
 };
 

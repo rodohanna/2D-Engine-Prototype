@@ -4,5 +4,5 @@ Tile::Tile(SDL_Rect clip, SDL_Rect box, Texture *texture) : mClip(clip), mBox(bo
 
 void Tile::render(SDL_Renderer *renderer, int x, int y)
 {
-    mTexture->render(renderer, x + mBox.x, y + mBox.y, &mClip);
+    mTexture->render(renderer, x, y, &mClip);
 }
