@@ -22,7 +22,7 @@ int main()
         printf("Unable to load font.\n");
     }
 
-    std::shared_ptr<Texture> texture = getTexture("apple");
+    Texture *texture = getTexture("apple");
     TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
     std::shared_ptr<Texture> textTexture;
