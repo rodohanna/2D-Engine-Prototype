@@ -3,6 +3,7 @@
 #include "Assets.h"
 #include "Texture.h"
 #include "Timer.h"
+#include "TileSet.h"
 
 int main()
 {
@@ -17,15 +18,20 @@ int main()
         printf("Unable to load texture.\n");
         return 1;
     }
+    if (!loadImageTexture("assets/tiles.png", "tiles", renderer))
+    {
+        printf("Unable to load tiles.\n");
+        return 1;
+    }
     if (!loadFont("assets/m5x7.ttf", "standard_font", 64))
     {
         printf("Unable to load font.\n");
     }
 
-    Texture *texture = getTexture("apple");
+    // Texture *texture = getTexture("apple");
     TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
-    std::shared_ptr<Texture> textTexture;
+    std::unique_ptr<Texture> textTexture;
 
     bool quit = false;
     SDL_Event e;
@@ -33,6 +39,9 @@ int main()
     Timer fpsCapTimer = makeTimer();
     std::stringstream fpsSStream;
     Uint32 frameCount = 0;
+
+    // create tile set
+    TileSet tileSet("tiles", 80, 80, 12);
 
     timerStart(fpsTimer);
     while (!quit)
@@ -58,7 +67,8 @@ int main()
         textTexture->render(renderer, (800 / 2) - textTexture->mWidth / 2, (640 / 6));
 
         // Render sprite
-        texture->render(renderer, (800 / 2) - texture->mWidth / 2, (640 / 2) - texture->mHeight / 2);
+        // texture->render(renderer, (800 / 2) - texture->mWidth / 2, (640 / 2) - texture->mHeight / 2);
+        tileSet.render(renderer, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
 
         // Draw
         SDL_RenderPresent(renderer);
