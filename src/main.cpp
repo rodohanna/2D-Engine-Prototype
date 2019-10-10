@@ -85,7 +85,13 @@ int main()
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Avg FPS: " << frameCount / (timerGetTicks(fpsTimer) / 1000.f);
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, 800 - textTexture->mWidth, 640 - textTexture->mHeight);
+        textTexture->render(renderer, 800 - textTexture->mWidth, 0);
+
+        fpsSStream.str("");
+        fpsSStream.precision(2);
+        fpsSStream << std::fixed << "Player (X: " << player.mBox.x << ", Y: " << player.mBox.y << ")";
+        textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
+        textTexture->render(renderer, 800 - textTexture->mWidth, textTexture->mHeight);
 
         // Render sprite
         // texture->render(renderer, (800 / 2) - texture->mWidth / 2, (640 / 2) - texture->mHeight / 2);

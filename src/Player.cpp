@@ -1,6 +1,6 @@
 #include "Player.h"
 
-const int PLAYER_VEL = 10;
+const int PLAYER_VEL = 5;
 
 Player::Player(Texture *texture) : mTexture(texture)
 {
