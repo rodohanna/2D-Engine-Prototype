@@ -16,7 +16,7 @@ struct TileMapTile
 struct TileMap
 {
     TileMap(TileSet &tileSet, std::string mapPath);
-    void render(SDL_Renderer *renderer, SDL_Rect &camera);
+    int render(SDL_Renderer *renderer, SDL_Rect &camera);
     std::vector<TileMapTile> mTiles;
     int mWidth, mHeight;
 };

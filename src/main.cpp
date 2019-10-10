@@ -79,13 +79,16 @@ int main()
         player.adjustCamera(camera, 800, 640, tileMap.mWidth, tileMap.mHeight);
 
         // Render fps
-        tileMap.render(renderer, camera);
-        player.render(renderer, camera);
+        int numTilesRendered = tileMap.render(renderer, camera);
+        // tileSet.render(renderer, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
+
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Avg FPS: " << frameCount / (timerGetTicks(fpsTimer) / 1000.f);
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
         textTexture->render(renderer, 800 - textTexture->mWidth, 0);
+
+        player.render(renderer, camera);
 
         fpsSStream.str("");
         fpsSStream.precision(2);
@@ -93,9 +96,11 @@ int main()
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
         textTexture->render(renderer, 800 - textTexture->mWidth, textTexture->mHeight);
 
-        // Render sprite
-        // texture->render(renderer, (800 / 2) - texture->mWidth / 2, (640 / 2) - texture->mHeight / 2);
-        // tileSet.render(renderer, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
+        fpsSStream.str("");
+        fpsSStream.precision(2);
+        fpsSStream << std::fixed << "Tiles Rendered: " << numTilesRendered;
+        textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
+        textTexture->render(renderer, 800 - textTexture->mWidth, textTexture->mHeight * 2);
 
         // Draw
         SDL_RenderPresent(renderer);

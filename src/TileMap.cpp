@@ -1,6 +1,7 @@
 #include "TileMap.h"
 
 #include <fstream>
+#include "Physics.h"
 
 TileMap::TileMap(TileSet &tileSet, std::string mapPath)
 {
@@ -20,7 +21,7 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath)
     {
         if (map.fail())
         {
-            printf("breaking early...\n");
+            printf("Reading from map %s failed, quiting early\n", mapPath.c_str());
             break;
         }
         if (tileIndex < 0 || tileIndex > tileSet.mTiles.size() - 1)
@@ -54,10 +55,17 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath)
     printf("Map Width: %d Map Height: %d\n", mWidth, mHeight);
 }
 
-void TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
+int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
 {
+    int numTilesRendered = 0;
     for (auto tile : mTiles)
     {
-        tile.tile->render(renderer, tile.x - camera.x, tile.y - camera.y);
+        SDL_Rect tileBox = {tile.x, tile.y, tile.tile->mBox.w, tile.tile->mBox.h};
+        if (checkCollision(camera, tileBox))
+        {
+            ++numTilesRendered;
+            tile.tile->render(renderer, tile.x - camera.x, tile.y - camera.y);
+        }
     }
+    return numTilesRendered;
 }
