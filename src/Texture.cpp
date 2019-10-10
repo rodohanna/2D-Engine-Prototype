@@ -2,7 +2,18 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-std::unique_ptr<Texture> loadTextureFromFile(std::string path, SDL_Renderer *renderer)
+Texture::Texture(SDL_Texture *texture, int width, int height) : mTexture(texture), mWidth(width), mHeight(height) {}
+
+Texture::~Texture()
+{
+    if (mTexture != NULL)
+    {
+        SDL_DestroyTexture(mTexture);
+        mTexture = NULL;
+    }
+}
+
+std::unique_ptr<Texture> Texture::makeTextureFromFile(std::string path, SDL_Renderer *renderer)
 {
     SDL_Surface *loadedSurface = IMG_Load(path.c_str());
     if (loadedSurface == NULL)
@@ -18,16 +29,12 @@ std::unique_ptr<Texture> loadTextureFromFile(std::string path, SDL_Renderer *ren
         return NULL;
     }
 
-    Texture texture;
-    texture.texture = newTexture;
-    texture.width = loadedSurface->w;
-    texture.height = loadedSurface->h;
-
+    Texture *texture = new Texture(newTexture, loadedSurface->w, loadedSurface->h);
     SDL_FreeSurface(loadedSurface);
-    return std::make_unique<Texture>(texture);
+    return std::unique_ptr<Texture>(texture);
 }
 
-std::unique_ptr<Texture> createTextureFromText(std::string textureText, SDL_Color textColor, TTF_Font *font, SDL_Renderer *renderer)
+std::unique_ptr<Texture> Texture::makeTextureFromText(std::string textureText, SDL_Color textColor, TTF_Font *font, SDL_Renderer *renderer)
 {
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
     if (textSurface == NULL)
@@ -42,36 +49,23 @@ std::unique_ptr<Texture> createTextureFromText(std::string textureText, SDL_Colo
         printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
         return nullptr;
     }
-    Texture texture;
-    texture.texture = newTexture;
-    texture.width = textSurface->w;
-    texture.height = textSurface->h;
-
+    Texture *texture = new Texture(newTexture, textSurface->w, textSurface->h);
     SDL_FreeSurface(textSurface);
-    return std::make_unique<Texture>(texture);
+    return std::unique_ptr<Texture>(texture);
 }
 
-void renderTexture(Texture const *texture, SDL_Renderer *renderer, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip)
+void Texture::render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip)
 {
-    if (texture == NULL)
+    if (mTexture == NULL)
     {
         printf("Warning! A null texture render was attempted.\n");
         return;
     }
-    SDL_Rect renderQuad = {x, y, texture->width, texture->height};
+    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
     if (clip != NULL)
     {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
-    SDL_RenderCopyEx(renderer, texture->texture, clip, &renderQuad, angle, center, flip);
-}
-
-void freeTexture(std::unique_ptr<Texture> &texture)
-{
-    if (texture != NULL)
-    {
-        SDL_DestroyTexture(texture->texture);
-        texture.reset();
-    }
+    SDL_RenderCopyEx(renderer, mTexture, clip, &renderQuad, angle, center, flip);
 }

@@ -2,16 +2,15 @@
 #include "Texture.h"
 #include <unordered_map>
 
-std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap;
+std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
 std::unordered_map<std::string, TTF_Font *> fontMap;
 
 bool loadImageTexture(std::string texturePath, std::string textureKey, SDL_Renderer *renderer)
 {
-    std::unique_ptr<Texture> texture = loadTextureFromFile(texturePath, renderer);
-
+    std::shared_ptr<Texture> texture = Texture::makeTextureFromFile(texturePath, renderer);
     if (texture != nullptr)
     {
-        textureMap[textureKey] = std::move(texture);
+        textureMap[textureKey] = texture;
         return true;
     }
     printf("Error loading texture %s from %s.\n", textureKey.c_str(), texturePath.c_str());
@@ -30,11 +29,11 @@ bool loadFont(std::string fontPath, std::string fontKey, Uint32 fontSize)
     return false;
 }
 
-std::unique_ptr<Texture> getTexture(std::string textureKey)
+std::shared_ptr<Texture> getTexture(std::string textureKey)
 {
     if (textureMap.find(textureKey) != textureMap.end())
     {
-        return std::move(textureMap[textureKey]);
+        return textureMap[textureKey];
     }
     printf("Error finding texture %s.\n", textureKey.c_str());
     return NULL;

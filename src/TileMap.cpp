@@ -14,7 +14,7 @@ TileMap makeTileMap(Uint32 numTiles)
 
 TileMap *loadTileMap(std::string textureKey, Uint32 tileWidth, Uint32 tileHeight)
 {
-    std::unique_ptr<Texture> texture = getTexture(textureKey);
+    std::shared_ptr<Texture> texture = getTexture(textureKey);
     if (texture == nullptr)
     {
         printf("TileMap %s could not be loaded\n", "tiles");
