@@ -6,7 +6,7 @@ struct Player
 {
     Player(Texture *texture);
     void handleInput(SDL_Event &e);
-    void adjustCamera(SDL_Rect &camera, int screenWidth, int screenHeight, int levelWidth, int levelHeight);
+    void adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight);
     void render(SDL_Renderer *renderer, SDL_Rect &camera);
     void update(int levelWidth, int levelHeight);
     int mPositionX, mPositionY, mVelocityX, mVelocityY;

@@ -54,18 +54,18 @@ std::unique_ptr<Texture> Texture::makeTextureFromText(std::string textureText, S
     return std::unique_ptr<Texture>(texture);
 }
 
-void Texture::render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip)
+void Texture::render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip, int scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
 {
     if (mTexture == NULL)
     {
         printf("Warning! A null texture render was attempted.\n");
         return;
     }
-    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
+    SDL_Rect renderQuad = {x, y, mWidth * scale, mHeight * scale};
     if (clip != NULL)
     {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
+        renderQuad.w = clip->w * scale;
+        renderQuad.h = clip->h * scale;
     }
     SDL_RenderCopyEx(renderer, mTexture, clip, &renderQuad, angle, center, flip);
 }

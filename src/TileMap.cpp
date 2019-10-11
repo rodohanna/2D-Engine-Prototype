@@ -3,8 +3,9 @@
 #include <fstream>
 #include "Physics.h"
 
-TileMap::TileMap(TileSet &tileSet, std::string mapPath)
+TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
 {
+    mScale = scale;
     std::ifstream map(mapPath);
     if (map.fail())
     {
@@ -33,22 +34,24 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath)
         Tile *tile = tileSet.mTiles[tileIndex].get();
         TileMapTile tileMapTile;
         printf("Creating tile at (%d, %d) with index %d\n", x, y, tileIndex);
-        tileMapTile.tile = tile;
-        tileMapTile.x = x;
-        tileMapTile.y = y;
-        x += tile->mBox.w;
-        if (x >= mapWidth * tile->mBox.w)
+        tileMapTile.mTile = tile;
+        tileMapTile.mBox.x = x;
+        tileMapTile.mBox.y = y;
+        tileMapTile.mBox.w = tile->mBox.w * mScale;
+        tileMapTile.mBox.h = tile->mBox.h * mScale;
+        x += tileMapTile.mBox.w;
+        if (x >= mapWidth * tileMapTile.mBox.w)
         {
             x = 0;
-            y += tile->mBox.h;
+            y += tileMapTile.mBox.h;
         }
         mTiles.push_back(tileMapTile);
     }
     if (mTiles.size() > 0)
     {
-        Tile *tile = mTiles[0].tile;
-        mWidth = mapWidth * tile->mBox.w;
-        mHeight = mapHeight * tile->mBox.h;
+        Tile *tile = mTiles[0].mTile;
+        mWidth = mapWidth * tile->mBox.w * mScale;
+        mHeight = mapHeight * tile->mBox.h * mScale;
     }
     map.close();
     printf("TileMap loaded %lu tiles\n", mTiles.size());
@@ -60,11 +63,10 @@ int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
     int numTilesRendered = 0;
     for (auto tile : mTiles)
     {
-        SDL_Rect tileBox = {tile.x, tile.y, tile.tile->mBox.w, tile.tile->mBox.h};
-        if (checkCollision(camera, tileBox))
+        if (checkCollision(camera, tile.mBox))
         {
             ++numTilesRendered;
-            tile.tile->render(renderer, tile.x - camera.x, tile.y - camera.y);
+            tile.mTile->render(renderer, tile.mBox.x - camera.x, tile.mBox.y - camera.y, mScale);
         }
     }
     return numTilesRendered;

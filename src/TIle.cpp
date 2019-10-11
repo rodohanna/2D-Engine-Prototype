@@ -2,7 +2,7 @@
 
 Tile::Tile(SDL_Rect clip, SDL_Rect box, Texture *texture) : mClip(clip), mBox(box), mTexture(texture){};
 
-void Tile::render(SDL_Renderer *renderer, int x, int y)
+void Tile::render(SDL_Renderer *renderer, int x, int y, int scale)
 {
-    mTexture->render(renderer, x, y, &mClip);
+    mTexture->render(renderer, x, y, &mClip, scale);
 }

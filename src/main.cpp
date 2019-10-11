@@ -25,6 +25,11 @@ int main()
         printf("Unable to load tiles.\n");
         return 1;
     }
+    if (!loadImageTexture("assets/grass-tiles.png", "grass-tiles", renderer))
+    {
+        printf("Unable to load grass-tiles.\n");
+        return 1;
+    }
     if (!loadImageTexture("assets/character.png", "player", renderer))
     {
         printf("Unable to load player.\n");
@@ -48,8 +53,11 @@ int main()
     Uint32 frameCount = 0;
 
     // create tile set
-    TileSet tileSet("tiles", 80, 80, 12);
-    TileMap tileMap(tileSet, "assets/test-map.map");
+    // TileSet tileSet("tiles", 80, 80, 12);
+    // TileMap tileMap(tileSet, "assets/test-map.map");
+
+    TileSet tileSet("grass-tiles", 32, 32, 5);
+    TileMap tileMap(tileSet, "assets/grass-map.map", 4);
 
     // create player
     Player player(getTexture("player"));
@@ -76,7 +84,7 @@ int main()
 
         // update
         player.update(tileMap.mWidth, tileMap.mHeight);
-        player.adjustCamera(camera, 800, 640, tileMap.mWidth, tileMap.mHeight);
+        player.adjustCamera(camera, tileMap.mWidth, tileMap.mHeight);
 
         // Render fps
         int numTilesRendered = tileMap.render(renderer, camera);

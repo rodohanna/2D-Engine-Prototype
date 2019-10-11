@@ -74,7 +74,7 @@ void Player::render(SDL_Renderer *renderer, SDL_Rect &camera)
     mTexture->render(renderer, mBox.x - camera.x, mBox.y - camera.y, &mClip);
 }
 
-void Player::adjustCamera(SDL_Rect &camera, int screenWidth, int screenHeight, int levelWidth, int levelHeight)
+void Player::adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight)
 {
     camera.x = mBox.x - (camera.w / 2);
     camera.y = mBox.y - (camera.h / 2);

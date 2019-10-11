@@ -6,7 +6,7 @@
 struct Tile
 {
     Tile(SDL_Rect clip, SDL_Rect box, Texture *texture);
-    void render(SDL_Renderer *renderer, int x = 0, int y = 0);
+    void render(SDL_Renderer *renderer, int x = 0, int y = 0, int scale = 1);
     SDL_Rect mClip;
     SDL_Rect mBox;
     Texture *mTexture;
