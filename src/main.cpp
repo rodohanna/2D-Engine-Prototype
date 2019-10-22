@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "Input.h"
+#include "GameEvent.h"
 
 int main()
 {
@@ -85,13 +86,13 @@ int main()
                 if (e.button.button == SDL_BUTTON_LEFT)
                 {
                     registerInput(LEFT_MOUSE_PRESSED);
-                    registerInput(LEFT_MOUSE_JUST_PRESSED);
                 }
             }
             else if (e.type == SDL_MOUSEBUTTONUP)
             {
                 if (e.button.button == SDL_BUTTON_LEFT)
                 {
+                    registerInput(LEFT_MOUSE_JUST_PRESSED);
                     clearInput(LEFT_MOUSE_PRESSED);
                 }
             }
@@ -102,8 +103,21 @@ int main()
         SDL_RenderClear(renderer);
 
         // update
+        int numberOfGameEvents = getGameEventsNum();
+        GameEvent *gameEvents = getGameEvents();
+        for (int i = 0; i < numberOfGameEvents; ++i)
+        {
+            if (gameEvents[i].type == TILE_CLICKED)
+            {
+                TileMapTile *tile = static_cast<TileMapTile *>(gameEvents[i].tileClickedEvent.tile);
+                tile->mTile = tileSet.mTiles[4].get();
+            }
+        }
+
         player.update(tileMap.mWidth, tileMap.mHeight);
         player.adjustCamera(camera, tileMap.mWidth, tileMap.mHeight);
+
+        clearGameEvents();
 
         // Render fps
         int numTilesRendered = tileMap.render(renderer, camera);

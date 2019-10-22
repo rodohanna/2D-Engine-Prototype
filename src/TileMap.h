@@ -9,6 +9,7 @@
 
 struct TileMapTile
 {
+    TileMapTile(Tile *tile, SDL_Rect box);
     Tile *mTile;
     SDL_Rect mBox;
 };
@@ -17,7 +18,7 @@ struct TileMap
 {
     TileMap(TileSet &tileSet, std::string mapPath, int scale = 1);
     int render(SDL_Renderer *renderer, SDL_Rect &camera);
-    std::vector<TileMapTile> mTiles;
+    std::vector<std::unique_ptr<TileMapTile>> mTiles;
     int mWidth, mHeight, mScale;
 };
 

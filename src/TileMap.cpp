@@ -1,7 +1,13 @@
 #include "TileMap.h"
 
 #include <fstream>
+#include <sstream>
+#include "Assets.h"
 #include "Physics.h"
+#include "Input.h"
+#include "GameEvent.h"
+
+TileMapTile::TileMapTile(Tile *tile, SDL_Rect box) : mTile(tile), mBox(box){};
 
 TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
 {
@@ -32,24 +38,19 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
             return;
         }
         Tile *tile = tileSet.mTiles[tileIndex].get();
-        TileMapTile tileMapTile;
         printf("Creating tile at (%d, %d) with index %d\n", x, y, tileIndex);
-        tileMapTile.mTile = tile;
-        tileMapTile.mBox.x = x;
-        tileMapTile.mBox.y = y;
-        tileMapTile.mBox.w = tile->mBox.w * mScale;
-        tileMapTile.mBox.h = tile->mBox.h * mScale;
-        x += tileMapTile.mBox.w;
-        if (x >= mapWidth * tileMapTile.mBox.w)
+        SDL_Rect box = {x, y, tile->mBox.w * mScale, tile->mBox.h * mScale};
+        mTiles.push_back(std::make_unique<TileMapTile>(TileMapTile(tile, box)));
+        x += box.w;
+        if (x >= mapWidth * box.w)
         {
             x = 0;
-            y += tileMapTile.mBox.h;
+            y += box.h;
         }
-        mTiles.push_back(tileMapTile);
     }
     if (mTiles.size() > 0)
     {
-        Tile *tile = mTiles[0].mTile;
+        Tile *tile = mTiles[0]->mTile;
         mWidth = mapWidth * tile->mBox.w * mScale;
         mHeight = mapHeight * tile->mBox.h * mScale;
     }
@@ -61,12 +62,40 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
 int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
 {
     int numTilesRendered = 0;
-    for (auto tile : mTiles)
+    for (int i = 0; i < mTiles.size(); ++i)
     {
-        if (checkCollision(camera, tile.mBox))
+        TileMapTile *tile = mTiles[i].get();
+        if (checkCollision(camera, tile->mBox))
         {
             ++numTilesRendered;
-            tile.mTile->render(renderer, camera, tile.mBox.x - camera.x, tile.mBox.y - camera.y, mScale);
+            int x = tile->mBox.x - camera.x, y = tile->mBox.y - camera.y;
+            tile->mTile->render(renderer, camera, x, y, mScale);
+
+            int mouseX = 0, mouseY = 0;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            SDL_Rect clip = tile->mTile->mClip;
+            int tileWidth = clip.w * mScale, tileHeight = clip.h * mScale;
+            if (x < mouseX && x + tileWidth > mouseX && y < mouseY && y + tileHeight > mouseY)
+            {
+                SDL_Rect rect = {x, y, tileWidth, tileHeight};
+                SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0x7F);
+                SDL_RenderDrawRect(renderer, &rect);
+                std::stringstream ss("");
+                int tileX = (x + camera.x) / tileWidth, tileY = (y + camera.y) / tileHeight;
+                ss << tileX << ", " << tileY;
+                SDL_Color color = {0x11, 0x11, 0x11, 0xFF};
+                auto label = Texture::makeTextureFromText(ss.str(), color, getFont("standard_font"), renderer);
+                label->render(renderer, x + ((tileWidth - label->mWidth) / 2), y + ((tileHeight - label->mHeight) / 2));
+                if (isInputActive(LEFT_MOUSE_JUST_PRESSED))
+                {
+                    GameEvent e;
+                    e.type = TILE_CLICKED;
+                    TileClickedEvent tE = {e.type, tileX, tileY, tile};
+                    e.tileClickedEvent = tE;
+                    registerGameEvent(e);
+                    printf("left mouse just pressed, registering e: %d\n", e.type);
+                }
+            }
         }
     }
     return numTilesRendered;
