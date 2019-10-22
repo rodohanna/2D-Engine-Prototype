@@ -37,6 +37,7 @@ bool initializeSDL(int screenWidth, int screenHeight)
             }
             else
             {
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
                 int imgFlags = IMG_INIT_PNG;

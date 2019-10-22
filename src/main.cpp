@@ -6,6 +6,7 @@
 #include "TileSet.h"
 #include "TileMap.h"
 #include "Player.h"
+#include "Input.h"
 
 int main()
 {
@@ -40,6 +41,8 @@ int main()
         printf("Unable to load font.\n");
     }
 
+    initializeInputEvents();
+
     // Texture *texture = getTexture("apple");
     TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -57,7 +60,7 @@ int main()
     // TileMap tileMap(tileSet, "assets/test-map.map");
 
     TileSet tileSet("grass-tiles", 32, 32, 5);
-    TileMap tileMap(tileSet, "assets/grass-map.map", 4);
+    TileMap tileMap(tileSet, "assets/grass-map.map", 2);
 
     // create player
     Player player(getTexture("player"));
@@ -69,12 +72,28 @@ int main()
     while (!quit)
     {
         timerStart(fpsCapTimer);
+        clearInput(LEFT_MOUSE_JUST_PRESSED);
         while (SDL_PollEvent(&e) != 0)
         {
             //User requests quit
             if (e.type == SDL_QUIT)
             {
                 quit = true;
+            }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (e.button.button == SDL_BUTTON_LEFT)
+                {
+                    registerInput(LEFT_MOUSE_PRESSED);
+                    registerInput(LEFT_MOUSE_JUST_PRESSED);
+                }
+            }
+            else if (e.type == SDL_MOUSEBUTTONUP)
+            {
+                if (e.button.button == SDL_BUTTON_LEFT)
+                {
+                    clearInput(LEFT_MOUSE_PRESSED);
+                }
             }
             player.handleInput(e);
         }
@@ -88,7 +107,8 @@ int main()
 
         // Render fps
         int numTilesRendered = tileMap.render(renderer, camera);
-        // tileSet.render(renderer, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
+        // int numTilesRendered = 0;
+        // tileSet.render(renderer, camera, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
 
         fpsSStream.str("");
         fpsSStream.precision(2);

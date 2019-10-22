@@ -66,7 +66,7 @@ int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
         if (checkCollision(camera, tile.mBox))
         {
             ++numTilesRendered;
-            tile.mTile->render(renderer, tile.mBox.x - camera.x, tile.mBox.y - camera.y, mScale);
+            tile.mTile->render(renderer, camera, tile.mBox.x - camera.x, tile.mBox.y - camera.y, mScale);
         }
     }
     return numTilesRendered;

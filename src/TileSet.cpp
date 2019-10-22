@@ -48,10 +48,10 @@ TileSet::TileSet(std::string textureKey, int tileWidth, int tileHeight, int numT
     printf("Tiles for %s loaded!\n", textureKey.c_str());
 }
 
-void TileSet::render(SDL_Renderer *renderer, int x, int y)
+void TileSet::render(SDL_Renderer *renderer, SDL_Rect camera, int x, int y)
 {
     for (auto &tile : mTiles)
     {
-        tile->render(renderer, x + tile->mBox.x, y + tile->mBox.y);
+        tile->render(renderer, camera, x + tile->mBox.x, y + tile->mBox.y);
     }
 }
