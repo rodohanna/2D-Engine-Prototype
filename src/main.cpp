@@ -88,6 +88,15 @@ int main()
             {
                 quit = true;
             }
+            else if (e.type == SDL_WINDOWEVENT)
+            {
+                if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+                {
+                    camera.w = std::min(e.window.data1, tileMap.mWidth);
+                    camera.h = std::min(e.window.data1, tileMap.mHeight);
+                    SDL_RenderSetLogicalSize(renderer, e.window.data1, e.window.data2);
+                }
+            }
             else if (e.type == SDL_MOUSEMOTION)
             {
                 mouseX = e.button.x;
