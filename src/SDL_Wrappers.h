@@ -4,6 +4,7 @@
 
 bool initializeSDL(int screenWidth, int screenHeight);
 SDL_Renderer *getRenderer();
+SDL_Window *getWindow();
 void quitSDL();
 
 #endif

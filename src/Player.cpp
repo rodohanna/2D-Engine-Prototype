@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <algorithm>
 
 const int PLAYER_VEL = 5;
 
@@ -70,7 +71,6 @@ void Player::update(int levelWidth, int levelHeight)
 
 void Player::render(SDL_Renderer *renderer, SDL_Rect &camera)
 {
-
     mTexture->render(renderer, mBox.x - camera.x, mBox.y - camera.y, &mClip);
 }
 

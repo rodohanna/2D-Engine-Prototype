@@ -21,7 +21,7 @@ bool initializeSDL(int screenWidth, int screenHeight)
             printf("Warning: Linear texture filtering not enabled!");
         }
 
-        window = SDL_CreateWindow("October Hackweek 2019", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow("Simulation Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -62,6 +62,11 @@ bool initializeSDL(int screenWidth, int screenHeight)
 SDL_Renderer *getRenderer()
 {
     return renderer;
+}
+
+SDL_Window *getWindow()
+{
+    return window;
 }
 
 void quitSDL()

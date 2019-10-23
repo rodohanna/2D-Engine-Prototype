@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm>
 #include "SDL_Wrappers.h"
 #include "Assets.h"
 #include "Texture.h"
@@ -9,14 +10,18 @@
 #include "Input.h"
 #include "GameEvent.h"
 
+const int LEVEL_WIDTH = 800;
+const int LEVEL_HEIGHT = 640;
+
 int main()
 {
-    if (!initializeSDL(800, 640))
+    if (!initializeSDL(LEVEL_WIDTH, LEVEL_HEIGHT))
     {
         printf("SDL failed to initialze.\n");
         return 1;
     }
     SDL_Renderer *renderer = getRenderer();
+    SDL_Window *window = getWindow();
     if (!loadImageTexture("assets/apple.png", "apple", renderer))
     {
         printf("Unable to load texture.\n");
@@ -67,8 +72,10 @@ int main()
     Player player(getTexture("player"));
 
     // create camera
-    SDL_Rect camera = {0, 0, 800, 640};
-
+    SDL_Rect camera = {0, 0, LEVEL_WIDTH, LEVEL_HEIGHT};
+    SDL_RenderSetLogicalSize(renderer, camera.w, camera.h);
+    SDL_SetWindowMinimumSize(window, camera.w, camera.h);
+    int mouseX = 0, mouseY = 0;
     timerStart(fpsTimer);
     while (!quit)
     {
@@ -80,6 +87,11 @@ int main()
             if (e.type == SDL_QUIT)
             {
                 quit = true;
+            }
+            else if (e.type == SDL_MOUSEMOTION)
+            {
+                mouseX = e.button.x;
+                mouseY = e.button.y;
             }
             else if (e.type == SDL_MOUSEBUTTONDOWN)
             {
@@ -120,7 +132,7 @@ int main()
         clearGameEvents();
 
         // Render fps
-        int numTilesRendered = tileMap.render(renderer, camera);
+        int numTilesRendered = tileMap.render(renderer, camera, mouseX, mouseY);
         // int numTilesRendered = 0;
         // tileSet.render(renderer, camera, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
 
@@ -128,7 +140,7 @@ int main()
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Avg FPS: " << frameCount / (timerGetTicks(fpsTimer) / 1000.f);
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, 800 - textTexture->mWidth, 0);
+        textTexture->render(renderer, camera.w - textTexture->mWidth, 0);
 
         player.render(renderer, camera);
 
@@ -136,13 +148,13 @@ int main()
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Player (X: " << player.mBox.x << ", Y: " << player.mBox.y << ")";
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, 800 - textTexture->mWidth, textTexture->mHeight);
+        textTexture->render(renderer, camera.w - textTexture->mWidth, textTexture->mHeight);
 
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Tiles Rendered: " << numTilesRendered;
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, 800 - textTexture->mWidth, textTexture->mHeight * 2);
+        textTexture->render(renderer, camera.w - textTexture->mWidth, textTexture->mHeight * 2);
 
         // Draw
         SDL_RenderPresent(renderer);

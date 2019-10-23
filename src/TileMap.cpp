@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include "Assets.h"
 #include "Physics.h"
 #include "Input.h"
@@ -59,7 +60,7 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
     printf("Map Width: %d Map Height: %d\n", mWidth, mHeight);
 }
 
-int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
+int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera, int mouseX, int mouseY)
 {
     int numTilesRendered = 0;
     for (int i = 0; i < mTiles.size(); ++i)
@@ -71,8 +72,6 @@ int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera)
             int x = tile->mBox.x - camera.x, y = tile->mBox.y - camera.y;
             tile->mTile->render(renderer, camera, x, y, mScale);
 
-            int mouseX = 0, mouseY = 0;
-            SDL_GetMouseState(&mouseX, &mouseY);
             SDL_Rect clip = tile->mTile->mClip;
             int tileWidth = clip.w * mScale, tileHeight = clip.h * mScale;
             if (x < mouseX && x + tileWidth > mouseX && y < mouseY && y + tileHeight > mouseY)
