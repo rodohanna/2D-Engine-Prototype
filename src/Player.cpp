@@ -18,16 +18,16 @@ void Player::handleInput(SDL_Event &e)
     {
         switch (e.key.keysym.sym)
         {
-        case SDLK_UP:
+        case SDLK_w:
             mVelocityY -= PLAYER_VEL;
             break;
-        case SDLK_DOWN:
+        case SDLK_s:
             mVelocityY += PLAYER_VEL;
             break;
-        case SDLK_LEFT:
+        case SDLK_a:
             mVelocityX -= PLAYER_VEL;
             break;
-        case SDLK_RIGHT:
+        case SDLK_d:
             mVelocityX += PLAYER_VEL;
             break;
         }
@@ -36,16 +36,16 @@ void Player::handleInput(SDL_Event &e)
     {
         switch (e.key.keysym.sym)
         {
-        case SDLK_UP:
+        case SDLK_w:
             mVelocityY += PLAYER_VEL;
             break;
-        case SDLK_DOWN:
+        case SDLK_s:
             mVelocityY -= PLAYER_VEL;
             break;
-        case SDLK_LEFT:
+        case SDLK_a:
             mVelocityX += PLAYER_VEL;
             break;
-        case SDLK_RIGHT:
+        case SDLK_d:
             mVelocityX -= PLAYER_VEL;
             break;
         }
@@ -76,23 +76,23 @@ void Player::render(SDL_Renderer *renderer, SDL_Rect &camera)
 
 void Player::adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight)
 {
-    camera.x = mBox.x - (camera.w / 2);
-    camera.y = mBox.y - (camera.h / 2);
+    camera.x = mBox.x + (mBox.w / 2) - (camera.w / 2);
+    camera.y = mBox.y + (mBox.h / 2) - (camera.h / 2);
 
-    if (camera.x < 0)
-    {
-        camera.x = 0;
-    }
-    if (camera.x > levelWidth - camera.w)
-    {
-        camera.x = levelWidth - camera.w;
-    }
-    if (camera.y < 0)
-    {
-        camera.y = 0;
-    }
-    if (camera.y > levelHeight - camera.h)
-    {
-        camera.y = levelHeight - camera.h;
-    }
+    // if (camera.x < 0)
+    // {
+    //     camera.x = 0;
+    // }
+    // if (camera.x > levelWidth - camera.w)
+    // {
+    //     camera.x = levelWidth - camera.w;
+    // }
+    // if (camera.y < 0)
+    // {
+    //     camera.y = 0;
+    // }
+    // if (camera.y > levelHeight - camera.h)
+    // {
+    //     camera.y = levelHeight - camera.h;
+    // }
 }
