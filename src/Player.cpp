@@ -52,21 +52,22 @@ void Player::handleInput(SDL_Event &e)
     }
 }
 
-void Player::update(int levelWidth, int levelHeight)
+bool Player::update(GameState &state)
 {
     mBox.x += mVelocityX;
 
-    if ((mBox.x < 0) || (mBox.x + mBox.w > levelWidth))
+    if ((mBox.x < 0) || (mBox.x + mBox.w > state.mapWidth))
     {
         mBox.x -= mVelocityX;
     }
 
     mBox.y += mVelocityY;
 
-    if ((mBox.y < 0) || (mBox.y + mBox.h > levelHeight))
+    if ((mBox.y < 0) || (mBox.y + mBox.h > state.mapHeight))
     {
         mBox.y -= mVelocityY;
     }
+    return true;
 }
 
 void Player::render(SDL_Renderer *renderer, SDL_Rect &camera)

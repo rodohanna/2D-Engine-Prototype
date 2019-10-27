@@ -9,6 +9,8 @@
 #include "Player.h"
 #include "Input.h"
 #include "GameEvent.h"
+#include "GameState.h"
+#include "Plot.h"
 
 const int LEVEL_WIDTH = 800;
 const int LEVEL_HEIGHT = 640;
@@ -66,6 +68,11 @@ int main()
         printf("Unable to load grass-tiles.\n");
         return 1;
     }
+    if (!loadImageTexture("assets/farm/plowed_soil.png", "plowed-soil", renderer))
+    {
+        printf("Unable to load plowed-soil.\n");
+        return 1;
+    }
     if (!loadImageTexture("assets/character.png", "player", renderer))
     {
         printf("Unable to load player.\n");
@@ -93,17 +100,23 @@ int main()
     Uint32 numFramesLastSecond = 60;
 
     // create tile set
-    TileSet tileSet("grass-tiles", 32, 32, 5);
-    TileMap tileMap(tileSet, "assets/grass-map.map", 2);
+    TileSet tileSet("plowed-soil", 32, 32, 18);
+    TileMap tileMap(tileSet, "assets/farm/farm-map.map", 1);
 
-    // create player
-    Player player(getTexture("player"));
-
-    // create camera
-    SDL_Rect camera = {0, 0, LEVEL_WIDTH, LEVEL_HEIGHT};
-    setZoomLevel(1, window, renderer, camera);
+    // set up game state
+    GameState gameState;
+    gameState.camera = {0, 0, LEVEL_WIDTH, LEVEL_HEIGHT};
+    gameState.mapWidth = tileMap.mWidth;
+    gameState.mapHeight = tileMap.mHeight;
+    gameState.mouseX = 0;
+    gameState.mouseY = 0;
+    setZoomLevel(1, window, renderer, gameState.camera);
     SDL_SetWindowMinimumSize(window, LEVEL_WIDTH, LEVEL_HEIGHT);
-    int mouseX = 0, mouseY = 0;
+
+    // set up game objects
+    Player player(getTexture("player"));
+    Plot plot(&tileMap);
+
     timerStart(fpsTimer);
     while (!quit)
     {
@@ -138,27 +151,28 @@ int main()
                     zoomLevel = 1;
                 if (zoomLevel > 3)
                     zoomLevel = 3;
-                setZoomLevel(zoomLevel, window, renderer, camera);
+                setZoomLevel(zoomLevel, window, renderer, gameState.camera);
                 int zoom = getZoom(zoomLevel);
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                mouseX = x / zoom;
-                mouseY = y / zoom;
+                gameState.mouseX = x / zoom;
+                gameState.mouseY = y / zoom;
             }
             else if (e.type == SDL_WINDOWEVENT)
             {
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     int zoom = getZoom(getZoomLevel());
-                    camera.w = e.window.data1 / zoom;
-                    camera.h = e.window.data2 / zoom;
+                    gameState.camera.w = e.window.data1 / zoom;
+                    gameState.camera.h = e.window.data2 / zoom;
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
             {
+                // TODO: Don't wait for mouse motion. Just grab mouse every frame.
                 int zoom = getZoom(getZoomLevel());
-                mouseX = e.button.x / zoom;
-                mouseY = e.button.y / zoom;
+                gameState.mouseX = e.button.x / zoom;
+                gameState.mouseY = e.button.y / zoom;
             }
             else if (e.type == SDL_MOUSEBUTTONDOWN)
             {
@@ -188,20 +202,20 @@ int main()
         {
             if (gameEvents[i].type == TILE_CLICKED)
             {
-                TileMapTile *tile = static_cast<TileMapTile *>(gameEvents[i].tileClickedEvent.tile);
-                tile->mTile = tileSet.mTiles[4].get();
+                // handle game event here
             }
         }
 
-        player.update(tileMap.mWidth, tileMap.mHeight);
-        player.adjustCamera(camera, tileMap.mWidth, tileMap.mHeight);
+        player.update(gameState);
+        player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
+        plot.update(gameState);
 
         clearGameEvents();
 
         // Render
-        int numTilesRendered = tileMap.render(renderer, camera, mouseX, mouseY);
+        int numTilesRendered = tileMap.render(renderer, gameState.camera, gameState.mouseX, gameState.mouseY);
         // int numTilesRendered = 0;
-        // tileSet.render(renderer, camera, (800 / 2) - tileSet.mWidth / 2, (640 / 2) - tileSet.mHeight / 2);
+        // tileSet.render(renderer, camera, (camera.w - tileSet.mWidth) / 2, (camera.h - tileSet.mHeight) / 2);
 
         if (timerGetTicks(fpsTimer) >= 1000)
         {
@@ -209,25 +223,32 @@ int main()
             numFramesLastSecond = frameCount;
         }
 
+        plot.render(renderer, gameState.camera);
+        player.render(renderer, gameState.camera);
+
+        int zoomLevel = getZoomLevel();
+        setZoomLevel(1, window, renderer, gameState.camera);
+
+        SDL_RenderSetScale(renderer, 1.0, 1.0);
+
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << "FPS: " << numFramesLastSecond;
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, camera.w - textTexture->mWidth, 0);
-
-        player.render(renderer, camera);
+        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, 0);
 
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Player (X: " << player.mBox.x << ", Y: " << player.mBox.y << ")";
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, camera.w - textTexture->mWidth, textTexture->mHeight);
+        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight);
 
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << std::fixed << "Tiles Rendered: " << numTilesRendered;
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, camera.w - textTexture->mWidth, textTexture->mHeight * 2);
+        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight * 2);
+        setZoomLevel(zoomLevel, window, renderer, gameState.camera);
 
         // Draw
         SDL_RenderPresent(renderer);

@@ -12,6 +12,7 @@ TileMapTile::TileMapTile(Tile *tile, SDL_Rect box) : mTile(tile), mBox(box){};
 
 TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
 {
+    mTileSet = &tileSet;
     mScale = scale;
     std::ifstream map(mapPath);
     if (map.fail())
@@ -71,31 +72,26 @@ int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera, int mouseX, int mo
             ++numTilesRendered;
             int x = tile->mBox.x - camera.x, y = tile->mBox.y - camera.y;
             tile->mTile->render(renderer, camera, x, y, mScale);
-
-            SDL_Rect clip = tile->mTile->mClip;
-            int tileWidth = clip.w * mScale, tileHeight = clip.h * mScale;
-            if (x < mouseX && x + tileWidth > mouseX && y < mouseY && y + tileHeight > mouseY)
-            {
-                SDL_Rect rect = {x, y, tileWidth, tileHeight};
-                SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0x7F);
-                SDL_RenderDrawRect(renderer, &rect);
-                std::stringstream ss("");
-                int tileX = (x + camera.x) / tileWidth, tileY = (y + camera.y) / tileHeight;
-                ss << tileX << ", " << tileY;
-                SDL_Color color = {0x11, 0x11, 0x11, 0xFF};
-                auto label = Texture::makeTextureFromText(ss.str(), color, getFont("standard_font"), renderer);
-                label->render(renderer, x + ((tileWidth - label->mWidth) / 2), y + ((tileHeight - label->mHeight) / 2));
-                if (isInputActive(LEFT_MOUSE_JUST_PRESSED))
-                {
-                    GameEvent e;
-                    e.type = TILE_CLICKED;
-                    TileClickedEvent tE = {e.type, tileX, tileY, tile};
-                    e.tileClickedEvent = tE;
-                    registerGameEvent(e);
-                    printf("left mouse just pressed, registering e: %d\n", e.type);
-                }
-            }
         }
     }
     return numTilesRendered;
+}
+
+TileMapTile *TileMap::getHoveredTile(GameState &state)
+{
+    for (int i = 0; i < mTiles.size(); ++i)
+    {
+        TileMapTile *tile = mTiles[i].get();
+        if (checkCollision(state.camera, tile->mBox))
+        {
+            int x = tile->mBox.x - state.camera.x, y = tile->mBox.y - state.camera.y;
+
+            int tileWidth = tile->mBox.w * mScale, tileHeight = tile->mBox.h * mScale;
+            if (x < state.mouseX && x + tileWidth > state.mouseX && y < state.mouseY && y + tileHeight > state.mouseY)
+            {
+                return tile;
+            }
+        }
+    }
+    return NULL;
 }
