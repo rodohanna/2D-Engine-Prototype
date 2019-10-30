@@ -56,14 +56,14 @@ bool Player::update(GameState &state)
 {
     mBox.x += mVelocityX;
 
-    if ((mBox.x < 0) || (mBox.x + mBox.w > state.mapWidth))
+    if ((mBox.x < 0) || (mBox.x + mBox.w > state.mapDimensions.x))
     {
         mBox.x -= mVelocityX;
     }
 
     mBox.y += mVelocityY;
 
-    if ((mBox.y < 0) || (mBox.y + mBox.h > state.mapHeight))
+    if ((mBox.y < 0) || (mBox.y + mBox.h > state.mapDimensions.y))
     {
         mBox.y -= mVelocityY;
     }

@@ -34,3 +34,10 @@ bool checkCollision(SDL_Rect &a, SDL_Rect &b)
 
     return true;
 }
+
+bool checkPointInRect(V2 &point, SDL_Rect &rect)
+{
+    int x = point.x;
+    int y = point.y;
+    return rect.x < x && rect.x + rect.w > x && rect.y < y && rect.y + rect.h > y;
+}

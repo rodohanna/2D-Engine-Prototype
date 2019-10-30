@@ -12,6 +12,7 @@
 #include "GameState.h"
 #include "Plot.h"
 #include "EventBus.h"
+#include "Panel.h"
 
 const int LEVEL_WIDTH = 800;
 const int LEVEL_HEIGHT = 640;
@@ -105,10 +106,8 @@ int main()
     // set up game state
     GameState gameState;
     gameState.camera = {0, 0, LEVEL_WIDTH, LEVEL_HEIGHT};
-    gameState.mapWidth = tileMap.mWidth;
-    gameState.mapHeight = tileMap.mHeight;
-    gameState.mouseX = 0;
-    gameState.mouseY = 0;
+    gameState.mapDimensions = {tileMap.mWidth, tileMap.mHeight};
+    gameState.mouseCoords = {0, 0};
     setZoomLevel(1, window, renderer, gameState.camera);
     SDL_SetWindowMinimumSize(window, LEVEL_WIDTH, LEVEL_HEIGHT);
 
@@ -119,6 +118,8 @@ int main()
     // set up game objects
     Player player(getTexture("player"));
     Plot plot(&tileMap);
+    SDL_Rect panelBox = {0, 0, 100, 100};
+    Panel panel(panelBox);
 
     timerStart(fpsTimer);
     while (!quit)
@@ -158,8 +159,8 @@ int main()
                 int zoom = getZoom(zoomLevel);
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                gameState.mouseX = x / zoom;
-                gameState.mouseY = y / zoom;
+                gameState.mouseCoords.x = x / zoom;
+                gameState.mouseCoords.y = y / zoom;
             }
             else if (e.type == SDL_WINDOWEVENT)
             {
@@ -174,8 +175,8 @@ int main()
             {
                 // TODO: Don't wait for mouse motion. Just grab mouse every frame.
                 int zoom = getZoom(getZoomLevel());
-                gameState.mouseX = e.button.x / zoom;
-                gameState.mouseY = e.button.y / zoom;
+                gameState.mouseCoords.x = e.button.x / zoom;
+                gameState.mouseCoords.y = e.button.y / zoom;
             }
             else if (e.type == SDL_MOUSEBUTTONDOWN)
             {
@@ -190,11 +191,11 @@ int main()
                 {
                     registerInput(LEFT_MOUSE_JUST_PRESSED);
                     clearInput(LEFT_MOUSE_PRESSED);
-                    ClickEvent e;
-                    e.eventType = GameEventType::CLICK;
-                    e.clickEventType = ClickEventType::LEFT_MOUSE;
-                    e.handled = false;
-                    publish(e);
+                    // ClickEvent e;
+                    // e.eventType = GameEventType::CLICK;
+                    // e.clickEventType = ClickEventType::LEFT_MOUSE;
+                    // e.handled = false;
+                    // publish(e);
                 }
             }
             player.handleInput(e);
@@ -204,12 +205,15 @@ int main()
         SDL_RenderClear(renderer);
 
         // update
+        // update GUI elements first
+        panel.update(gameState);
+        // everything else after
         player.update(gameState);
         player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
         plot.update(gameState);
 
         // Render
-        int numTilesRendered = tileMap.render(renderer, gameState.camera, gameState.mouseX, gameState.mouseY);
+        int numTilesRendered = tileMap.render(renderer, gameState);
         // int numTilesRendered = 0;
         // tileSet.render(renderer, camera, (camera.w - tileSet.mWidth) / 2, (camera.h - tileSet.mHeight) / 2);
 
@@ -221,6 +225,8 @@ int main()
 
         plot.render(renderer, gameState.camera);
         player.render(renderer, gameState.camera);
+        // render GUI elements last
+        panel.render(renderer, gameState.camera);
 
         int zoomLevel = getZoomLevel();
         setZoomLevel(1, window, renderer, gameState.camera);

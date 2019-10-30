@@ -61,8 +61,9 @@ TileMap::TileMap(TileSet &tileSet, std::string mapPath, int scale)
     printf("Map Width: %d Map Height: %d\n", mWidth, mHeight);
 }
 
-int TileMap::render(SDL_Renderer *renderer, SDL_Rect &camera, int mouseX, int mouseY)
+int TileMap::render(SDL_Renderer *renderer, GameState &state)
 {
+    SDL_Rect camera = state.camera;
     int numTilesRendered = 0;
     for (int i = 0; i < mTiles.size(); ++i)
     {
@@ -87,7 +88,8 @@ TileMapTile *TileMap::getHoveredTile(GameState &state)
             int x = tile->mBox.x - state.camera.x, y = tile->mBox.y - state.camera.y;
 
             int tileWidth = tile->mBox.w * mScale, tileHeight = tile->mBox.h * mScale;
-            if (x < state.mouseX && x + tileWidth > state.mouseX && y < state.mouseY && y + tileHeight > state.mouseY)
+            SDL_Rect tileRect = {x, y, tileWidth, tileHeight};
+            if (checkPointInRect(state.mouseCoords, tileRect))
             {
                 return tile;
             }
