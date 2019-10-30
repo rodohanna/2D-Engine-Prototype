@@ -14,9 +14,10 @@ enum ClickEventType
 
 struct GameEvent
 {
+    virtual ~GameEvent() = default;
     GameEventType eventType;
 };
-struct ClickEvent : public GameEvent
+struct ClickEvent : GameEvent
 {
     ClickEventType clickEventType;
     bool handled;

@@ -6,7 +6,7 @@
 
 Plot::Plot(TileMap *t) : mTileMap(t)
 {
-    subscribe(CLICK, this);
+    subscribe(GameEventType::CLICK, this);
     mDebugRect = {0, 0, 0, 0};
 }
 Plot::~Plot() {}
@@ -43,11 +43,19 @@ void Plot::handleEvent(GameEvent *e, GameState *state)
     case GameEventType::CLICK:
     {
         printf("Plot::handleEvent (CLICK)\n");
-        // ClickEvent *event = static_cast<ClickEvent *>(e);
-        TileMapTile *tile = mTileMap->getHoveredTile(*state);
-        if (tile != NULL)
+        ClickEvent *event = static_cast<ClickEvent *>(e);
+        if (event == NULL)
         {
-            tile->mTile = mTileMap->mTileSet->mTiles[0].get();
+            printf("ERROR: Plot::handleEvent (CLICK) could not be casted.\n");
+        }
+        else
+        {
+            event->handled = true;
+            TileMapTile *tile = mTileMap->getHoveredTile(*state);
+            if (tile != NULL)
+            {
+                tile->mTile = mTileMap->mTileSet->mTiles[0].get();
+            }
         }
         break;
     }

@@ -29,7 +29,7 @@ void publish(GameEvent e)
 }
 void subscribe(GameEventType t, GameEntity *entity)
 {
-    printf("Subscribing func %p for event type %d\n", entity, t);
+    printf("Subscribing entity %p to event type %d\n", entity, t);
     if (subscriptions.find(t) != subscriptions.end())
     {
         subscriptions[t].push_back(entity);
@@ -44,7 +44,7 @@ void subscribe(GameEventType t, GameEntity *entity)
 
 void unsubscribe(GameEventType t, GameEntity *entity)
 {
-    printf("Unsubscribing func %p for event type %d\n", entity, t);
+    printf("Unsubscribing entity %p to event type %d\n", entity, t);
     if (subscriptions.find(t) != subscriptions.end())
     {
         auto it = std::find(subscriptions[t].begin(), subscriptions[t].end(), entity);
