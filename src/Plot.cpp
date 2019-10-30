@@ -1,10 +1,12 @@
 #include "Plot.h"
 #include "Assets.h"
 #include "Input.h"
+#include "EventBus.h"
 #include <sstream>
 
 Plot::Plot(TileMap *t) : mTileMap(t)
 {
+    subscribe(CLICK, this);
     mDebugRect = {0, 0, 0, 0};
 }
 Plot::~Plot() {}
@@ -15,10 +17,6 @@ bool Plot::update(GameState &state)
     {
         mDebugRect = {0, 0, 0, 0};
         return false;
-    }
-    if (isInputActive(LEFT_MOUSE_JUST_PRESSED))
-    {
-        tile->mTile = mTileMap->mTileSet->mTiles[0].get();
     }
     mDebugRect = {tile->mBox.x - state.camera.x, tile->mBox.y - state.camera.y, tile->mBox.w, tile->mBox.h};
     return true;
@@ -37,3 +35,26 @@ void Plot::render(SDL_Renderer *renderer, SDL_Rect &camera)
     auto label = Texture::makeTextureFromText(ss.str(), color, getFont("standard_font"), renderer);
     label->render(renderer, mDebugRect.x + ((mDebugRect.w - label->mWidth) / 2), mDebugRect.y + ((mDebugRect.h - label->mHeight) / 2));
 };
+
+void Plot::handleEvent(GameEvent *e, GameState *state)
+{
+    switch (e->eventType)
+    {
+    case GameEventType::CLICK:
+    {
+        printf("Plot::handleEvent (CLICK)\n");
+        // ClickEvent *event = static_cast<ClickEvent *>(e);
+        TileMapTile *tile = mTileMap->getHoveredTile(*state);
+        if (tile != NULL)
+        {
+            tile->mTile = mTileMap->mTileSet->mTiles[0].get();
+        }
+        break;
+    }
+    default:
+    {
+        printf("Warning Plot::handleEvent could not find an event type to handle\n");
+        break;
+    }
+    }
+}

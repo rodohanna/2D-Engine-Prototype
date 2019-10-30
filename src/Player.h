@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include "GameEntity.h"
 #include "GameState.h"
+#include "GameEvent.h"
 #include "Texture.h"
 struct Player : public GameEntity
 {
@@ -11,6 +12,7 @@ struct Player : public GameEntity
     void adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight);
     void render(SDL_Renderer *renderer, SDL_Rect &camera);
     bool update(GameState &state);
+    void handleEvent(GameEvent *e, GameState *state);
     int mPositionX, mPositionY, mVelocityX, mVelocityY;
     SDL_Rect mBox;
     SDL_Rect mClip;

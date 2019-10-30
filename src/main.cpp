@@ -11,6 +11,7 @@
 #include "GameEvent.h"
 #include "GameState.h"
 #include "Plot.h"
+#include "EventBus.h"
 
 const int LEVEL_WIDTH = 800;
 const int LEVEL_HEIGHT = 640;
@@ -83,8 +84,6 @@ int main()
         printf("Unable to load font.\n");
     }
 
-    initializeInputEvents();
-
     // Texture *texture = getTexture("apple");
     TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -112,6 +111,10 @@ int main()
     gameState.mouseY = 0;
     setZoomLevel(1, window, renderer, gameState.camera);
     SDL_SetWindowMinimumSize(window, LEVEL_WIDTH, LEVEL_HEIGHT);
+
+    // intialize systems
+    initializeInputEvents();
+    initializeEventBus(&gameState);
 
     // set up game objects
     Player player(getTexture("player"));
@@ -187,6 +190,11 @@ int main()
                 {
                     registerInput(LEFT_MOUSE_JUST_PRESSED);
                     clearInput(LEFT_MOUSE_PRESSED);
+                    ClickEvent e;
+                    e.eventType = GameEventType::CLICK;
+                    e.clickEventType = ClickEventType::LEFT_MOUSE;
+                    e.handled = false;
+                    publish(e);
                 }
             }
             player.handleInput(e);
@@ -196,21 +204,9 @@ int main()
         SDL_RenderClear(renderer);
 
         // update
-        int numberOfGameEvents = getGameEventsNum();
-        GameEvent *gameEvents = getGameEvents();
-        for (int i = 0; i < numberOfGameEvents; ++i)
-        {
-            if (gameEvents[i].type == TILE_CLICKED)
-            {
-                // handle game event here
-            }
-        }
-
         player.update(gameState);
         player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
         plot.update(gameState);
-
-        clearGameEvents();
 
         // Render
         int numTilesRendered = tileMap.render(renderer, gameState.camera, gameState.mouseX, gameState.mouseY);

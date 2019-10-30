@@ -73,6 +73,7 @@
         "*.tcc": "cpp",
         "memory_resource": "cpp",
         "cinttypes": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "filesystem": "cpp"
     }
 }

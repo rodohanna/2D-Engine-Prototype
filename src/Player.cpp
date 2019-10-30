@@ -75,6 +75,11 @@ void Player::render(SDL_Renderer *renderer, SDL_Rect &camera)
     mTexture->render(renderer, mBox.x - camera.x, mBox.y - camera.y, &mClip);
 }
 
+void Player::handleEvent(GameEvent *e, GameState *state)
+{
+    return;
+}
+
 void Player::adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight)
 {
     camera.x = mBox.x + (mBox.w / 2) - (camera.w / 2);

@@ -3,26 +3,23 @@
 
 enum GameEventType
 {
-    EMPTY_GAME_EVENT,
-    TILE_CLICKED
+    CLICK
 };
 
-typedef struct
+enum ClickEventType
 {
-    GameEventType type;
-    int tileX, tileY;
-    void *tile;
-} TileClickedEvent;
+    LEFT_MOUSE,
+    RIGHT_MOUSE
+};
 
-typedef union GameEvent {
-    GameEventType type;
-    TileClickedEvent tileClickedEvent;
-} GameEvent;
-
-void initializeGameEvents();
-void registerGameEvent(GameEvent e);
-void clearGameEvents();
-GameEvent *getGameEvents();
-int getGameEventsNum();
+struct GameEvent
+{
+    GameEventType eventType;
+};
+struct ClickEvent : public GameEvent
+{
+    ClickEventType clickEventType;
+    bool handled;
+};
 
 #endif
