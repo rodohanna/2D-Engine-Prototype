@@ -7,15 +7,21 @@
 #include "GameState.h"
 #include "TileMap.h"
 #include "EventBus.h"
+#include "Player.h"
+#include "FarmTile.h"
+#include "Label.h"
 
 struct FarmScene : Subscriber
 {
-    FarmScene(TileMap *tileMap);
+    FarmScene(Player player, TileMap *tileMap);
     ~FarmScene();
     void update(GameState &state);
     void render(SDL_Renderer *renderer, GameState &state);
     void handleEvent(GameEvent *e, GameState *s);
-    std::vector<std::unique_ptr<GameEntity>> mGameEntities;
+
+    Player mPlayer;
+    Label mLabel;
+    std::vector<FarmTile> mFarmTiles;
     std::vector<GameEntity *> mRenderList;
     TileMap *mTileMap;
 };

@@ -14,6 +14,7 @@
 #include "EventBus.h"
 #include "Panel.h"
 #include "FarmScene.h"
+#include "Label.h"
 
 const int LEVEL_WIDTH = 800;
 const int LEVEL_HEIGHT = 640;
@@ -86,8 +87,6 @@ int main()
         printf("Unable to load font.\n");
     }
 
-    // Texture *texture = getTexture("apple");
-    TTF_Font *font = getFont("standard_font");
     SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
     std::unique_ptr<Texture> textTexture;
 
@@ -122,7 +121,10 @@ int main()
     // SDL_Rect panelBox = {0, 0, 100, 100};
     // Panel panel(panelBox);
 
-    FarmScene scene(&tileMap);
+    FarmScene scene(Player(getTexture("player")), &tileMap);
+
+    // set up labels
+    Label fpsLabel;
 
     timerStart(fpsTimer);
     while (!quit)
@@ -271,8 +273,10 @@ int main()
         fpsSStream.str("");
         fpsSStream.precision(2);
         fpsSStream << "FPS: " << numFramesLastSecond;
-        textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, 0);
+        std::string s = fpsSStream.str();
+        Texture *texture = fpsLabel.setText(renderer, color, s);
+        SDL_Rect rect = {gameState.camera.w - texture->mWidth, 0, texture->mWidth, texture->mHeight};
+        fpsLabel.render(renderer, rect);
 
         // fpsSStream.str("");
         // fpsSStream.precision(2);

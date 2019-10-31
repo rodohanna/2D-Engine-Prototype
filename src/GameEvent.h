@@ -29,7 +29,7 @@ struct ClickEvent : GameEvent
 struct TillSoilEvent : GameEvent
 {
     TillSoilEvent(){};
-    ~TillSoilEvent() { printf("TS die\n"); };
+    ~TillSoilEvent(){};
     V2 coords;
 };
 
