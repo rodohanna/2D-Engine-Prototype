@@ -1,9 +1,13 @@
 #ifndef GAMEEVENT_h_
 #define GAMEEVENT_h_
 
+#include "GameTypes.h"
+#include <cstdio>
+
 enum GameEventType
 {
-    CLICK
+    CLICK,
+    TILL_SOIL
 };
 
 enum ClickEventType
@@ -21,6 +25,12 @@ struct ClickEvent : GameEvent
 {
     ClickEventType clickEventType;
     bool handled;
+};
+struct TillSoilEvent : GameEvent
+{
+    TillSoilEvent(){};
+    ~TillSoilEvent() { printf("TS die\n"); };
+    V2 coords;
 };
 
 #endif

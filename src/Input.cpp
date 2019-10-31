@@ -11,6 +11,7 @@ void initializeInputEvents()
     {
         events[i] = EMPTY_INPUT_EVENT;
     }
+    eventsLength = 0;
 }
 
 void registerInput(InputEvent e)

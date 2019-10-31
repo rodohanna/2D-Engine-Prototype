@@ -1,5 +1,8 @@
 #include "Player.h"
 #include <algorithm>
+#include "Input.h"
+#include "EventBus.h"
+#include "GameEvent.h"
 
 const int PLAYER_VEL = 5;
 
@@ -10,50 +13,64 @@ Player::Player(Texture *texture) : mTexture(texture)
     mBox.y = 10;
     mBox.w = mClip.w - mClip.x;
     mBox.h = mClip.h - mClip.y;
+    mVelocityX = 0;
+    mVelocityY = 0;
 };
 
-void Player::handleInput(SDL_Event &e)
+Player::~Player(){};
+
+void Player::handleInput(GameState &state)
 {
-    if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+    if (isInputActive(W_KEY_DOWN))
     {
-        switch (e.key.keysym.sym)
-        {
-        case SDLK_w:
-            mVelocityY -= PLAYER_VEL;
-            break;
-        case SDLK_s:
-            mVelocityY += PLAYER_VEL;
-            break;
-        case SDLK_a:
-            mVelocityX -= PLAYER_VEL;
-            break;
-        case SDLK_d:
-            mVelocityX += PLAYER_VEL;
-            break;
-        }
+        mVelocityY -= PLAYER_VEL;
     }
-    else if (e.type == SDL_KEYUP && e.key.repeat == 0)
+    else if (isInputActive(W_KEY_UP))
     {
-        switch (e.key.keysym.sym)
-        {
-        case SDLK_w:
-            mVelocityY += PLAYER_VEL;
-            break;
-        case SDLK_s:
-            mVelocityY -= PLAYER_VEL;
-            break;
-        case SDLK_a:
-            mVelocityX += PLAYER_VEL;
-            break;
-        case SDLK_d:
-            mVelocityX -= PLAYER_VEL;
-            break;
-        }
+        mVelocityY += PLAYER_VEL;
+    }
+
+    if (isInputActive(S_KEY_DOWN))
+    {
+        mVelocityY += PLAYER_VEL;
+    }
+    else if (isInputActive(S_KEY_UP))
+    {
+        mVelocityY -= PLAYER_VEL;
+    }
+
+    if (isInputActive(A_KEY_DOWN))
+    {
+        mVelocityX -= PLAYER_VEL;
+    }
+    else if (isInputActive(A_KEY_UP))
+    {
+        mVelocityX += PLAYER_VEL;
+    }
+
+    if (isInputActive(D_KEY_DOWN))
+    {
+        mVelocityX += PLAYER_VEL;
+    }
+    else if (isInputActive(D_KEY_UP))
+    {
+        mVelocityX -= PLAYER_VEL;
+    }
+
+    if (isInputActive(LEFT_MOUSE_JUST_PRESSED))
+    {
+        TillSoilEvent *e = new TillSoilEvent();
+        e->eventType = TILL_SOIL;
+        e->coords = state.mouseCoords;
+        printf("player: %d %d\n", state.mouseCoords.x, state.mouseCoords.y);
+        printf("player 2: %d %d\n", e->coords.x, e->coords.y);
+        publish(std::unique_ptr<TillSoilEvent>(e));
     }
 }
 
 bool Player::update(GameState &state)
 {
+    handleInput(state);
     mBox.x += mVelocityX;
 
     if ((mBox.x < 0) || (mBox.x + mBox.w > state.mapDimensions.x))
@@ -67,6 +84,8 @@ bool Player::update(GameState &state)
     {
         mBox.y -= mVelocityY;
     }
+
+    adjustCamera(state.camera, state.mapDimensions.x, state.mapDimensions.y);
     return true;
 }
 

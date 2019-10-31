@@ -74,6 +74,8 @@
         "memory_resource": "cpp",
         "cinttypes": "cpp",
         "list": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "__tree": "cpp",
+        "map": "cpp"
     }
 }

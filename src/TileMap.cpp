@@ -4,7 +4,6 @@
 #include <sstream>
 #include <algorithm>
 #include "Assets.h"
-#include "Physics.h"
 #include "Input.h"
 #include "GameEvent.h"
 
@@ -78,7 +77,7 @@ int TileMap::render(SDL_Renderer *renderer, GameState &state)
     return numTilesRendered;
 }
 
-TileMapTile *TileMap::getHoveredTile(GameState &state)
+TileMapTile *TileMap::getTileFromPosition(GameState &state, V2 &position)
 {
     for (int i = 0; i < mTiles.size(); ++i)
     {
@@ -89,7 +88,7 @@ TileMapTile *TileMap::getHoveredTile(GameState &state)
 
             int tileWidth = tile->mBox.w * mScale, tileHeight = tile->mBox.h * mScale;
             SDL_Rect tileRect = {x, y, tileWidth, tileHeight};
-            if (checkPointInRect(state.mouseCoords, tileRect))
+            if (checkPointInRect(position, tileRect))
             {
                 return tile;
             }

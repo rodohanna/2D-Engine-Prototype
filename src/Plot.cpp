@@ -1,7 +1,6 @@
 #include "Plot.h"
 #include "Assets.h"
 #include "Input.h"
-#include "EventBus.h"
 #include <sstream>
 
 Plot::Plot(TileMap *t) : mTileMap(t)
@@ -12,7 +11,7 @@ Plot::Plot(TileMap *t) : mTileMap(t)
 Plot::~Plot() {}
 bool Plot::update(GameState &state)
 {
-    TileMapTile *tile = mTileMap->getHoveredTile(state);
+    TileMapTile *tile = mTileMap->getTileFromPosition(state, state.mouseCoords);
     if (tile == NULL)
     {
         mDebugRect = {0, 0, 0, 0};
@@ -20,7 +19,7 @@ bool Plot::update(GameState &state)
     }
     if (isInputActive(LEFT_MOUSE_JUST_PRESSED))
     {
-        TileMapTile *tile = mTileMap->getHoveredTile(state);
+        TileMapTile *tile = mTileMap->getTileFromPosition(state, state.mouseCoords);
         if (tile != NULL)
         {
             tile->mTile = mTileMap->mTileSet->mTiles[0].get();

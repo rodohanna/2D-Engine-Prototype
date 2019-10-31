@@ -6,6 +6,7 @@
 
 struct GameEntity
 {
+    virtual ~GameEntity();
     virtual bool update(GameState &state) = 0;
     virtual void render(SDL_Renderer *renderer, SDL_Rect &camera) = 0;
     virtual void handleEvent(GameEvent *e, GameState *state) = 0;

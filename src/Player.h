@@ -8,7 +8,8 @@
 struct Player : public GameEntity
 {
     Player(Texture *texture);
-    void handleInput(SDL_Event &e);
+    ~Player();
+    void handleInput(GameState &state);
     void adjustCamera(SDL_Rect &camera, int levelWidth, int levelHeight);
     void render(SDL_Renderer *renderer, SDL_Rect &camera);
     bool update(GameState &state);

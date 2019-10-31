@@ -7,6 +7,7 @@
 #include "TileSet.h"
 #include "Tile.h"
 #include "GameState.h"
+#include "Physics.h"
 
 struct TileMapTile
 {
@@ -19,7 +20,7 @@ struct TileMap
 {
     TileMap(TileSet &tileSet, std::string mapPath, int scale = 1);
     int render(SDL_Renderer *renderer, GameState &state);
-    TileMapTile *getHoveredTile(GameState &state);
+    TileMapTile *getTileFromPosition(GameState &state, V2 &position);
     std::vector<std::unique_ptr<TileMapTile>> mTiles;
     int mWidth, mHeight, mScale;
     TileSet *mTileSet;

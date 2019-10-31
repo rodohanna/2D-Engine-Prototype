@@ -13,6 +13,7 @@
 #include "Plot.h"
 #include "EventBus.h"
 #include "Panel.h"
+#include "FarmScene.h"
 
 const int LEVEL_WIDTH = 800;
 const int LEVEL_HEIGHT = 640;
@@ -116,10 +117,12 @@ int main()
     initializeEventBus(&gameState);
 
     // set up game objects
-    Player player(getTexture("player"));
-    Plot plot(&tileMap);
-    SDL_Rect panelBox = {0, 0, 100, 100};
-    Panel panel(panelBox);
+    // Player player(getTexture("player"));
+    // Plot plot(&tileMap);
+    // SDL_Rect panelBox = {0, 0, 100, 100};
+    // Panel panel(panelBox);
+
+    FarmScene scene(&tileMap);
 
     timerStart(fpsTimer);
     while (!quit)
@@ -131,7 +134,7 @@ int main()
             timerStart(fpsTimer);
         }
         timerStart(fpsCapTimer);
-        clearInput(LEFT_MOUSE_JUST_PRESSED);
+        initializeInputEvents();
         while (SDL_PollEvent(&e) != 0)
         {
             //User requests quit
@@ -150,6 +153,18 @@ int main()
                 case SDLK_x:
                     --zoomLevel;
                     break;
+                case SDLK_w:
+                    registerInput(W_KEY_DOWN);
+                    break;
+                case SDLK_a:
+                    registerInput(A_KEY_DOWN);
+                    break;
+                case SDLK_s:
+                    registerInput(S_KEY_DOWN);
+                    break;
+                case SDLK_d:
+                    registerInput(D_KEY_DOWN);
+                    break;
                 }
                 if (zoomLevel < 1)
                     zoomLevel = 1;
@@ -161,6 +176,24 @@ int main()
                 SDL_GetMouseState(&x, &y);
                 gameState.mouseCoords.x = x / zoom;
                 gameState.mouseCoords.y = y / zoom;
+            }
+            else if (e.type == SDL_KEYUP && e.key.repeat == 0)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_w:
+                    registerInput(W_KEY_UP);
+                    break;
+                case SDLK_a:
+                    registerInput(A_KEY_UP);
+                    break;
+                case SDLK_s:
+                    registerInput(S_KEY_UP);
+                    break;
+                case SDLK_d:
+                    registerInput(D_KEY_UP);
+                    break;
+                }
             }
             else if (e.type == SDL_WINDOWEVENT)
             {
@@ -198,7 +231,7 @@ int main()
                     // publish(e);
                 }
             }
-            player.handleInput(e);
+            // player.handleInput(e);
         }
         // Clear renderer
         SDL_SetRenderDrawColor(renderer, 0x11, 0x11, 0x11, 0xFF);
@@ -206,14 +239,15 @@ int main()
 
         // update
         // update GUI elements first
-        panel.update(gameState);
+        // panel.update(gameState);
         // everything else after
-        player.update(gameState);
-        player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
-        plot.update(gameState);
+        // player.update(gameState);
+        // player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
+        // plot.update(gameState);
+        scene.update(gameState);
 
         // Render
-        int numTilesRendered = tileMap.render(renderer, gameState);
+        // int numTilesRendered = tileMap.render(renderer, gameState);
         // int numTilesRendered = 0;
         // tileSet.render(renderer, camera, (camera.w - tileSet.mWidth) / 2, (camera.h - tileSet.mHeight) / 2);
 
@@ -223,10 +257,11 @@ int main()
             numFramesLastSecond = frameCount;
         }
 
-        plot.render(renderer, gameState.camera);
-        player.render(renderer, gameState.camera);
+        // plot.render(renderer, gameState.camera);
+        // player.render(renderer, gameState.camera);
         // render GUI elements last
-        panel.render(renderer, gameState.camera);
+        // panel.render(renderer, gameState.camera);
+        scene.render(renderer, gameState);
 
         int zoomLevel = getZoomLevel();
         setZoomLevel(1, window, renderer, gameState.camera);
@@ -239,17 +274,17 @@ int main()
         textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
         textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, 0);
 
-        fpsSStream.str("");
-        fpsSStream.precision(2);
-        fpsSStream << std::fixed << "Player (X: " << player.mBox.x << ", Y: " << player.mBox.y << ")";
-        textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight);
+        // fpsSStream.str("");
+        // fpsSStream.precision(2);
+        // fpsSStream << std::fixed << "Player (X: " << player.mBox.x << ", Y: " << player.mBox.y << ")";
+        // textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
+        // textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight);
 
-        fpsSStream.str("");
-        fpsSStream.precision(2);
-        fpsSStream << std::fixed << "Tiles Rendered: " << numTilesRendered;
-        textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
-        textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight * 2);
+        // fpsSStream.str("");
+        // fpsSStream.precision(2);
+        // fpsSStream << std::fixed << "Tiles Rendered: " << numTilesRendered;
+        // textTexture = Texture::makeTextureFromText(fpsSStream.str(), color, font, renderer);
+        // textTexture->render(renderer, gameState.camera.w - textTexture->mWidth, textTexture->mHeight * 2);
         setZoomLevel(zoomLevel, window, renderer, gameState.camera);
 
         // Draw

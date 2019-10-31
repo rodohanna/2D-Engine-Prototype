@@ -5,8 +5,9 @@
 #include "GameEvent.h"
 #include "GameState.h"
 #include "TileMap.h"
+#include "EventBus.h"
 
-struct Plot : GameEntity
+struct Plot : GameEntity, Subscriber
 {
     Plot(TileMap *t);
     ~Plot();
