@@ -93,7 +93,6 @@ int main()
     bool quit = false;
     SDL_Event e;
     Timer fpsTimer = makeTimer();
-    Timer fpsCapTimer = makeTimer();
     std::stringstream fpsSStream;
     Uint32 frameCount = 0;
     bool restartFpsTimer = false;
@@ -135,7 +134,6 @@ int main()
             frameCount = 0;
             timerStart(fpsTimer);
         }
-        timerStart(fpsCapTimer);
         initializeInputEvents();
         while (SDL_PollEvent(&e) != 0)
         {
@@ -226,11 +224,6 @@ int main()
                 {
                     registerInput(LEFT_MOUSE_JUST_PRESSED);
                     clearInput(LEFT_MOUSE_PRESSED);
-                    // ClickEvent e;
-                    // e.eventType = GameEventType::CLICK;
-                    // e.clickEventType = ClickEventType::LEFT_MOUSE;
-                    // e.handled = false;
-                    // publish(e);
                 }
             }
             // player.handleInput(e);
@@ -240,29 +233,15 @@ int main()
         SDL_RenderClear(renderer);
 
         // update
-        // update GUI elements first
-        // panel.update(gameState);
-        // everything else after
-        // player.update(gameState);
-        // player.adjustCamera(gameState.camera, tileMap.mWidth, tileMap.mHeight);
-        // plot.update(gameState);
         scene.update(gameState);
 
         // Render
-        // int numTilesRendered = tileMap.render(renderer, gameState);
-        // int numTilesRendered = 0;
-        // tileSet.render(renderer, camera, (camera.w - tileSet.mWidth) / 2, (camera.h - tileSet.mHeight) / 2);
-
         if (timerGetTicks(fpsTimer) >= 1000)
         {
             restartFpsTimer = true;
             numFramesLastSecond = frameCount;
         }
 
-        // plot.render(renderer, gameState.camera);
-        // player.render(renderer, gameState.camera);
-        // render GUI elements last
-        // panel.render(renderer, gameState.camera);
         scene.render(renderer, gameState);
 
         int zoomLevel = getZoomLevel();
