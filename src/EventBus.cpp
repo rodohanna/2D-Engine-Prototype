@@ -1,57 +1,49 @@
 #include "EventBus.h"
+#include <stdio.h>
+#include <memory>
 
-#include <unordered_map>
-#include <vector>
-
-GameState *state = NULL;
-std::unordered_map<GameEventType, std::vector<Subscriber *>> subscriptions;
-
-void initializeEventBus(GameState *s)
+EventBus::EventBus() : renderQueueLength(0)
 {
-    state = s;
 }
 
-void publish(std::unique_ptr<GameEvent> e)
+EventBus::~EventBus()
 {
-    printf("Event published with type %d\n", e->eventType);
-    if (subscriptions.find(e->eventType) != subscriptions.end())
-    {
-        auto entities = subscriptions[e->eventType];
-        for (auto entity : entities)
-        {
-            entity->handleEvent(e.get(), state);
-        }
-    }
-    else
-    {
-        printf("No subscriptions for type %d found.\n", e->eventType);
-    }
 }
 
-void subscribe(GameEventType t, Subscriber *entity)
+void EventBus::publishRenderEvent(const RenderEvent &e)
 {
-    printf("Subscribing entity %p to event type %d\n", entity, t);
-    if (subscriptions.find(t) != subscriptions.end())
+    if (renderQueueLength == RENDER_QUEUE_SIZE - 1)
     {
-        subscriptions[t].push_back(entity);
+        printf("Warning: Render Event Queue is full. Consider increasing Queue size from %zu.\n", RENDER_QUEUE_SIZE);
+        return;
     }
-    else
+    renderQueue[renderQueueLength] = e;
+    ++renderQueueLength;
+}
+
+void EventBus::subscribeToRenderEvents(IRenderEventSubscriber *subscriber)
+{
+    this->renderEventSubscribers.push_back(subscriber);
+}
+
+void EventBus::unsubscribeToRenderEvents(IRenderEventSubscriber *subscriber)
+{
+    auto it = std::find(this->renderEventSubscribers.begin(), this->renderEventSubscribers.end(), subscriber);
+    if (it != this->renderEventSubscribers.end())
     {
-        auto vec = std::vector<Subscriber *>();
-        vec.push_back(entity);
-        subscriptions[t] = vec;
+        this->renderEventSubscribers.erase(it);
     }
 }
 
-void unsubscribe(GameEventType t, Subscriber *entity)
+void EventBus::notify()
 {
-    printf("Unsubscribing entity %p to event type %d\n", entity, t);
-    if (subscriptions.find(t) != subscriptions.end())
+    for (auto it = this->renderEventSubscribers.begin(); it != this->renderEventSubscribers.end(); ++it)
     {
-        auto it = std::find(subscriptions[t].begin(), subscriptions[t].end(), entity);
-        if (it != subscriptions[t].end())
-        {
-            subscriptions[t].erase(it);
-        }
+        (*it)->handleRenderEvents(this->renderQueue, this->renderQueueLength);
     }
+}
+
+void EventBus::clear()
+{
+    renderQueueLength = 0;
 }

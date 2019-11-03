@@ -1,20 +1,28 @@
 #ifndef EVENTBUS_h_
 #define EVENTBUS_h_
 
-#include "GameEvent.h"
-#include "GameEntity.h"
-#include "GameState.h"
-#include <memory>
+#include <vector>
+#include "Events.h"
 
-struct Subscriber
+const static size_t RENDER_QUEUE_SIZE = 2048;
+
+struct IRenderEventSubscriber
 {
-    virtual ~Subscriber() = default;
-    virtual void handleEvent(GameEvent *e, GameState *s) = 0;
+    virtual ~IRenderEventSubscriber() = default;
+    virtual void handleRenderEvents(const RenderEvent *, size_t) = 0;
 };
-
-void initializeEventBus(GameState *s);
-void publish(std::unique_ptr<GameEvent> e);
-void subscribe(GameEventType t, Subscriber *entity);
-void unsubscribe(GameEventType t, Subscriber *entity);
+struct EventBus
+{
+    EventBus();
+    ~EventBus();
+    void publishRenderEvent(const RenderEvent &e);
+    void subscribeToRenderEvents(IRenderEventSubscriber *);
+    void unsubscribeToRenderEvents(IRenderEventSubscriber *);
+    void notify();
+    void clear();
+    std::vector<IRenderEventSubscriber *> renderEventSubscribers;
+    RenderEvent renderQueue[RENDER_QUEUE_SIZE];
+    size_t renderQueueLength;
+};
 
 #endif
