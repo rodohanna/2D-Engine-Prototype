@@ -1,5 +1,6 @@
 #include "SDLWrapper.h"
 #include "EventBus.h"
+#include "InputSystem.h"
 #include "RenderSystem.h"
 #include "Events.h"
 
@@ -15,19 +16,24 @@ int main()
     // initialize systems
     EventBus eventBus;
     RenderSystem renderSystem(sdl.renderer, &eventBus);
-    // prepare game loop
-    bool quit = false;
-    SDL_Event e;
+    InputSystem inputSystem(&eventBus);
     // start game loop
-    while (!quit)
+    while (!inputSystem.quit)
     {
-        while (SDL_PollEvent(&e) != 0)
-        {
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-        }
+        /** 
+         * GL Structure:
+         * 
+         * Collect Input Events
+         * Notify Input Event Subscribers
+         * 
+         * Update Game Objects
+         * Notify Game Object Subscribers
+         * 
+         * Notify Render Event Subscribers
+         **/
+
+        inputSystem.collectInputEvents();
+        eventBus.notifyInputEventSubscribers();
         RenderEvent e;
         e.type = RENDER_RECTANGLE;
         e.data.renderRectangleEvent.rect = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
@@ -43,7 +49,7 @@ int main()
         eventBus.publishRenderEvent(e);
         eventBus.publishRenderEvent(e1);
         eventBus.publishRenderEvent(e2);
-        eventBus.notify();
+        eventBus.notifyRenderEventSubscribers();
         eventBus.clear();
     }
     return 0;

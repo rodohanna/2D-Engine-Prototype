@@ -1,5 +1,5 @@
-#ifndef DRAW_h_
-#define DRAW_h_
+#ifndef RENDERSYSTEM_h_
+#define RENDERSYSTEM_h_
 
 #include <SDL2/SDL.h>
 #include "EventBus.h"
