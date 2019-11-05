@@ -4,12 +4,11 @@
 #include <SDL2/SDL.h>
 #include "EventBus.h"
 
-struct InputSystem : IInputEventSubscriber
+struct InputSystem
 {
     InputSystem(EventBus *);
     ~InputSystem();
     void collectInputEvents();
-    void handleInputEvents(const InputEvent *, size_t);
     EventBus *eventBus;
     bool quit;
 };

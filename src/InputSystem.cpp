@@ -2,11 +2,9 @@
 
 InputSystem::InputSystem(EventBus *eB) : eventBus(eB), quit(false)
 {
-    eB->subscribeToInputEvents(this);
 }
 InputSystem::~InputSystem()
 {
-    eventBus->unsubscribeToInputEvents(this);
 }
 void InputSystem::collectInputEvents()
 {
@@ -64,22 +62,6 @@ void InputSystem::collectInputEvents()
                 eventBus->publishInputEvent(iE);
                 break;
             }
-        }
-    }
-}
-
-void InputSystem::handleInputEvents(const InputEvent *inputEvents, size_t length)
-{
-    for (size_t i = 0; i < length; ++i)
-    {
-        InputEvent e = inputEvents[i];
-        if (e.type == KEY_DOWN && e.data.keyEvent.key == W_KEY)
-        {
-            printf("W down\n");
-        }
-        else if (e.type == KEY_UP && e.data.keyEvent.key == W_KEY)
-        {
-            printf("W up\n");
         }
     }
 }

@@ -3,6 +3,8 @@
 #include "InputSystem.h"
 #include "RenderSystem.h"
 #include "Events.h"
+#include "GameTypes.h"
+#include "Player.h"
 
 int main()
 {
@@ -17,6 +19,9 @@ int main()
     EventBus eventBus;
     RenderSystem renderSystem(sdl.renderer, &eventBus);
     InputSystem inputSystem(&eventBus);
+    Rect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
+    Color color = {0xFF, 0xFF, 0xFF, 0xFF};
+    Player player(&eventBus, box, color);
     // start game loop
     while (!inputSystem.quit)
     {
@@ -34,21 +39,7 @@ int main()
 
         inputSystem.collectInputEvents();
         eventBus.notifyInputEventSubscribers();
-        RenderEvent e;
-        e.type = RENDER_RECTANGLE;
-        e.data.renderRectangleEvent.rect = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
-        e.data.renderRectangleEvent.color = {0xFF, 0xFF, 0xFF, 0xFF};
-        RenderEvent e1;
-        e1.type = RENDER_RECTANGLE;
-        e1.data.renderRectangleEvent.rect = {0, (640 - 100) / 2, 100, 100};
-        e1.data.renderRectangleEvent.color = {0xFF, 0x00, 0xFF, 0xFF};
-        RenderEvent e2;
-        e2.type = RENDER_RECTANGLE;
-        e2.data.renderRectangleEvent.rect = {(800 - 100), (640 - 100) / 2, 100, 100};
-        e2.data.renderRectangleEvent.color = {0xFF, 0xFF, 0x00, 0xFF};
-        eventBus.publishRenderEvent(e);
-        eventBus.publishRenderEvent(e1);
-        eventBus.publishRenderEvent(e2);
+        player.update();
         eventBus.notifyRenderEventSubscribers();
         eventBus.clear();
     }

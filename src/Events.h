@@ -2,6 +2,7 @@
 #define EVENTS_h_
 
 #include <SDL2/SDL.h>
+#include "GameTypes.h"
 
 enum InputEventType
 {
@@ -37,8 +38,8 @@ enum RenderEventType
 
 struct RenderRectangleEvent
 {
-    SDL_Rect rect;
-    SDL_Color color;
+    Rect rect;
+    Color color;
 };
 
 struct RenderTextureEvent
