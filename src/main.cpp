@@ -26,7 +26,6 @@ int main()
     // start game loop
     double updateRate = 60;
     int64_t desiredFrameTime = SDL_GetPerformanceFrequency() / updateRate;
-    int64_t desiredFrameTimeUpperBound = SDL_GetPerformanceFrequency() / (updateRate + 2);
     int64_t prevFrameTime = SDL_GetPerformanceCounter();
     int64_t frameAccumulator = 0;
     while (!inputSystem.quit)
@@ -39,7 +38,7 @@ int main()
             int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / SDL_GetPerformanceFrequency();
             if (millis >= 10)
             {
-                SDL_Delay(5);
+                SDL_Delay(4);
             }
             continue;
         }
@@ -73,7 +72,7 @@ int main()
         eventBus.notifyInputEventSubscribers();
         eventBus.clearInputEvents();
         int i = 0;
-        while (frameAccumulator >= desiredFrameTimeUpperBound)
+        while (frameAccumulator >= desiredFrameTime)
         {
             i++;
             eventBus.clearRenderEvents();
