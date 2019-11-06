@@ -38,7 +38,8 @@ enum RenderEventType
 
 struct RenderRectangleEvent
 {
-    Rect rect;
+    FRect prev;
+    FRect now;
     Color color;
 };
 

@@ -5,8 +5,9 @@
 SDLWrapper::SDLWrapper() {}
 SDLWrapper::~SDLWrapper() {}
 
-bool SDLWrapper::initializeSDL(size_t screenWidth, size_t screenHeight)
+bool SDLWrapper::initializeSDL(size_t screenWidth, size_t screenHeight, bool vsync)
 {
+    this->vsync = vsync;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
@@ -28,7 +29,12 @@ bool SDLWrapper::initializeSDL(size_t screenWidth, size_t screenHeight)
         }
         else
         {
-            this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+            Uint32 flags = SDL_RENDERER_ACCELERATED;
+            if (this->vsync)
+            {
+                flags |= SDL_RENDERER_PRESENTVSYNC;
+            }
+            this->renderer = SDL_CreateRenderer(this->window, -1, flags);
             if (this->renderer == NULL)
             {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());

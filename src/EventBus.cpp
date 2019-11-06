@@ -68,16 +68,20 @@ void EventBus::unsubscribeToRenderEvents(IRenderEventSubscriber *subscriber)
     }
 }
 
-void EventBus::notifyRenderEventSubscribers()
+void EventBus::notifyRenderEventSubscribers(double alpha)
 {
     for (auto it = this->renderEventSubscribers.begin(); it != this->renderEventSubscribers.end(); ++it)
     {
-        (*it)->handleRenderEvents(this->renderQueue, this->renderQueueLength);
+        (*it)->handleRenderEvents(this->renderQueue, this->renderQueueLength, alpha);
     }
 }
 
-void EventBus::clear()
+void EventBus::clearInputEvents()
 {
     inputQueueLength = 0;
+}
+
+void EventBus::clearRenderEvents()
+{
     renderQueueLength = 0;
 }

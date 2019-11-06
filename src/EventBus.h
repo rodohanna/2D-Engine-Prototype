@@ -16,7 +16,7 @@ struct IInputEventSubscriber
 struct IRenderEventSubscriber
 {
     virtual ~IRenderEventSubscriber() = default;
-    virtual void handleRenderEvents(const RenderEvent *, size_t) = 0;
+    virtual void handleRenderEvents(const RenderEvent *, size_t, double) = 0;
 };
 struct EventBus
 {
@@ -31,9 +31,10 @@ struct EventBus
     void publishRenderEvent(const RenderEvent &e);
     void subscribeToRenderEvents(IRenderEventSubscriber *);
     void unsubscribeToRenderEvents(IRenderEventSubscriber *);
-    void notifyRenderEventSubscribers();
+    void notifyRenderEventSubscribers(double alpha);
 
-    void clear();
+    void clearInputEvents();
+    void clearRenderEvents();
     std::vector<IInputEventSubscriber *> inputEventSubscribers;
     std::vector<IRenderEventSubscriber *> renderEventSubscribers;
     InputEvent inputQueue[INPUT_QUEUE_SIZE];

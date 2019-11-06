@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(EventBus *eB, const Rect &r, const Color &c) : eventBus(eB), box(r), color(c)
+Player::Player(EventBus *eB, const FRect &r, const Color &c) : eventBus(eB), box(r), color(c)
 {
     eB->subscribeToInputEvents(this);
 }
@@ -8,27 +8,29 @@ Player::~Player()
 {
     this->eventBus->unsubscribeToInputEvents(this);
 }
+const double SPEED = 5.0;
 void Player::update()
 {
+    RenderEvent e;
+    e.type = RENDER_RECTANGLE;
+    e.data.renderRectangleEvent.prev = this->box;
     if (actions[PlayerActions::MOVE_UP])
     {
-        this->box.y -= 5;
+        this->box.y -= SPEED;
     }
     if (actions[PlayerActions::MOVE_DOWN])
     {
-        this->box.y += 5;
+        this->box.y += SPEED;
     }
     if (actions[PlayerActions::MOVE_LEFT])
     {
-        this->box.x -= 5;
+        this->box.x -= SPEED;
     }
     if (actions[PlayerActions::MOVE_RIGHT])
     {
-        this->box.x += 5;
+        this->box.x += SPEED;
     }
-    RenderEvent e;
-    e.type = RENDER_RECTANGLE;
-    e.data.renderRectangleEvent.rect = this->box;
+    e.data.renderRectangleEvent.now = this->box;
     e.data.renderRectangleEvent.color = this->color;
     eventBus->publishRenderEvent(e);
 }

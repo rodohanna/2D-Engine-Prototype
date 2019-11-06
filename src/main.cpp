@@ -5,6 +5,7 @@
 #include "Events.h"
 #include "GameTypes.h"
 #include "Player.h"
+#include <algorithm>
 
 int main()
 {
@@ -19,12 +20,32 @@ int main()
     EventBus eventBus;
     RenderSystem renderSystem(sdl.renderer, &eventBus);
     InputSystem inputSystem(&eventBus);
-    Rect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
-    Color color = {0xFF, 0xFF, 0xFF, 0xFF};
+    FRect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
+    Color color = {0x11, 0x11, 0xFF, 0xFF};
     Player player(&eventBus, box, color);
     // start game loop
+    double updateRate = 60;
+    int64_t desiredFrameRate = SDL_GetPerformanceFrequency() / updateRate;
+    int64_t prevFrameTime = SDL_GetPerformanceCounter();
+    int64_t frameAccumulator = 0;
     while (!inputSystem.quit)
     {
+        int64_t currentFrameTime = SDL_GetPerformanceCounter();
+        int64_t deltaTime = currentFrameTime - prevFrameTime;
+        prevFrameTime = currentFrameTime;
+
+        //handle unexpected timer anomalies (overflow, extra slow frames, etc)
+        if (deltaTime > desiredFrameRate * 8)
+        {
+            deltaTime = desiredFrameRate;
+        }
+        if (deltaTime < 0)
+        {
+            deltaTime = 0;
+        }
+
+        frameAccumulator += deltaTime;
+
         /** 
          * GL Structure:
          * 
@@ -39,9 +60,18 @@ int main()
 
         inputSystem.collectInputEvents();
         eventBus.notifyInputEventSubscribers();
-        player.update();
-        eventBus.notifyRenderEventSubscribers();
-        eventBus.clear();
+        eventBus.clearInputEvents();
+
+        while (frameAccumulator >= desiredFrameRate)
+        {
+            eventBus.clearRenderEvents();
+            player.update();
+            frameAccumulator -= desiredFrameRate;
+        }
+
+        double alpha = (double)frameAccumulator / (double)desiredFrameRate;
+
+        eventBus.notifyRenderEventSubscribers(alpha);
     }
     return 0;
 }

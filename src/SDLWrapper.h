@@ -6,9 +6,10 @@ struct SDLWrapper
 {
     SDLWrapper();
     ~SDLWrapper();
-    bool initializeSDL(size_t screenWidth, size_t screenHeight);
+    bool initializeSDL(size_t screenWidth, size_t screenHeight, bool vsync = true);
     SDL_Renderer *renderer;
     SDL_Window *window;
+    bool vsync;
 };
 
 #endif
