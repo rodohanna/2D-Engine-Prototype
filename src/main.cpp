@@ -25,19 +25,30 @@ int main()
     Player player(&eventBus, box, color);
     // start game loop
     double updateRate = 60;
-    int64_t desiredFrameRate = SDL_GetPerformanceFrequency() / updateRate;
+    int64_t desiredFrameTime = SDL_GetPerformanceFrequency() / updateRate;
+    int64_t desiredFrameTimeUpperBound = SDL_GetPerformanceFrequency() / (updateRate + 2);
     int64_t prevFrameTime = SDL_GetPerformanceCounter();
     int64_t frameAccumulator = 0;
     while (!inputSystem.quit)
     {
         int64_t currentFrameTime = SDL_GetPerformanceCounter();
         int64_t deltaTime = currentFrameTime - prevFrameTime;
+        if (deltaTime < desiredFrameTime)
+        {
+
+            int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / SDL_GetPerformanceFrequency();
+            if (millis >= 10)
+            {
+                SDL_Delay(5);
+            }
+            continue;
+        }
         prevFrameTime = currentFrameTime;
 
         //handle unexpected timer anomalies (overflow, extra slow frames, etc)
-        if (deltaTime > desiredFrameRate * 8)
+        if (deltaTime > desiredFrameTime * 8)
         {
-            deltaTime = desiredFrameRate;
+            deltaTime = desiredFrameTime;
         }
         if (deltaTime < 0)
         {
@@ -61,17 +72,16 @@ int main()
         inputSystem.collectInputEvents();
         eventBus.notifyInputEventSubscribers();
         eventBus.clearInputEvents();
-
-        while (frameAccumulator >= desiredFrameRate)
+        int i = 0;
+        while (frameAccumulator >= desiredFrameTimeUpperBound)
         {
+            i++;
             eventBus.clearRenderEvents();
             player.update();
-            frameAccumulator -= desiredFrameRate;
+            frameAccumulator -= desiredFrameTime;
         }
-
-        double alpha = (double)frameAccumulator / (double)desiredFrameRate;
-
-        eventBus.notifyRenderEventSubscribers(alpha);
+        printf("%d", i);
+        eventBus.notifyRenderEventSubscribers(1.0);
     }
     return 0;
 }
