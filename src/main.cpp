@@ -20,20 +20,34 @@ int main()
     EventBus eventBus;
     RenderSystem renderSystem(sdl.renderer, &eventBus);
     InputSystem inputSystem(&eventBus);
-    FRect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
+    Rect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
     Color color = {0x11, 0x11, 0xFF, 0xFF};
     Player player(&eventBus, box, color);
     // start game loop
-    double updateRate = 60;
+    SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
+    if (SDL_GetDisplayMode(0, 0, &mode) != 0)
+    {
+        SDL_Log("SDL_GetDisplayMode failed: %s", SDL_GetError());
+        return 1;
+    }
     int64_t performanceFrequency = SDL_GetPerformanceFrequency();
-    int64_t desiredFrameTime = performanceFrequency / updateRate;
+    bool refreshRateSpecified = false;
+    double ts = 1.f / 60.f;
+    int64_t desiredFrameTime = performanceFrequency / 60;
+    if (mode.refresh_rate > 0 && sdl.vsync)
+    {
+        ts = 1.f / (double)mode.refresh_rate;
+        desiredFrameTime = performanceFrequency / mode.refresh_rate;
+        refreshRateSpecified = true;
+    }
+    printf("Initializing with ts: %f\n", ts);
+    printf("Refresh rate: %d\n", mode.refresh_rate);
     int64_t prevFrameTime = SDL_GetPerformanceCounter();
-    int64_t frameAccumulator = 0;
     while (!inputSystem.quit)
     {
         int64_t currentFrameTime = SDL_GetPerformanceCounter();
         int64_t deltaTime = currentFrameTime - prevFrameTime;
-        if (deltaTime < desiredFrameTime)
+        if (!refreshRateSpecified && deltaTime < desiredFrameTime)
         {
             int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / performanceFrequency;
             if (millis >= 10)
@@ -54,40 +68,12 @@ int main()
             deltaTime = 0;
         }
 
-        frameAccumulator += deltaTime;
-
-        /** 
-         * GL Structure:
-         * 
-         * Collect Input Events
-         * Notify Input Event Subscribers
-         * 
-         * Update Game Objects
-         * Notify Game Object Subscribers
-         * 
-         * Notify Render Event Subscribers
-         **/
-
+        eventBus.clearInputEvents();
         inputSystem.collectInputEvents();
         eventBus.notifyInputEventSubscribers();
-        eventBus.clearInputEvents();
-        int i = 0;
-        while (frameAccumulator >= desiredFrameTime)
-        {
-            i++;
-            eventBus.clearRenderEvents();
-            player.update();
-            frameAccumulator -= desiredFrameTime;
-        }
-        printf("%d", i);
-        // int64_t current = SDL_GetPerformanceCounter();
-        // int64_t d2 = current - currentFrameTime;
-        // int64_t fps = SDL_GetPerformanceFrequency() / 30;
-        // while (d2 < fps)
-        // {
-        //     d2 = SDL_GetPerformanceCounter() - currentFrameTime;
-        //     continue;
-        // }
+
+        eventBus.clearRenderEvents();
+        player.update(ts);
         eventBus.notifyRenderEventSubscribers(1.0);
     }
     return 0;

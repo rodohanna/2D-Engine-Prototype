@@ -15,12 +15,12 @@ enum PlayerActions
 
 struct Player : IInputEventSubscriber
 {
-    Player(EventBus *, const FRect &, const Color &);
+    Player(EventBus *, const Rect &, const Color &);
     ~Player();
-    void update();
+    void update(double ts);
     void handleInputEvents(const InputEvent *, size_t);
     EventBus *eventBus;
-    FRect box;
+    Rect box;
     Color color;
     bool actions[TOTAL_PLAYER_ACTIONS];
 };
