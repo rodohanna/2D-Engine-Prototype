@@ -25,7 +25,8 @@ int main()
     Player player(&eventBus, box, color);
     // start game loop
     double updateRate = 60;
-    int64_t desiredFrameTime = SDL_GetPerformanceFrequency() / updateRate;
+    int64_t performanceFrequency = SDL_GetPerformanceFrequency();
+    int64_t desiredFrameTime = performanceFrequency / updateRate;
     int64_t prevFrameTime = SDL_GetPerformanceCounter();
     int64_t frameAccumulator = 0;
     while (!inputSystem.quit)
@@ -34,8 +35,7 @@ int main()
         int64_t deltaTime = currentFrameTime - prevFrameTime;
         if (deltaTime < desiredFrameTime)
         {
-
-            int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / SDL_GetPerformanceFrequency();
+            int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / performanceFrequency;
             if (millis >= 10)
             {
                 SDL_Delay(4);
@@ -80,6 +80,14 @@ int main()
             frameAccumulator -= desiredFrameTime;
         }
         printf("%d", i);
+        // int64_t current = SDL_GetPerformanceCounter();
+        // int64_t d2 = current - currentFrameTime;
+        // int64_t fps = SDL_GetPerformanceFrequency() / 30;
+        // while (d2 < fps)
+        // {
+        //     d2 = SDL_GetPerformanceCounter() - currentFrameTime;
+        //     continue;
+        // }
         eventBus.notifyRenderEventSubscribers(1.0);
     }
     return 0;
