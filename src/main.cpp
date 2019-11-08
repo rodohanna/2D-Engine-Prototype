@@ -7,6 +7,11 @@
 #include "Player.h"
 #include <algorithm>
 
+double SDL_GetSecondsElapsed(int64_t old_counter, int64_t current_counter)
+{
+    return ((double)(current_counter - old_counter) / (double)(SDL_GetPerformanceFrequency()));
+}
+
 int main()
 {
     // initialize SDL
@@ -17,12 +22,12 @@ int main()
         return 1;
     }
     // initialize systems
-    EventBus eventBus;
-    RenderSystem renderSystem(sdl.renderer, &eventBus);
-    InputSystem inputSystem(&eventBus);
+    EventBus event_bus;
+    RenderSystem render_system(sdl.renderer, &event_bus);
+    InputSystem input_system(&event_bus);
     Rect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
     Color color = {0x11, 0x11, 0xFF, 0xFF};
-    Player player(&eventBus, box, color);
+    Player player(&event_bus, box, color);
     // start game loop
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)
@@ -30,51 +35,42 @@ int main()
         SDL_Log("SDL_GetDisplayMode failed: %s", SDL_GetError());
         return 1;
     }
-    int64_t performanceFrequency = SDL_GetPerformanceFrequency();
-    bool refreshRateSpecified = false;
     double ts = 1.f / 60.f;
-    int64_t desiredFrameTime = performanceFrequency / 60;
     if (mode.refresh_rate > 0 && sdl.vsync)
     {
         ts = 1.f / (double)mode.refresh_rate;
-        desiredFrameTime = performanceFrequency / mode.refresh_rate;
-        refreshRateSpecified = true;
     }
+    ts = 1.f / 60.f;
     printf("Initializing with ts: %f\n", ts);
     printf("Refresh rate: %d\n", mode.refresh_rate);
-    int64_t prevFrameTime = SDL_GetPerformanceCounter();
-    while (!inputSystem.quit)
+    int64_t last_counter = SDL_GetPerformanceCounter();
+    while (!input_system.quit)
     {
-        int64_t currentFrameTime = SDL_GetPerformanceCounter();
-        int64_t deltaTime = currentFrameTime - prevFrameTime;
-        if (!refreshRateSpecified && deltaTime < desiredFrameTime)
-        {
-            int64_t millis = (double)(((desiredFrameTime - deltaTime)) * 1000) / performanceFrequency;
-            if (millis >= 10)
-            {
-                SDL_Delay(4);
-            }
-            continue;
-        }
-        prevFrameTime = currentFrameTime;
 
-        //handle unexpected timer anomalies (overflow, extra slow frames, etc)
-        if (deltaTime > desiredFrameTime * 8)
-        {
-            deltaTime = desiredFrameTime;
-        }
-        if (deltaTime < 0)
-        {
-            deltaTime = 0;
-        }
+        event_bus.clearInputEvents();
+        input_system.collectInputEvents();
+        event_bus.notifyInputEventSubscribers();
 
-        eventBus.clearInputEvents();
-        inputSystem.collectInputEvents();
-        eventBus.notifyInputEventSubscribers();
-
-        eventBus.clearRenderEvents();
+        event_bus.clearRenderEvents();
         player.update(ts);
-        eventBus.notifyRenderEventSubscribers(1.0);
+
+        if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
+        {
+            int64_t TimeToSleep = ((ts - SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter())) * 1000) - 1;
+            if (TimeToSleep > 0)
+            {
+                SDL_Delay(TimeToSleep);
+            }
+            while (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
+            {
+                // Waiting...
+            }
+        }
+        int64_t end_counter = SDL_GetPerformanceCounter();
+
+        event_bus.notifyRenderEventSubscribers(1.0);
+
+        last_counter = end_counter;
     }
     return 0;
 }
