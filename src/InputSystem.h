@@ -1,7 +1,7 @@
 #ifndef INPUTSYSTEM_h_
 #define INPUTSYSTEM_h_
 
-#include <SDL2/SDL.h>
+#include "SDLWrapper.h"
 #include "EventBus.h"
 
 struct InputSystem

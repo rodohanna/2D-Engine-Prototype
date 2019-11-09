@@ -1,6 +1,7 @@
 #include "EventBus.h"
 #include <stdio.h>
 #include <memory>
+#include <algorithm>
 
 EventBus::EventBus() : inputQueueLength(0), renderQueueLength(0)
 {
@@ -14,7 +15,7 @@ void EventBus::publishInputEvent(const InputEvent &e)
 {
     if (inputQueueLength == INPUT_QUEUE_SIZE - 1)
     {
-        printf("Warning: Input Event Queue is full. Consider increasing Queue size from %zu.\n", INPUT_QUEUE_SIZE);
+        printf("Warning: Input Event Queue is full. Consider increasing Queue size from %d.\n", INPUT_QUEUE_SIZE);
         return;
     }
     inputQueue[inputQueueLength] = e;
@@ -47,7 +48,7 @@ void EventBus::publishRenderEvent(const RenderEvent &e)
 {
     if (renderQueueLength == RENDER_QUEUE_SIZE - 1)
     {
-        printf("Warning: Render Event Queue is full. Consider increasing Queue size from %zu.\n", RENDER_QUEUE_SIZE);
+        printf("Warning: Render Event Queue is full. Consider increasing Queue size from %d.\n", RENDER_QUEUE_SIZE);
         return;
     }
     renderQueue[renderQueueLength] = e;

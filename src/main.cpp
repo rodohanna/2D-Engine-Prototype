@@ -6,14 +6,29 @@
 #include "GameTypes.h"
 #include "Player.h"
 #include <algorithm>
+#include <stdio.h>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 double SDL_GetSecondsElapsed(int64_t old_counter, int64_t current_counter)
 {
     return ((double)(current_counter - old_counter) / (double)(SDL_GetPerformanceFrequency()));
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+    if (timeBeginPeriod(1) == TIMERR_NOCANDO)
+    {
+        printf("Error calling timeBeginPeriod\n");
+    }
+    else
+    {
+        printf("Successfully set timer granularity to 1ms\n");
+    }
+#endif
     // initialize SDL
     SDLWrapper sdl;
     if (!sdl.initializeSDL(800, 640))

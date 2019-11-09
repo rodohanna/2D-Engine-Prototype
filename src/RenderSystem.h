@@ -1,7 +1,7 @@
 #ifndef RENDERSYSTEM_h_
 #define RENDERSYSTEM_h_
 
-#include <SDL2/SDL.h>
+#include "SDLWrapper.h"
 #include "EventBus.h"
 
 struct RenderSystem : IRenderEventSubscriber

@@ -1,6 +1,5 @@
 #include "SDLWrapper.h"
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include <stdio.h>
 
 SDLWrapper::SDLWrapper() {}
 SDLWrapper::~SDLWrapper() {}

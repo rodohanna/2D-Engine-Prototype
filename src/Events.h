@@ -1,7 +1,7 @@
 #ifndef EVENTS_h_
 #define EVENTS_h_
 
-#include <SDL2/SDL.h>
+#include "SDLWrapper.h"
 #include "GameTypes.h"
 
 enum InputEventType
