@@ -5,6 +5,7 @@
 #include "Events.h"
 #include "GameTypes.h"
 #include "Player.h"
+#include "Assets.h"
 #include <algorithm>
 #include <stdio.h>
 
@@ -36,13 +37,14 @@ int main(int argc, char *argv[])
         printf("SDL failed to initialze.\n");
         return 1;
     }
+    // Load assets
+    Assets::load_assets_from_manifest(sdl.renderer, "assets/some-manifest.txt");
     // initialize systems
     EventBus event_bus;
     RenderSystem render_system(sdl.renderer, &event_bus);
     InputSystem input_system(&event_bus);
-    Rect box = {(800 - 100) / 2, (640 - 100) / 2, 100, 100};
     Color color = {0x11, 0x11, 0xFF, 0xFF};
-    Player player(&event_bus, box, color);
+    Player player(&event_bus, {(800 - 100) / 2, (640 - 100) / 2}, color);
     // start game loop
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)

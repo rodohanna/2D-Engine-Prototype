@@ -1,9 +1,11 @@
 #include "RenderSystem.h"
+#include "Assets.h"
 #include <stdio.h>
 
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
 {
     this->event_bus->subscribe_to_render_Events(this);
+    this->texture_table = Assets::get_texture_table();
 }
 RenderSystem::~RenderSystem()
 {
@@ -18,16 +20,31 @@ void RenderSystem::handle_render_events(const RenderEvent *renderEvents, size_t 
         RenderEvent e = renderEvents[i];
         switch (e.type)
         {
-        case RENDER_RECTANGLE:
+        case RenderEventType::RENDER_RECTANGLE:
         {
             SDL_SetRenderDrawColor(
                 renderer,
-                e.data.renderRectangleEvent.color.r,
-                e.data.renderRectangleEvent.color.g,
-                e.data.renderRectangleEvent.color.b,
-                e.data.renderRectangleEvent.color.a);
+                e.data.render_rectangle_event.color.r,
+                e.data.render_rectangle_event.color.g,
+                e.data.render_rectangle_event.color.b,
+                e.data.render_rectangle_event.color.a);
 
-            SDL_RenderFillRect(this->renderer, &e.data.renderRectangleEvent.box);
+            SDL_RenderFillRect(this->renderer, &e.data.render_rectangle_event.box);
+            break;
+        }
+        case RenderEventType::RENDER_TEXTURE:
+        {
+            size_t texture_index = e.data.render_texture_event.texture_index;
+            if (texture_index >= 0 && texture_index < texture_table->size())
+            {
+                Texture *texture = this->texture_table->at(texture_index).get();
+                if (texture == nullptr)
+                {
+                    printf("Error: RenderSystem received event with texture index to nullptr: %d\n", texture_index);
+                    break;
+                }
+                texture->render(this->renderer, e.data.render_texture_event.position);
+            }
             break;
         }
         }

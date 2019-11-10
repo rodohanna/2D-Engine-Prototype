@@ -8,7 +8,7 @@ typedef SDL_Color Color;
 
 struct V2
 {
-    double x, y;
+    int x, y;
 };
 
 struct FRect

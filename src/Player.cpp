@@ -1,9 +1,12 @@
 #include "Player.h"
+#include "Assets.h"
 #include <stdio.h>
 
-Player::Player(EventBus *eB, const Rect &r, const Color &c) : event_bus(eB), box(r), color(c)
+Player::Player(EventBus *eB, const V2 &p, const Color &c) : event_bus(eB), color(c), position(p)
 {
     eB->subscribe_to_input_events(this);
+    this->texture_index = Assets::get_texture_index("apple");
+    this->dimensions = Assets::get_texture_dimensions("apple");
 }
 Player::~Player()
 {
@@ -13,22 +16,20 @@ const double SPEED = 350.0;
 bool goRight = true;
 void Player::update(double ts)
 {
-    RenderEvent e;
-    e.type = RENDER_RECTANGLE;
     int vel = ts * SPEED;
     if (goRight)
     {
-        this->box.x += vel;
+        this->position.x += vel;
     }
     else
     {
-        this->box.x -= vel;
+        this->position.x -= vel;
     }
-    if (this->box.x > 700)
+    if (this->position.x > 800 - this->dimensions.x)
     {
         goRight = false;
     }
-    if (this->box.x < 0)
+    if (this->position.x < 0)
     {
         goRight = true;
     }
@@ -48,8 +49,9 @@ void Player::update(double ts)
     // {
     //     this->box.x += vel;
     // }
-    e.data.renderRectangleEvent.box = this->box;
-    e.data.renderRectangleEvent.color = this->color;
+    RenderEvent e;
+    e.type = RenderEventType::RENDER_TEXTURE;
+    e.data.render_texture_event = {this->texture_index, this->position};
     event_bus->publish_render_event(e);
 }
 void Player::handle_input_events(const InputEvent *inputEvents, size_t length)

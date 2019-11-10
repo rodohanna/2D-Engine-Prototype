@@ -77,6 +77,18 @@
         "filesystem": "cpp",
         "__tree": "cpp",
         "map": "cpp",
-        "hash_map": "cpp"
+        "hash_map": "cpp",
+        "xstring": "cpp",
+        "concepts": "cpp",
+        "xfacet": "cpp",
+        "xhash": "cpp",
+        "xiosbase": "cpp",
+        "xlocale": "cpp",
+        "xlocinfo": "cpp",
+        "xlocnum": "cpp",
+        "xmemory": "cpp",
+        "xstddef": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp"
     }
 }

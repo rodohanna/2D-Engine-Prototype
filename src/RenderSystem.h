@@ -3,6 +3,9 @@
 
 #include "SDLWrapper.h"
 #include "EventBus.h"
+#include "Assets.h"
+#include <vector>
+#include <memory>
 
 struct RenderSystem : IRenderEventSubscriber
 {
@@ -13,6 +16,7 @@ struct RenderSystem : IRenderEventSubscriber
     void update();
     SDL_Renderer *renderer;
     EventBus *event_bus;
+    std::vector<std::unique_ptr<Texture>> *texture_table;
 };
 
 #endif

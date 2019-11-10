@@ -33,7 +33,8 @@ struct InputEvent
 
 enum RenderEventType
 {
-    RENDER_RECTANGLE
+    RENDER_RECTANGLE,
+    RENDER_TEXTURE
 };
 
 struct RenderRectangleEvent
@@ -44,15 +45,16 @@ struct RenderRectangleEvent
 
 struct RenderTextureEvent
 {
-    size_t textureId;
+    size_t texture_index;
+    V2 position;
 };
 
 struct RenderEvent
 {
     RenderEventType type;
     union {
-        RenderRectangleEvent renderRectangleEvent;
-        RenderTextureEvent renderTextureEvent;
+        RenderRectangleEvent render_rectangle_event;
+        RenderTextureEvent render_texture_event;
     } data;
 };
 
