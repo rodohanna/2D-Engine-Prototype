@@ -10,36 +10,36 @@ const static size_t INPUT_QUEUE_SIZE = 1024;
 struct IInputEventSubscriber
 {
     virtual ~IInputEventSubscriber() = default;
-    virtual void handleInputEvents(const InputEvent *, size_t) = 0;
+    virtual void handle_input_events(const InputEvent *, size_t) = 0;
 };
 
 struct IRenderEventSubscriber
 {
     virtual ~IRenderEventSubscriber() = default;
-    virtual void handleRenderEvents(const RenderEvent *, size_t, double) = 0;
+    virtual void handle_render_events(const RenderEvent *, size_t, double) = 0;
 };
 struct EventBus
 {
     EventBus();
     ~EventBus();
 
-    void publishInputEvent(const InputEvent &e);
-    void subscribeToInputEvents(IInputEventSubscriber *);
-    void unsubscribeToInputEvents(IInputEventSubscriber *);
-    void notifyInputEventSubscribers();
+    void publish_input_event(const InputEvent &e);
+    void subscribe_to_input_events(IInputEventSubscriber *);
+    void unsubscribe_to_input_events(IInputEventSubscriber *);
+    void notify_input_event_subscribers();
 
-    void publishRenderEvent(const RenderEvent &e);
-    void subscribeToRenderEvents(IRenderEventSubscriber *);
-    void unsubscribeToRenderEvents(IRenderEventSubscriber *);
-    void notifyRenderEventSubscribers(double alpha);
+    void publish_render_event(const RenderEvent &e);
+    void subscribe_to_render_Events(IRenderEventSubscriber *);
+    void unsubscribe_to_render_Events(IRenderEventSubscriber *);
+    void notify_render_event_subscribers(double alpha);
 
-    void clearInputEvents();
-    void clearRenderEvents();
+    void clear_input_events();
+    void clear_render_events();
     std::vector<IInputEventSubscriber *> inputEventSubscribers;
     std::vector<IRenderEventSubscriber *> renderEventSubscribers;
-    InputEvent inputQueue[INPUT_QUEUE_SIZE];
-    RenderEvent renderQueue[RENDER_QUEUE_SIZE];
-    size_t inputQueueLength, renderQueueLength;
+    InputEvent input_queue[INPUT_QUEUE_SIZE];
+    RenderEvent render_queue[RENDER_QUEUE_SIZE];
+    size_t input_queue_length, render_queue_length;
 };
 
 #endif

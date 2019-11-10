@@ -1,12 +1,12 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem(EventBus *eB) : eventBus(eB), quit(false)
+InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false)
 {
 }
 InputSystem::~InputSystem()
 {
 }
-void InputSystem::collectInputEvents()
+void InputSystem::collect_input_events()
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
@@ -23,19 +23,19 @@ void InputSystem::collectInputEvents()
             {
             case SDLK_w:
                 iE.data.keyEvent.key = W_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_a:
                 iE.data.keyEvent.key = A_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_s:
                 iE.data.keyEvent.key = S_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_d:
                 iE.data.keyEvent.key = D_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             }
         }
@@ -47,19 +47,19 @@ void InputSystem::collectInputEvents()
             {
             case SDLK_w:
                 iE.data.keyEvent.key = W_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_a:
                 iE.data.keyEvent.key = A_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_s:
                 iE.data.keyEvent.key = S_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             case SDLK_d:
                 iE.data.keyEvent.key = D_KEY;
-                eventBus->publishInputEvent(iE);
+                event_bus->publish_input_event(iE);
                 break;
             }
         }

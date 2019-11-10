@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 #endif
     // initialize SDL
     SDLWrapper sdl;
-    if (!sdl.initializeSDL(800, 640))
+    if (!sdl.initialize_SDL(800, 640))
     {
         printf("SDL failed to initialze.\n");
         return 1;
@@ -55,26 +55,25 @@ int main(int argc, char *argv[])
     {
         ts = 1.f / (double)mode.refresh_rate;
     }
-    ts = 1.f / 60.f;
     printf("Initializing with ts: %f\n", ts);
     printf("Refresh rate: %d\n", mode.refresh_rate);
     int64_t last_counter = SDL_GetPerformanceCounter();
     while (!input_system.quit)
     {
 
-        event_bus.clearInputEvents();
-        input_system.collectInputEvents();
-        event_bus.notifyInputEventSubscribers();
+        event_bus.clear_input_events();
+        input_system.collect_input_events();
+        event_bus.notify_input_event_subscribers();
 
-        event_bus.clearRenderEvents();
+        event_bus.clear_render_events();
         player.update(ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {
-            int64_t TimeToSleep = ((ts - SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter())) * 1000) - 1;
-            if (TimeToSleep > 0)
+            int64_t time_to_sleep = ((ts - SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter())) * 1000) - 1;
+            if (time_to_sleep > 0)
             {
-                SDL_Delay(TimeToSleep);
+                SDL_Delay(time_to_sleep);
             }
             while (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
             {
@@ -83,7 +82,7 @@ int main(int argc, char *argv[])
         }
         int64_t end_counter = SDL_GetPerformanceCounter();
 
-        event_bus.notifyRenderEventSubscribers(1.0);
+        event_bus.notify_render_event_subscribers(1.0);
 
         last_counter = end_counter;
     }

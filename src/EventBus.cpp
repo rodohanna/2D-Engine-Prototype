@@ -3,7 +3,7 @@
 #include <memory>
 #include <algorithm>
 
-EventBus::EventBus() : inputQueueLength(0), renderQueueLength(0)
+EventBus::EventBus() : input_queue_length(0), render_queue_length(0)
 {
 }
 
@@ -11,23 +11,23 @@ EventBus::~EventBus()
 {
 }
 
-void EventBus::publishInputEvent(const InputEvent &e)
+void EventBus::publish_input_event(const InputEvent &e)
 {
-    if (inputQueueLength == INPUT_QUEUE_SIZE - 1)
+    if (input_queue_length == INPUT_QUEUE_SIZE - 1)
     {
         printf("Warning: Input Event Queue is full. Consider increasing Queue size from %d.\n", INPUT_QUEUE_SIZE);
         return;
     }
-    inputQueue[inputQueueLength] = e;
-    ++inputQueueLength;
+    input_queue[input_queue_length] = e;
+    ++input_queue_length;
 }
 
-void EventBus::subscribeToInputEvents(IInputEventSubscriber *subscriber)
+void EventBus::subscribe_to_input_events(IInputEventSubscriber *subscriber)
 {
     this->inputEventSubscribers.push_back(subscriber);
 }
 
-void EventBus::unsubscribeToInputEvents(IInputEventSubscriber *subscriber)
+void EventBus::unsubscribe_to_input_events(IInputEventSubscriber *subscriber)
 {
     auto it = std::find(this->inputEventSubscribers.begin(), this->inputEventSubscribers.end(), subscriber);
     if (it != this->inputEventSubscribers.end())
@@ -36,31 +36,31 @@ void EventBus::unsubscribeToInputEvents(IInputEventSubscriber *subscriber)
     }
 }
 
-void EventBus::notifyInputEventSubscribers()
+void EventBus::notify_input_event_subscribers()
 {
     for (auto it = this->inputEventSubscribers.begin(); it != this->inputEventSubscribers.end(); ++it)
     {
-        (*it)->handleInputEvents(this->inputQueue, this->inputQueueLength);
+        (*it)->handle_input_events(this->input_queue, this->input_queue_length);
     }
 }
 
-void EventBus::publishRenderEvent(const RenderEvent &e)
+void EventBus::publish_render_event(const RenderEvent &e)
 {
-    if (renderQueueLength == RENDER_QUEUE_SIZE - 1)
+    if (render_queue_length == RENDER_QUEUE_SIZE - 1)
     {
         printf("Warning: Render Event Queue is full. Consider increasing Queue size from %d.\n", RENDER_QUEUE_SIZE);
         return;
     }
-    renderQueue[renderQueueLength] = e;
-    ++renderQueueLength;
+    render_queue[render_queue_length] = e;
+    ++render_queue_length;
 }
 
-void EventBus::subscribeToRenderEvents(IRenderEventSubscriber *subscriber)
+void EventBus::subscribe_to_render_Events(IRenderEventSubscriber *subscriber)
 {
     this->renderEventSubscribers.push_back(subscriber);
 }
 
-void EventBus::unsubscribeToRenderEvents(IRenderEventSubscriber *subscriber)
+void EventBus::unsubscribe_to_render_Events(IRenderEventSubscriber *subscriber)
 {
     auto it = std::find(this->renderEventSubscribers.begin(), this->renderEventSubscribers.end(), subscriber);
     if (it != this->renderEventSubscribers.end())
@@ -69,20 +69,20 @@ void EventBus::unsubscribeToRenderEvents(IRenderEventSubscriber *subscriber)
     }
 }
 
-void EventBus::notifyRenderEventSubscribers(double alpha)
+void EventBus::notify_render_event_subscribers(double alpha)
 {
     for (auto it = this->renderEventSubscribers.begin(); it != this->renderEventSubscribers.end(); ++it)
     {
-        (*it)->handleRenderEvents(this->renderQueue, this->renderQueueLength, alpha);
+        (*it)->handle_render_events(this->render_queue, this->render_queue_length, alpha);
     }
 }
 
-void EventBus::clearInputEvents()
+void EventBus::clear_input_events()
 {
-    inputQueueLength = 0;
+    input_queue_length = 0;
 }
 
-void EventBus::clearRenderEvents()
+void EventBus::clear_render_events()
 {
-    renderQueueLength = 0;
+    render_queue_length = 0;
 }

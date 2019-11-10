@@ -4,7 +4,7 @@
 SDLWrapper::SDLWrapper() {}
 SDLWrapper::~SDLWrapper() {}
 
-bool SDLWrapper::initializeSDL(size_t screenWidth, size_t screenHeight, bool vsync)
+bool SDLWrapper::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
 {
     this->vsync = vsync;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)

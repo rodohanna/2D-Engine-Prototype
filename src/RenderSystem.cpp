@@ -1,14 +1,15 @@
 #include "RenderSystem.h"
+#include <stdio.h>
 
-RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), eventBus(eB)
+RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
 {
-    this->eventBus->subscribeToRenderEvents(this);
+    this->event_bus->subscribe_to_render_Events(this);
 }
 RenderSystem::~RenderSystem()
 {
-    this->eventBus->subscribeToRenderEvents(this);
+    this->event_bus->subscribe_to_render_Events(this);
 }
-void RenderSystem::handleRenderEvents(const RenderEvent *renderEvents, size_t length, double alpha)
+void RenderSystem::handle_render_events(const RenderEvent *renderEvents, size_t length, double alpha)
 {
     SDL_SetRenderDrawColor(this->renderer, 0x11, 0x11, 0x11, 0xFF);
     SDL_RenderClear(this->renderer);

@@ -1,40 +1,58 @@
 #include "Player.h"
+#include <stdio.h>
 
-Player::Player(EventBus *eB, const Rect &r, const Color &c) : eventBus(eB), box(r), color(c)
+Player::Player(EventBus *eB, const Rect &r, const Color &c) : event_bus(eB), box(r), color(c)
 {
-    eB->subscribeToInputEvents(this);
+    eB->subscribe_to_input_events(this);
 }
 Player::~Player()
 {
-    this->eventBus->unsubscribeToInputEvents(this);
+    this->event_bus->unsubscribe_to_input_events(this);
 }
 const double SPEED = 350.0;
+bool goRight = true;
 void Player::update(double ts)
 {
     RenderEvent e;
     e.type = RENDER_RECTANGLE;
-    double vel = ts * SPEED;
-    if (actions[PlayerActions::MOVE_UP])
-    {
-        this->box.y -= vel;
-    }
-    if (actions[PlayerActions::MOVE_DOWN])
-    {
-        this->box.y += vel;
-    }
-    if (actions[PlayerActions::MOVE_LEFT])
-    {
-        this->box.x -= vel;
-    }
-    if (actions[PlayerActions::MOVE_RIGHT])
+    int vel = ts * SPEED;
+    if (goRight)
     {
         this->box.x += vel;
     }
+    else
+    {
+        this->box.x -= vel;
+    }
+    if (this->box.x > 700)
+    {
+        goRight = false;
+    }
+    if (this->box.x < 0)
+    {
+        goRight = true;
+    }
+    // if (actions[PlayerActions::MOVE_UP])
+    // {
+    //     this->box.y -= vel;
+    // }
+    // if (actions[PlayerActions::MOVE_DOWN])
+    // {
+    //     this->box.y += vel;
+    // }
+    // if (actions[PlayerActions::MOVE_LEFT])
+    // {
+    //     this->box.x -= vel;
+    // }
+    // if (actions[PlayerActions::MOVE_RIGHT])
+    // {
+    //     this->box.x += vel;
+    // }
     e.data.renderRectangleEvent.box = this->box;
     e.data.renderRectangleEvent.color = this->color;
-    eventBus->publishRenderEvent(e);
+    event_bus->publish_render_event(e);
 }
-void Player::handleInputEvents(const InputEvent *inputEvents, size_t length)
+void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
 {
     for (size_t i = 0; i < length; ++i)
     {

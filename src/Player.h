@@ -18,8 +18,8 @@ struct Player : IInputEventSubscriber
     Player(EventBus *, const Rect &, const Color &);
     ~Player();
     void update(double ts);
-    void handleInputEvents(const InputEvent *, size_t);
-    EventBus *eventBus;
+    void handle_input_events(const InputEvent *, size_t);
+    EventBus *event_bus;
     Rect box;
     Color color;
     bool actions[TOTAL_PLAYER_ACTIONS];

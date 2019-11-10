@@ -8,8 +8,8 @@ struct InputSystem
 {
     InputSystem(EventBus *);
     ~InputSystem();
-    void collectInputEvents();
-    EventBus *eventBus;
+    void collect_input_events();
+    EventBus *event_bus;
     bool quit;
 };
 
