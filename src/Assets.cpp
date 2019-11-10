@@ -57,7 +57,6 @@ V2 Assets::get_texture_dimensions(std::string texture_key)
     if (texture_index_map.find(texture_key) != texture_index_map.end())
     {
         size_t texture_index = texture_index_map[texture_key];
-        printf("%d %d\n", texture_index, texture_table.size());
         assert(texture_index >= 0 && texture_index < texture_table.size());
         return texture_table[texture_index]->dimensions;
     }
