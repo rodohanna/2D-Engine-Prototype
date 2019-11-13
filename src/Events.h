@@ -46,12 +46,16 @@ struct RenderRectangleEvent
 struct RenderTextureEvent
 {
     size_t texture_index;
+    Rect clip;
     V2 position;
+    size_t scale;
+    bool has_clip;
 };
 
 struct RenderEvent
 {
     RenderEventType type;
+    size_t z_index;
     union {
         RenderRectangleEvent render_rectangle_event;
         RenderTextureEvent render_texture_event;

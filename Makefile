@@ -2,7 +2,8 @@
 
 #OBJS specifies which files to compile as part of the project
 OBJS = src/main.cpp src/EventBus.cpp src/InputSystem.cpp \
- src/Player.cpp src/RenderSystem.cpp src/SDLWrapper.cpp src/Assets.cpp
+ src/Player.cpp src/RenderSystem.cpp src/SDLWrapper.cpp src/Assets.cpp \
+ src/Scenery.cpp src/MapGen.cpp src/Camera.cpp src/Physics.cpp
 
 #CC specifies which compiler we're using
 CC = g++

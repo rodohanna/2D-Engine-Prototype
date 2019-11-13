@@ -42,7 +42,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
     }
 }
 
-size_t Assets::get_texture_index(std::string texture_key)
+int Assets::get_texture_index(std::string texture_key)
 {
     if (texture_index_map.find(texture_key) != texture_index_map.end())
     {
@@ -103,14 +103,14 @@ Texture::~Texture()
     }
 }
 
-void Texture::render(SDL_Renderer *renderer, const V2 &position, SDL_Rect *clip, int scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
+void Texture::render(SDL_Renderer *renderer, const V2 &position, SDL_Rect *clip, size_t scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
 {
     if (this->texture == nullptr)
     {
         printf("Warning! A null texture render was attempted.\n");
         return;
     }
-    SDL_Rect render_quad = {position.x, position.y, this->dimensions.x * scale, this->dimensions.y * scale};
+    SDL_Rect render_quad = {position.x, position.y, this->dimensions.x * static_cast<int>(scale), this->dimensions.y * static_cast<int>(scale)};
     if (clip != NULL)
     {
         render_quad.w = clip->w * scale;

@@ -5,53 +5,40 @@
 Player::Player(EventBus *eB, const V2 &p, const Color &c) : event_bus(eB), color(c), position(p)
 {
     eB->subscribe_to_input_events(this);
-    this->texture_index = Assets::get_texture_index("apple");
-    this->dimensions = Assets::get_texture_dimensions("apple");
+    this->texture_index = Assets::get_texture_index("tilesheet-colored");
+    this->dimensions = Assets::get_texture_dimensions("tilesheet-colored");
+    this->position.x = (800 - this->dimensions.x) / 2;
+    this->position.y = (640 - this->dimensions.y) / 2;
 }
 Player::~Player()
 {
     this->event_bus->unsubscribe_to_input_events(this);
 }
-const double SPEED = 350.0;
+const double SPEED = 100.0;
 bool goRight = true;
 void Player::update(double ts)
 {
-    int vel = ts * SPEED;
-    if (goRight)
-    {
-        this->position.x += vel;
-    }
-    else
-    {
-        this->position.x -= vel;
-    }
-    if (this->position.x > 800 - this->dimensions.x)
-    {
-        goRight = false;
-    }
-    if (this->position.x < 0)
-    {
-        goRight = true;
-    }
-    // if (actions[PlayerActions::MOVE_UP])
+    // int vel = ts * SPEED;
+    // if (goRight)
     // {
-    //     this->box.y -= vel;
+    //     this->position.x += vel;
     // }
-    // if (actions[PlayerActions::MOVE_DOWN])
+    // else
     // {
-    //     this->box.y += vel;
+    //     this->position.x -= vel;
     // }
-    // if (actions[PlayerActions::MOVE_LEFT])
+    // if (this->position.x > 800 - this->dimensions.x)
     // {
-    //     this->box.x -= vel;
+    //     goRight = false;
     // }
-    // if (actions[PlayerActions::MOVE_RIGHT])
+    // if (this->position.x < 0)
     // {
-    //     this->box.x += vel;
+    //     goRight = true;
     // }
     RenderEvent e;
     e.type = RenderEventType::RENDER_TEXTURE;
-    e.data.render_texture_event = {this->texture_index, this->position};
+    e.z_index = 1;
+    e.data.render_texture_event = {this->texture_index, {}, this->position, 4, false};
     event_bus->publish_render_event(e);
 }
 void Player::handle_input_events(const InputEvent *inputEvents, size_t length)

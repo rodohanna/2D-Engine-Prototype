@@ -6,8 +6,13 @@
 #include "GameTypes.h"
 #include "Player.h"
 #include "Assets.h"
+#include "MapGen.h"
+#include "Camera.h"
+#include <memory>
 #include <algorithm>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -20,6 +25,7 @@ double SDL_GetSecondsElapsed(int64_t old_counter, int64_t current_counter)
 
 int main(int argc, char *argv[])
 {
+    srand(time(0));
 #ifdef _WIN32
     if (timeBeginPeriod(1) == TIMERR_NOCANDO)
     {
@@ -38,13 +44,13 @@ int main(int argc, char *argv[])
         return 1;
     }
     // Load assets
-    Assets::load_assets_from_manifest(sdl.renderer, "assets/some-manifest.txt");
+    Assets::load_assets_from_manifest(sdl.renderer, "assets/asset-manifest.txt");
     // initialize systems
     EventBus event_bus;
     RenderSystem render_system(sdl.renderer, &event_bus);
     InputSystem input_system(&event_bus);
     Color color = {0x11, 0x11, 0xFF, 0xFF};
-    Player player(&event_bus, {(800 - 100) / 2, (640 - 100) / 2}, color);
+    Player player(&event_bus, {0, 0}, color);
     // start game loop
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)
@@ -60,6 +66,13 @@ int main(int argc, char *argv[])
     printf("Initializing with ts: %f\n", ts);
     printf("Refresh rate: %d\n", mode.refresh_rate);
     int64_t last_counter = SDL_GetPerformanceCounter();
+
+    // testing
+    Rect camera = {0, 0, 800, 640};
+    Camera::set_camera(camera);
+    V2 dimensions = {100, 100};
+    Palette p = MapGen::load_palette("assets/palette.txt");
+    std::vector<std::unique_ptr<IEntity>> map = MapGen::generate_map(&p, &event_bus, dimensions);
     while (!input_system.quit)
     {
 
@@ -68,7 +81,12 @@ int main(int argc, char *argv[])
         event_bus.notify_input_event_subscribers();
 
         event_bus.clear_render_events();
-        player.update(ts);
+        // player.update(ts);
+        for (size_t i = 0; i < map.size(); ++i)
+        {
+            IEntity *e = map[i].get();
+            e->update(ts);
+        }
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {

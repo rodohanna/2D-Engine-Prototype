@@ -1,0 +1,13 @@
+2
+
+background ground tilesheet-colored 0 0 16 16
+
+ground loose-dirt-1 tilesheet-transparent 17 0 16 16
+ground loose-dirt-2 tilesheet-transparent 33 0 16 16
+ground dirt-patch-1 tilesheet-transparent 51 0 16 16
+ground dirt-patch-2 tilesheet-transparent 85 0 16 16
+
+tree pine-tree-1 tilesheet-transparent 0 17 16 16
+tree pine-tree-2 tilesheet-transparent 17 17 16 16
+tree pine-tree-3 tilesheet-transparent 51 17 16 16
+tree pine-tree-double tilesheet-transparent 85 17 16 16

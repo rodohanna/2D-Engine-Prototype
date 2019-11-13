@@ -3,6 +3,7 @@
 
 #include "EventBus.h"
 #include "GameTypes.h"
+#include "Entity.h"
 
 enum PlayerActions
 {
@@ -13,7 +14,7 @@ enum PlayerActions
     TOTAL_PLAYER_ACTIONS
 };
 
-struct Player : IInputEventSubscriber
+struct Player : IEntity, IInputEventSubscriber
 {
     Player(EventBus *, const V2 &, const Color &);
     ~Player();

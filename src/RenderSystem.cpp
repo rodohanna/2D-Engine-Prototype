@@ -1,6 +1,7 @@
 #include "RenderSystem.h"
 #include "Assets.h"
 #include <stdio.h>
+#include <algorithm>
 
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
 {
@@ -11,13 +12,19 @@ RenderSystem::~RenderSystem()
 {
     this->event_bus->subscribe_to_render_Events(this);
 }
-void RenderSystem::handle_render_events(const RenderEvent *renderEvents, size_t length, double alpha)
+
+bool compare_render_events(RenderEvent a, RenderEvent b)
 {
+    return a.z_index < b.z_index;
+}
+void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length, double alpha)
+{
+    std::vector<RenderEvent> render_vector(render_events, render_events + length);
+    std::sort(render_vector.begin(), render_vector.end(), compare_render_events);
     SDL_SetRenderDrawColor(this->renderer, 0x11, 0x11, 0x11, 0xFF);
     SDL_RenderClear(this->renderer);
-    for (size_t i = 0; i < length; ++i)
+    for (RenderEvent &e : render_vector)
     {
-        RenderEvent e = renderEvents[i];
         switch (e.type)
         {
         case RenderEventType::RENDER_RECTANGLE:
@@ -43,7 +50,12 @@ void RenderSystem::handle_render_events(const RenderEvent *renderEvents, size_t 
                     printf("Error: RenderSystem received event with texture index to nullptr: %d\n", texture_index);
                     break;
                 }
-                texture->render(this->renderer, e.data.render_texture_event.position);
+                Rect *clip = nullptr;
+                if (e.data.render_texture_event.has_clip)
+                {
+                    clip = &e.data.render_texture_event.clip;
+                }
+                texture->render(this->renderer, e.data.render_texture_event.position, clip, e.data.render_texture_event.scale);
             }
             break;
         }
