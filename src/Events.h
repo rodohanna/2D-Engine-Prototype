@@ -62,4 +62,10 @@ struct RenderEvent
     } data;
 };
 
+namespace Events
+{
+RenderEvent createRenderTextureEvent(size_t texture_index, V2 &position, size_t scale = 1, size_t z_index = 1);
+RenderEvent createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, size_t scale = 1, size_t z_index = 1);
+}; // namespace Events
+
 #endif

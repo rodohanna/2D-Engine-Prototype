@@ -2,31 +2,43 @@
 #include "Camera.h"
 #include "Physics.h"
 
-BackGround::BackGround(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index) : clip(clip), position(position), event_bus(e), texture_index(texture_index){};
+Scenery::Scenery(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale)
+    : clip(clip), position(position), event_bus(e), texture_index(texture_index), scale(scale) {}
+
+BackGround::BackGround(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale)
+    : Scenery(e, clip, position, texture_index, scale) {}
 
 void BackGround::update(double delta)
 {
-    RenderEvent e;
-    e.type = RenderEventType::RENDER_TEXTURE;
-    e.z_index = 0;
     Rect camera = Camera::get_camera();
-    size_t scale = camera.w / this->clip.w;
-    e.data.render_texture_event = {this->texture_index, this->clip, this->position, scale, true};
-    this->event_bus->publish_render_event(e);
+    size_t scale = (camera.w / this->clip.w);
+    this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, this->position, scale, 0u));
 }
 
-Tree::Tree(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index) : clip(clip), position(position), event_bus(e), texture_index(texture_index){};
+Dirt::Dirt(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale)
+    : Scenery(e, clip, position, texture_index, scale){};
+
+void Dirt::update(double delta)
+{
+    Rect camera = Camera::get_camera();
+    V2 render_position = {this->position.x - camera.x, this->position.y - camera.y};
+    Rect box = {this->position.x, this->position.y, static_cast<int>(this->clip.w * this->scale), static_cast<int>(this->clip.h * this->scale)};
+    if (Physics::checkCollision(camera, box))
+    {
+        this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, render_position, this->scale, 1u));
+    }
+}
+
+Tree::Tree(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale)
+    : Scenery(e, clip, position, texture_index, scale){};
 
 void Tree::update(double delta)
 {
-    RenderEvent e;
-    e.type = RenderEventType::RENDER_TEXTURE;
-    e.z_index = 1;
-    e.data.render_texture_event = {this->texture_index, this->clip, this->position, 2, true};
-    Rect box = {this->position.x, this->position.y, this->clip.w * 2, this->clip.h * 2};
     Rect camera = Camera::get_camera();
+    V2 render_position = {this->position.x - camera.x, this->position.y - camera.y};
+    Rect box = {this->position.x, this->position.y, static_cast<int>(this->clip.w * this->scale), static_cast<int>(this->clip.h * this->scale)};
     if (Physics::checkCollision(camera, box))
     {
-        this->event_bus->publish_render_event(e);
+        this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, render_position, this->scale, 1u));
     }
 }

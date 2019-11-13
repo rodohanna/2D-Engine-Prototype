@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         event_bus.notify_input_event_subscribers();
 
         event_bus.clear_render_events();
-        // player.update(ts);
+        player.update(ts);
         for (size_t i = 0; i < map.size(); ++i)
         {
             IEntity *e = map[i].get();

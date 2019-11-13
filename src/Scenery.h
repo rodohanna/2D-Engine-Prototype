@@ -5,24 +5,32 @@
 #include "GameTypes.h"
 #include "EventBus.h"
 
-struct BackGround : IEntity
+struct Scenery
 {
-    BackGround(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index);
-    void update(double delta);
+    Scenery(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale = 1);
     Rect clip;
     V2 position;
     EventBus *event_bus;
     size_t texture_index;
+    size_t scale;
 };
 
-struct Tree : IEntity
+struct BackGround : IEntity, Scenery
 {
-    Tree(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index);
+    BackGround(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale = 1);
     void update(double delta);
-    Rect clip;
-    V2 position;
-    EventBus *event_bus;
-    size_t texture_index;
+};
+
+struct Dirt : IEntity, Scenery
+{
+    Dirt(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale = 1);
+    void update(double delta);
+};
+
+struct Tree : IEntity, Scenery
+{
+    Tree(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale = 1);
+    void update(double delta);
 };
 
 #endif

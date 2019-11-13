@@ -12,6 +12,7 @@ struct Tile
 {
     Rect clip;
     size_t texture_index;
+    size_t scale;
 };
 
 struct Palette

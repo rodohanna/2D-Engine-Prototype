@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Assets.h"
+#include "Camera.h"
 #include <stdio.h>
 
 Player::Player(EventBus *eB, const V2 &p, const Color &c) : event_bus(eB), color(c), position(p)
@@ -14,32 +15,31 @@ Player::~Player()
 {
     this->event_bus->unsubscribe_to_input_events(this);
 }
-const double SPEED = 100.0;
-bool goRight = true;
+const double SPEED = 70.0;
 void Player::update(double ts)
 {
-    // int vel = ts * SPEED;
-    // if (goRight)
+    int vel = SPEED * ts;
+    // if (actions[PlayerActions::MOVE_UP])
     // {
-    //     this->position.x += vel;
+    //     this->position.y -= vel;
     // }
-    // else
+    // if (actions[PlayerActions::MOVE_DOWN])
+    // {
+    //     this->position.y += vel;
+    // }
+    // if (actions[PlayerActions::MOVE_LEFT])
     // {
     //     this->position.x -= vel;
     // }
-    // if (this->position.x > 800 - this->dimensions.x)
+    // if (actions[PlayerActions::MOVE_RIGHT])
     // {
-    //     goRight = false;
+    //     this->position.x += vel;
     // }
-    // if (this->position.x < 0)
-    // {
-    //     goRight = true;
-    // }
-    RenderEvent e;
-    e.type = RenderEventType::RENDER_TEXTURE;
-    e.z_index = 1;
-    e.data.render_texture_event = {this->texture_index, {}, this->position, 4, false};
-    event_bus->publish_render_event(e);
+    this->position.x += vel;
+    this->position.y += vel;
+
+    Rect new_camera = {this->position.x, this->position.y, 800, 640};
+    Camera::set_camera(new_camera);
 }
 void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
 {

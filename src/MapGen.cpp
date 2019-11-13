@@ -37,7 +37,8 @@ Palette MapGen::load_palette(std::string path)
              static_cast<int>(y_offset),
              static_cast<int>(width),
              static_cast<int>(height)},
-            static_cast<size_t>(texture_index)};
+            static_cast<size_t>(texture_index),
+            palette.scale};
         if (type == "background")
         {
             palette.background_tile = t;
@@ -64,13 +65,23 @@ std::vector<std::unique_ptr<IEntity>> MapGen::generate_map(Palette *p, EventBus 
     {
         for (int j = 0; j < dimensions.y; ++j)
         {
-            if (rand() % 25 == 0)
+            if (rand() % 50 == 0)
             {
                 size_t rand_index = rand() % p->tree_tiles.size();
                 size_t texture_index = p->tree_tiles[rand_index].texture_index;
                 Rect clip = p->tree_tiles[rand_index].clip;
-                Tree *tree = new Tree(e, clip, {i * 32, j * 32}, texture_index);
+                size_t scale = p->tree_tiles[rand_index].scale;
+                Tree *tree = new Tree(e, clip, {i * 32, j * 32}, texture_index, scale);
                 map.push_back(std::unique_ptr<IEntity>(tree));
+            }
+            else if (rand() % 15 == 0)
+            {
+                size_t rand_index = rand() % p->ground_tiles.size();
+                size_t texture_index = p->ground_tiles[rand_index].texture_index;
+                Rect clip = p->ground_tiles[rand_index].clip;
+                size_t scale = p->ground_tiles[rand_index].scale;
+                Dirt *dirt = new Dirt(e, clip, {i * 32, j * 32}, texture_index, scale);
+                map.push_back(std::unique_ptr<IEntity>(dirt));
             }
         }
     }
