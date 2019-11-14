@@ -1,0 +1,4 @@
+Forest 123 assets/palette.txt 100 100
+
+tree 30
+ground 40

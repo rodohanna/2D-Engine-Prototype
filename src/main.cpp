@@ -8,6 +8,7 @@
 #include "Assets.h"
 #include "MapGen.h"
 #include "Camera.h"
+#include "Scene.h"
 #include <memory>
 #include <algorithm>
 #include <stdio.h>
@@ -70,9 +71,8 @@ int main(int argc, char *argv[])
     // testing
     Rect camera = {0, 0, 800, 640};
     Camera::set_camera(camera);
-    V2 dimensions = {100, 100};
-    Palette p = MapGen::load_palette("assets/palette.txt");
-    std::vector<std::unique_ptr<IEntity>> map = MapGen::generate_map(&p, &event_bus, dimensions);
+    Scene scene(&event_bus);
+    scene.load_from_file("assets/scene.txt");
     while (!input_system.quit)
     {
 
@@ -82,11 +82,7 @@ int main(int argc, char *argv[])
 
         event_bus.clear_render_events();
         player.update(ts);
-        for (size_t i = 0; i < map.size(); ++i)
-        {
-            IEntity *e = map[i].get();
-            e->update(ts);
-        }
+        scene.update(ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {

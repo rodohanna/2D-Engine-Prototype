@@ -55,7 +55,7 @@ Palette MapGen::load_palette(std::string path)
     return palette;
 }
 
-std::vector<std::unique_ptr<IEntity>> MapGen::generate_map(Palette *p, EventBus *e, const V2 &dimensions)
+std::vector<std::unique_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions)
 {
     std::vector<std::unique_ptr<IEntity>> map;
     BackGround *ground = new BackGround(e, p->background_tile.clip, {0, 0}, p->background_tile.texture_index);
@@ -65,7 +65,7 @@ std::vector<std::unique_ptr<IEntity>> MapGen::generate_map(Palette *p, EventBus 
     {
         for (int j = 0; j < dimensions.y; ++j)
         {
-            if (rand() % 50 == 0)
+            if (rand() % 100 < r->tree_weight)
             {
                 size_t rand_index = rand() % p->tree_tiles.size();
                 size_t texture_index = p->tree_tiles[rand_index].texture_index;
@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<IEntity>> MapGen::generate_map(Palette *p, EventBus 
                 Tree *tree = new Tree(e, clip, {i * 32, j * 32}, texture_index, scale);
                 map.push_back(std::unique_ptr<IEntity>(tree));
             }
-            else if (rand() % 15 == 0)
+            else if (rand() % 100 < r->ground_weight)
             {
                 size_t rand_index = rand() % p->ground_tiles.size();
                 size_t texture_index = p->ground_tiles[rand_index].texture_index;

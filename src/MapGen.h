@@ -15,6 +15,12 @@ struct Tile
     size_t scale;
 };
 
+struct ProcGenRules
+{
+    size_t ground_weight;
+    size_t tree_weight;
+};
+
 struct Palette
 {
     // background
@@ -29,7 +35,7 @@ struct Palette
 namespace MapGen
 {
 Palette load_palette(std::string path);
-std::vector<std::unique_ptr<IEntity>> generate_map(Palette *p, EventBus *e, const V2 &dimensions);
+std::vector<std::unique_ptr<IEntity>> generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions);
 }; // namespace MapGen
 
 #endif
