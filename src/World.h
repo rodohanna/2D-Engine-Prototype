@@ -10,7 +10,6 @@
 
 struct Chunk
 {
-    ~Chunk() = default;
     V2 world_coords;
     Palette palette;
     ProcGenRules rules;
@@ -34,7 +33,7 @@ struct ChunkManager
     // Active chunks include the chunk the player
     // is currently at, as well as all of the surrounding
     // chunks.
-    Chunk chunk_add_buffer[10];
+    Chunk *chunk_add_buffer[10];
     World world;
     V2 last_world_position_sync;
     EventBus *event_bus;
