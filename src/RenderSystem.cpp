@@ -36,7 +36,7 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
                 e.data.render_rectangle_event.color.b,
                 e.data.render_rectangle_event.color.a);
 
-            SDL_RenderFillRect(this->renderer, &e.data.render_rectangle_event.box);
+            SDL_RenderDrawRect(this->renderer, &e.data.render_rectangle_event.box);
             break;
         }
         case RenderEventType::RENDER_TEXTURE:

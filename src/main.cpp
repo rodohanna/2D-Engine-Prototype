@@ -12,8 +12,6 @@
 #include <memory>
 #include <algorithm>
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -26,7 +24,6 @@ double SDL_GetSecondsElapsed(int64_t old_counter, int64_t current_counter)
 
 int main(int argc, char *argv[])
 {
-    srand(time(0));
 #ifdef _WIN32
     if (timeBeginPeriod(1) == TIMERR_NOCANDO)
     {
@@ -72,7 +69,6 @@ int main(int argc, char *argv[])
     Rect camera = {0, 0, 800, 640};
     Camera::set_camera(camera);
     Scene scene(&event_bus);
-    scene.load_from_file("assets/scene.txt");
     while (!input_system.quit)
     {
 

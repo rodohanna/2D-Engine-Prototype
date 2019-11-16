@@ -2,44 +2,26 @@
 
 #include "MapGen.h"
 #include "GameTypes.h"
+#include "Camera.h"
+#include <stdlib.h>
 #include <sstream>
 #include <fstream>
 
-Scene::Scene(EventBus *e) : event_bus(e){};
-
-void Scene::load_from_file(std::string path)
+Scene::Scene(EventBus *e) : event_bus(e)
 {
-    std::ifstream scene(path);
-    std::string name, palette, type;
-    V2 dimensions = {};
-    size_t weight = 0;
-    int seed = 0;
-    ProcGenRules rules = {};
-    scene >> name >> seed >> palette >> dimensions.x >> dimensions.y;
-    while (scene >> type >> weight)
-    {
-        if (scene.fail())
-        {
-            printf("Reading scene %s failed, quiting early\n", path.c_str());
-            return;
-        }
-        if (type == "tree")
-        {
-            rules.tree_weight = weight;
-        }
-        else if (type == "ground")
-        {
-            rules.ground_weight = weight;
-        }
-    }
-    Palette p = MapGen::load_palette(palette);
-    this->map = MapGen::generate_map(&p, &rules, this->event_bus, dimensions);
-}
+    V2 world_dimensions = {5, 5};
+    Palette p = MapGen::load_palette("assets/palette.txt");
+    World world(p, world_dimensions, 64);
+    world.generate_world();
+    this->chunk_manager = std::make_unique<ChunkManager>(ChunkManager(e, world, 64));
+    V2 player = {0, 0};
+    this->chunk_manager.get()->sync_chunks_to_world_position(player);
+};
 
 void Scene::update(double ts)
 {
-    for (size_t i = 0; i < this->map.size(); ++i)
-    {
-        this->map[i].get()->update(ts);
-    }
+    Rect camera = Camera::get_camera();
+    V2 player = {camera.x, camera.y};
+    this->chunk_manager.get()->sync_chunks_to_world_position(player);
+    this->chunk_manager.get()->update_chunks(ts);
 }
