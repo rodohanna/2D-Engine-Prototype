@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     // Load assets
     Assets::load_assets_from_manifest(sdl.renderer, "assets/asset-manifest.txt");
     // initialize systems
-    EventBus event_bus;
+    EventBus event_bus(sdl.renderer);
     RenderSystem render_system(sdl.renderer, &event_bus);
     InputSystem input_system(&event_bus);
     Color color = {0x11, 0x11, 0xFF, 0xFF};

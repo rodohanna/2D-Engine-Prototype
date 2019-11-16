@@ -130,16 +130,13 @@ void ChunkManager::update_chunks(double ts)
 {
     for (Chunk &chunk : this->active_chunks)
     {
-        RenderEvent e;
-        e.type = RenderEventType::RENDER_RECTANGLE;
         Rect camera = Camera::get_camera();
-        e.data.render_rectangle_event.box = {
-            static_cast<int>((chunk.world_coords.x * 32) - camera.x),
-            static_cast<int>((chunk.world_coords.y * 32) - camera.y),
-            static_cast<int>(32 * this->chunk_size),
-            static_cast<int>(32 * this->chunk_size)};
-        e.data.render_rectangle_event.color = {0xFF, 0xFF, 0xFF, 0xFF};
-        this->event_bus->publish_render_event(e);
+        this->event_bus->publish_render_event(
+            Events::createRenderRectangleEvent({static_cast<int>((chunk.world_coords.x * 32) - camera.x),
+                                                static_cast<int>((chunk.world_coords.y * 32) - camera.y),
+                                                static_cast<int>(32 * this->chunk_size),
+                                                static_cast<int>(32 * this->chunk_size)},
+                                               {0xFF, 0xFF, 0xFF, 0xFF}));
         for (size_t i = 0; i < chunk.entities.size(); ++i)
         {
             chunk.entities[i].get()->update(ts);

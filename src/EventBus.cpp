@@ -1,9 +1,10 @@
 #include "EventBus.h"
+#include "Assets.h"
 #include <stdio.h>
 #include <memory>
 #include <algorithm>
 
-EventBus::EventBus() : input_queue_length(0), render_queue_length(0)
+EventBus::EventBus(SDL_Renderer *r) : input_queue_length(0), render_queue_length(0), renderer(r)
 {
 }
 
@@ -55,12 +56,12 @@ void EventBus::publish_render_event(const RenderEvent &e)
     ++render_queue_length;
 }
 
-void EventBus::subscribe_to_render_Events(IRenderEventSubscriber *subscriber)
+void EventBus::subscribe_to_render_events(IRenderEventSubscriber *subscriber)
 {
     this->renderEventSubscribers.push_back(subscriber);
 }
 
-void EventBus::unsubscribe_to_render_Events(IRenderEventSubscriber *subscriber)
+void EventBus::unsubscribe_to_render_events(IRenderEventSubscriber *subscriber)
 {
     auto it = std::find(this->renderEventSubscribers.begin(), this->renderEventSubscribers.end(), subscriber);
     if (it != this->renderEventSubscribers.end())

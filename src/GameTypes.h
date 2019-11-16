@@ -5,6 +5,7 @@
 
 typedef SDL_Rect Rect;
 typedef SDL_Color Color;
+typedef TTF_Font Font;
 
 struct V2
 {

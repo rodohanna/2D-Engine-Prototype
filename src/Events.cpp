@@ -17,3 +17,12 @@ RenderEvent Events::createRenderTextureEvent(size_t texture_index, Rect &clip, V
     e.data.render_texture_event = {texture_index, clip, position, scale, true};
     return e;
 }
+
+RenderEvent Events::createRenderRectangleEvent(const Rect &box, const Color &color, bool filled, size_t z_index)
+{
+    RenderEvent e;
+    e.type = RenderEventType::RENDER_RECTANGLE;
+    e.z_index = z_index;
+    e.data.render_rectangle_event = {box, color, filled};
+    return e;
+}

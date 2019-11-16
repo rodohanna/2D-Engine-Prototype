@@ -1,2 +1,3 @@
 tilesheet-colored sprite assets/Tilesheet/colored.png
 tilesheet-transparent sprite assets/Tilesheet/colored_transparent.png
+standard-font font assets/m5x7.ttf

@@ -5,12 +5,12 @@
 
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
 {
-    this->event_bus->subscribe_to_render_Events(this);
+    this->event_bus->subscribe_to_render_events(this);
     this->texture_table = Assets::get_texture_table();
 }
 RenderSystem::~RenderSystem()
 {
-    this->event_bus->subscribe_to_render_Events(this);
+    this->event_bus->subscribe_to_render_events(this);
 }
 
 bool compare_render_events(RenderEvent a, RenderEvent b)
@@ -35,8 +35,14 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
                 e.data.render_rectangle_event.color.g,
                 e.data.render_rectangle_event.color.b,
                 e.data.render_rectangle_event.color.a);
-
-            SDL_RenderDrawRect(this->renderer, &e.data.render_rectangle_event.box);
+            if (e.data.render_rectangle_event.filled)
+            {
+                SDL_RenderFillRect(this->renderer, &e.data.render_rectangle_event.box);
+            }
+            else
+            {
+                SDL_RenderDrawRect(this->renderer, &e.data.render_rectangle_event.box);
+            }
             break;
         }
         case RenderEventType::RENDER_TEXTURE:

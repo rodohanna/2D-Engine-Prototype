@@ -1,8 +1,9 @@
 #ifndef EVENTBUS_h_
 #define EVENTBUS_h_
 
-#include <vector>
 #include "Events.h"
+#include "SDLWrapper.h"
+#include <vector>
 
 const static size_t RENDER_QUEUE_SIZE = 2048;
 const static size_t INPUT_QUEUE_SIZE = 1024;
@@ -20,7 +21,7 @@ struct IRenderEventSubscriber
 };
 struct EventBus
 {
-    EventBus();
+    EventBus(SDL_Renderer *);
     ~EventBus();
 
     void publish_input_event(const InputEvent &e);
@@ -29,8 +30,8 @@ struct EventBus
     void notify_input_event_subscribers();
 
     void publish_render_event(const RenderEvent &e);
-    void subscribe_to_render_Events(IRenderEventSubscriber *);
-    void unsubscribe_to_render_Events(IRenderEventSubscriber *);
+    void subscribe_to_render_events(IRenderEventSubscriber *);
+    void unsubscribe_to_render_events(IRenderEventSubscriber *);
     void notify_render_event_subscribers(double alpha);
 
     void clear_input_events();
@@ -40,6 +41,7 @@ struct EventBus
     InputEvent input_queue[INPUT_QUEUE_SIZE];
     RenderEvent render_queue[RENDER_QUEUE_SIZE];
     size_t input_queue_length, render_queue_length;
+    SDL_Renderer *renderer;
 };
 
 #endif

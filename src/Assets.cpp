@@ -6,7 +6,9 @@
 #include <assert.h>
 
 std::unordered_map<std::string, size_t> texture_index_map;
+std::unordered_map<std::string, size_t> font_index_map;
 std::vector<std::unique_ptr<Texture>> texture_table;
+std::vector<Font *> font_table;
 std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, size_t index);
 
 void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
@@ -23,7 +25,6 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         return;
     }
     std::string key, type, asset_path;
-    size_t index = 0;
     while (manifest >> key >> type >> asset_path)
     {
         if (manifest.fail())
@@ -34,12 +35,66 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         printf("Loading key: %s, type: %s, path: %s\n", key.c_str(), type.c_str(), asset_path.c_str());
         if (type == "sprite")
         {
+            size_t index = texture_table.size();
             std::unique_ptr<Texture> texture = create_texture_from_file(asset_path, renderer, index);
             texture_index_map[key] = index;
             texture_table.push_back(std::move(texture));
         }
-        ++index;
+        else if (type == "font")
+        {
+            Font *font = TTF_OpenFont(asset_path.c_str(), 32);
+            if (font != nullptr)
+            {
+                size_t font_index = font_table.size();
+                font_index_map[key] = font_index;
+                font_table.push_back(font);
+            }
+            else
+            {
+                printf("Error loading font %s from %s.\n", key.c_str(), asset_path.c_str());
+            }
+        }
     }
+}
+
+TextTextureInfo Assets::create_texture_from_text(SDL_Renderer *renderer, size_t font_index, std::string texture_key, std::string text, const Color &color)
+{
+    if (font_index < 0 || font_index >= font_table.size())
+    {
+        printf("Error: create_texture_from_text received a bad font_index %d\n", font_index);
+        return {-1};
+    }
+    Font *some_font = font_table[font_index];
+    SDL_Surface *text_surface = TTF_RenderText_Solid(some_font, text.c_str(), color);
+    if (text_surface == nullptr)
+    {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", IMG_GetError());
+        return {-1};
+    }
+
+    SDL_Texture *new_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+    if (new_texture == nullptr)
+    {
+        printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+        return {-1};
+    }
+    int texture_index = -1;
+    int existing_texture_index = get_texture_index(texture_key);
+    Texture *texture = nullptr;
+    if (existing_texture_index == -1)
+    {
+        texture_index = texture_table.size();
+        texture = new Texture(new_texture, {text_surface->w, text_surface->h}, texture_index);
+        texture_table.push_back(std::unique_ptr<Texture>(texture));
+    }
+    else
+    {
+        texture_index = existing_texture_index;
+        texture = new Texture(new_texture, {text_surface->w, text_surface->h}, texture_index);
+        texture_table[texture_index] = std::unique_ptr<Texture>(texture);
+    }
+    SDL_FreeSurface(text_surface);
+    return {texture_index, texture->dimensions};
 }
 
 int Assets::get_texture_index(std::string texture_key)

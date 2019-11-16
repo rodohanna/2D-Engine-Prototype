@@ -3,7 +3,12 @@
 
 #include "SDLWrapper.h"
 #include "GameTypes.h"
+#include "Assets.h"
+#include <string>
+#include <vector>
+#include <memory>
 
+// Input Events
 enum InputEventType
 {
     KEY_DOWN,
@@ -31,6 +36,7 @@ struct InputEvent
     } data;
 };
 
+// Render Events
 enum RenderEventType
 {
     RENDER_RECTANGLE,
@@ -41,6 +47,7 @@ struct RenderRectangleEvent
 {
     Rect box;
     Color color;
+    bool filled;
 };
 
 struct RenderTextureEvent
@@ -66,6 +73,7 @@ namespace Events
 {
 RenderEvent createRenderTextureEvent(size_t texture_index, V2 &position, size_t scale = 1, size_t z_index = 1);
 RenderEvent createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, size_t scale = 1, size_t z_index = 1);
+RenderEvent createRenderRectangleEvent(const Rect &box, const Color &color, bool filled = false, size_t z_index = 1);
 }; // namespace Events
 
 #endif

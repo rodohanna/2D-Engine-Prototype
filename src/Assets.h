@@ -17,9 +17,17 @@ struct Texture
     size_t index;
 };
 
+struct TextTextureInfo
+{
+    int texture_index;
+    V2 dimensions;
+};
+
 namespace Assets
 {
+void initialize(SDL_Renderer *);
 void load_assets_from_manifest(SDL_Renderer *, std::string);
+TextTextureInfo create_texture_from_text(SDL_Renderer *renderer, size_t font_index, std::string texture_key, std::string text, const Color &color);
 int get_texture_index(std::string texture_key);
 std::vector<std::unique_ptr<Texture>> *get_texture_table();
 V2 get_texture_dimensions(std::string texture_key);
