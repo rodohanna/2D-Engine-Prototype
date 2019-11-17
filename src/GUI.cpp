@@ -9,7 +9,6 @@ void Text::set_text(std::string text)
 {
     if (this->text != text)
     {
-        // regenerate font texture
         auto info = Assets::create_texture_from_text(
             this->event_bus->renderer,
             this->font_index,
@@ -28,6 +27,7 @@ void Text::update(double ts)
         Events::createRenderTextureEvent(
             this->texture_index,
             this->position,
+            &this->overflow_clip,
             1,
             5));
 }
@@ -40,7 +40,7 @@ void UIPanel::update(double ts)
         t.position = {
             this->rect.x + (this->rect.w - t.dimensions.x) / 2,
             this->rect.y + last_text_height + 10};
-        last_text_height = t.dimensions.y;
+        last_text_height += t.dimensions.y;
         t.update(ts);
     }
 }
@@ -53,8 +53,10 @@ GUI::GUI(EventBus *e) : event_bus(e)
         275,
         175};
     Text t = Text(e, 0, "test-text");
+    t.overflow_clip = this->inventory_panel.rect;
     t.set_text("Inventory");
     Text t2 = Text(e, 0, "test-text2");
+    t2.overflow_clip = this->inventory_panel.rect;
     t2.set_text("Rusty Sword");
     this->inventory_panel.panel_text.push_back(t);
     this->inventory_panel.panel_text.push_back(t2);

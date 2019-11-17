@@ -12,7 +12,7 @@ void BackGround::update(double delta)
 {
     Rect camera = Camera::get_camera();
     size_t scale = (camera.w / this->clip.w);
-    this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, this->position, scale, 0u));
+    this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, this->position, nullptr, scale, 0u));
 }
 
 void render_if_on_screen(EventBus *event_bus, size_t texture_index, V2 &position, Rect &clip, size_t scale)
@@ -22,7 +22,7 @@ void render_if_on_screen(EventBus *event_bus, size_t texture_index, V2 &position
     Rect box = {position.x, position.y, static_cast<int>(clip.w * scale), static_cast<int>(clip.h * scale)};
     if (Physics::checkCollision(camera, box))
     {
-        event_bus->publish_render_event(Events::createRenderTextureEvent(texture_index, clip, render_position, scale, 1u));
+        event_bus->publish_render_event(Events::createRenderTextureEvent(texture_index, clip, render_position, nullptr, scale, 1u));
     }
 };
 

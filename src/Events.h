@@ -4,9 +4,6 @@
 #include "SDLWrapper.h"
 #include "GameTypes.h"
 #include "Assets.h"
-#include <string>
-#include <vector>
-#include <memory>
 
 // Input Events
 enum InputEventType
@@ -62,6 +59,8 @@ struct RenderTextureEvent
 struct RenderEvent
 {
     RenderEventType type;
+    Rect overflow_clip;
+    bool has_overflow_clip;
     size_t z_index;
     union {
         RenderRectangleEvent render_rectangle_event;
@@ -71,8 +70,8 @@ struct RenderEvent
 
 namespace Events
 {
-RenderEvent createRenderTextureEvent(size_t texture_index, V2 &position, size_t scale = 1, size_t z_index = 1);
-RenderEvent createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, size_t scale = 1, size_t z_index = 1);
+RenderEvent createRenderTextureEvent(size_t texture_index, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
+RenderEvent createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
 RenderEvent createRenderRectangleEvent(const Rect &box, const Color &color, bool filled = false, size_t z_index = 1);
 }; // namespace Events
 

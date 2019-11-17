@@ -29,6 +29,10 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
         {
         case RenderEventType::RENDER_RECTANGLE:
         {
+            if (e.has_overflow_clip)
+            {
+                SDL_RenderSetClipRect(this->renderer, &e.overflow_clip);
+            }
             SDL_SetRenderDrawColor(
                 renderer,
                 e.data.render_rectangle_event.color.r,
@@ -43,10 +47,15 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
             {
                 SDL_RenderDrawRect(this->renderer, &e.data.render_rectangle_event.box);
             }
+            SDL_RenderSetClipRect(this->renderer, nullptr);
             break;
         }
         case RenderEventType::RENDER_TEXTURE:
         {
+            if (e.has_overflow_clip)
+            {
+                SDL_RenderSetClipRect(this->renderer, &e.overflow_clip);
+            }
             size_t texture_index = e.data.render_texture_event.texture_index;
             if (texture_index >= 0 && texture_index < texture_table->size())
             {
@@ -63,6 +72,7 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
                 }
                 texture->render(this->renderer, e.data.render_texture_event.position, clip, e.data.render_texture_event.scale);
             }
+            SDL_RenderSetClipRect(this->renderer, nullptr);
             break;
         }
         }

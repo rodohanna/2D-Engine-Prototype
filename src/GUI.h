@@ -14,6 +14,7 @@ struct Text
     void set_text(std::string);
     V2 dimensions;
     V2 position;
+    Rect overflow_clip;
     EventBus *event_bus;
     size_t font_index;
     size_t texture_index;
