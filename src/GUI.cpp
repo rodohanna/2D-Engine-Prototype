@@ -32,26 +32,39 @@ void Text::update(double ts)
             5));
 }
 
+void UIPanel::update(double ts)
+{
+    int last_text_height = 0;
+    for (Text &t : this->panel_text)
+    {
+        t.position = {
+            this->rect.x + (this->rect.w - t.dimensions.x) / 2,
+            this->rect.y + last_text_height + 10};
+        last_text_height = t.dimensions.y;
+        t.update(ts);
+    }
+}
+
 GUI::GUI(EventBus *e) : event_bus(e)
 {
-    this->right_panel = {200, 400};
-    this->text = Text(e, 0, "test-text");
+    this->inventory_panel.rect = {
+        (800 - (275 + 10)),
+        (640 - (175 + 10)),
+        275,
+        175};
+    Text t = Text(e, 0, "test-text");
+    t.set_text("Inventory");
+    Text t2 = Text(e, 0, "test-text2");
+    t2.set_text("Rusty Sword");
+    this->inventory_panel.panel_text.push_back(t);
+    this->inventory_panel.panel_text.push_back(t2);
 }
 
 void GUI::update(double ts)
 {
-    Rect panel_rect = {
-        (800 - (this->right_panel.dimensions.x + 10)),
-        (640 - this->right_panel.dimensions.y) / 2,
-        this->right_panel.dimensions.x,
-        this->right_panel.dimensions.y};
     this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(panel_rect, {0x11, 0x11, 0x11, 0xF0}, true, 4));
+        Events::createRenderRectangleEvent(this->inventory_panel.rect, {0x11, 0x11, 0x11, 0xF0}, true, 4));
     this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(panel_rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, 5));
-    this->text.set_text("Hello Chunky");
-    this->text.position = {
-        (panel_rect.x + (panel_rect.w - this->text.dimensions.x) / 2),
-        (panel_rect.y + 10)};
-    this->text.update(ts);
+        Events::createRenderRectangleEvent(this->inventory_panel.rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, 5));
+    this->inventory_panel.update(ts);
 };

@@ -4,6 +4,7 @@
 #include "GameTypes.h"
 #include "EventBus.h"
 #include <string>
+#include <vector>
 
 struct Text
 {
@@ -22,7 +23,9 @@ struct Text
 
 struct UIPanel
 {
-    V2 dimensions;
+    void update(double ts);
+    Rect rect;
+    std::vector<Text> panel_text;
 };
 
 struct GUI
@@ -30,8 +33,7 @@ struct GUI
     GUI(EventBus *);
     void update(double ts);
     EventBus *event_bus;
-    UIPanel right_panel;
-    Text text;
+    UIPanel inventory_panel;
 };
 
 #endif
