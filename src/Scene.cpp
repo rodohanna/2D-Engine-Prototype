@@ -17,6 +17,7 @@ Scene::Scene(EventBus *e) : event_bus(e)
     V2 player = {0, 0};
     this->chunk_manager.get()->sync_chunks_to_world_position(player);
     this->gui = std::make_unique<GUI>(GUI(e));
+    this->console = std::make_unique<Console>(Console(e));
 };
 
 void Scene::update(double ts)
@@ -26,4 +27,5 @@ void Scene::update(double ts)
     this->gui->update(ts);
     this->chunk_manager.get()->sync_chunks_to_world_position(player);
     this->chunk_manager.get()->update_chunks(ts);
+    this->console->update(ts);
 }
