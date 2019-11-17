@@ -35,8 +35,8 @@ void Player::update(double ts)
     {
         this->position.x += vel;
     }
-
-    Rect new_camera = {this->position.x, this->position.y, 800, 640};
+    Rect old_camera = Camera::get_camera();
+    Rect new_camera = {this->position.x, this->position.y, old_camera.w, old_camera.h};
     Camera::set_camera(new_camera);
 }
 void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
@@ -46,41 +46,49 @@ void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
         InputEvent e = inputEvents[i];
         if (e.type == KEY_DOWN)
         {
-            if (e.data.keyEvent.key == W_KEY)
+            if (e.data.key_event.key == W_KEY)
             {
                 actions[PlayerActions::MOVE_UP] = true;
             }
-            else if (e.data.keyEvent.key == S_KEY)
+            else if (e.data.key_event.key == S_KEY)
             {
                 actions[PlayerActions::MOVE_DOWN] = true;
             }
-            else if (e.data.keyEvent.key == A_KEY)
+            else if (e.data.key_event.key == A_KEY)
             {
                 actions[PlayerActions::MOVE_LEFT] = true;
             }
-            else if (e.data.keyEvent.key == D_KEY)
+            else if (e.data.key_event.key == D_KEY)
             {
                 actions[PlayerActions::MOVE_RIGHT] = true;
             }
         }
         else if (e.type == KEY_UP)
         {
-            if (e.data.keyEvent.key == W_KEY)
+            if (e.data.key_event.key == W_KEY)
             {
                 actions[PlayerActions::MOVE_UP] = false;
             }
-            else if (e.data.keyEvent.key == S_KEY)
+            else if (e.data.key_event.key == S_KEY)
             {
                 actions[PlayerActions::MOVE_DOWN] = false;
             }
-            else if (e.data.keyEvent.key == A_KEY)
+            else if (e.data.key_event.key == A_KEY)
             {
                 actions[PlayerActions::MOVE_LEFT] = false;
             }
-            else if (e.data.keyEvent.key == D_KEY)
+            else if (e.data.key_event.key == D_KEY)
             {
                 actions[PlayerActions::MOVE_RIGHT] = false;
             }
+        }
+        else if (e.type == InputEventType::WINDOW_RESIZE)
+        {
+            Rect new_camera = {this->position.x,
+                               this->position.y,
+                               e.data.resize_event.new_size.x,
+                               e.data.resize_event.new_size.y};
+            Camera::set_camera(new_camera);
         }
     }
 }

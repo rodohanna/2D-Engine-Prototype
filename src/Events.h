@@ -9,7 +9,8 @@
 enum InputEventType
 {
     KEY_DOWN,
-    KEY_UP
+    KEY_UP,
+    WINDOW_RESIZE
 };
 
 enum KeyEventType
@@ -25,11 +26,17 @@ struct KeyEvent
     KeyEventType key;
 };
 
+struct WindowResizeEvent
+{
+    V2 new_size;
+};
+
 struct InputEvent
 {
     InputEventType type;
     union {
-        KeyEvent keyEvent;
+        KeyEvent key_event;
+        WindowResizeEvent resize_event;
     } data;
 };
 

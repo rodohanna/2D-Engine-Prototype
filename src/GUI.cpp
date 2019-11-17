@@ -1,6 +1,7 @@
 #include "GUI.h"
 #include "Events.h"
 #include "Assets.h"
+#include "Camera.h"
 
 Text::Text(){};
 Text::Text(EventBus *e, size_t font_index, std::string texture_key) : event_bus(e), font_index(font_index), texture_key(texture_key){};
@@ -32,6 +33,38 @@ void Text::update(double ts)
             5));
 }
 
+void UIPanel::update_rect()
+{
+    Rect camera = Camera::get_camera();
+    int x, y;
+    if (this->anchor_horizontal.type == AnchorType::RIGHT)
+    {
+        x = camera.w - this->dimensions.x - this->anchor_horizontal.offset;
+    }
+    else
+    {
+        x = this->anchor_horizontal.offset;
+    }
+
+    if (this->anchor_vertical.type == AnchorType::TOP)
+    {
+        y = this->anchor_vertical.offset;
+    }
+    else
+    {
+        y = camera.h - this->dimensions.y - this->anchor_vertical.offset;
+    }
+    this->rect = {
+        x,
+        y,
+        this->dimensions.x,
+        this->dimensions.y};
+    for (Text &t : this->panel_text)
+    {
+        t.overflow_clip = this->rect;
+    }
+};
+
 void UIPanel::update(double ts)
 {
     int last_text_height = 0;
@@ -47,16 +80,12 @@ void UIPanel::update(double ts)
 
 GUI::GUI(EventBus *e) : event_bus(e)
 {
-    this->inventory_panel.rect = {
-        (800 - (275 + 10)),
-        (640 - (175 + 10)),
-        275,
-        175};
+    this->inventory_panel.dimensions = {275, 175};
+    this->inventory_panel.anchor_horizontal = {AnchorType::RIGHT, 10};
+    this->inventory_panel.anchor_vertical = {AnchorType::BOTTOM, 10};
     Text t = Text(e, 0, "test-text");
-    t.overflow_clip = this->inventory_panel.rect;
     t.set_text("Inventory");
     Text t2 = Text(e, 0, "test-text2");
-    t2.overflow_clip = this->inventory_panel.rect;
     t2.set_text("Rusty Sword");
     this->inventory_panel.panel_text.push_back(t);
     this->inventory_panel.panel_text.push_back(t2);
@@ -64,6 +93,7 @@ GUI::GUI(EventBus *e) : event_bus(e)
 
 void GUI::update(double ts)
 {
+    this->inventory_panel.update_rect();
     this->event_bus->publish_render_event(
         Events::createRenderRectangleEvent(this->inventory_panel.rect, {0x11, 0x11, 0x11, 0xF0}, true, 4));
     this->event_bus->publish_render_event(

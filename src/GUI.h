@@ -22,10 +22,28 @@ struct Text
     std::string texture_key;
 };
 
+enum AnchorType
+{
+    LEFT,
+    RIGHT,
+    TOP,
+    BOTTOM
+};
+
+struct Anchor
+{
+    AnchorType type;
+    size_t offset;
+};
+
 struct UIPanel
 {
     void update(double ts);
+    void update_rect();
     Rect rect;
+    Anchor anchor_horizontal;
+    Anchor anchor_vertical;
+    V2 dimensions;
     std::vector<Text> panel_text;
 };
 
