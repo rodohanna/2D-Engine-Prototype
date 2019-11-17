@@ -22,7 +22,7 @@ void Text::set_text(std::string text)
     }
 }
 
-void Text::update(double ts)
+void Text::update(double ts, size_t z_index)
 {
     this->event_bus->publish_render_event(
         Events::createRenderTextureEvent(
@@ -30,7 +30,7 @@ void Text::update(double ts)
             this->position,
             &this->overflow_clip,
             1,
-            5));
+            z_index));
 }
 
 void UIPanel::update_rect()
@@ -67,6 +67,7 @@ void UIPanel::update_rect()
 
 void UIPanel::update(double ts)
 {
+    this->update_rect();
     int last_text_height = 0;
     for (Text &t : this->panel_text)
     {
@@ -74,15 +75,21 @@ void UIPanel::update(double ts)
             this->rect.x + (this->rect.w - t.dimensions.x) / 2,
             this->rect.y + last_text_height + 10};
         last_text_height += t.dimensions.y;
-        t.update(ts);
+        t.update(ts, this->z_index + 1);
     }
+    this->event_bus->publish_render_event(
+        Events::createRenderRectangleEvent(this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+    this->event_bus->publish_render_event(
+        Events::createRenderRectangleEvent(this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
 }
 
 GUI::GUI(EventBus *e) : event_bus(e)
 {
+    this->inventory_panel.event_bus = e;
     this->inventory_panel.dimensions = {275, 175};
     this->inventory_panel.anchor_horizontal = {AnchorType::RIGHT, 10};
     this->inventory_panel.anchor_vertical = {AnchorType::BOTTOM, 10};
+    this->inventory_panel.z_index = 4;
     Text t = Text(e, 0, "test-text");
     t.set_text("Inventory");
     Text t2 = Text(e, 0, "test-text2");
@@ -93,10 +100,5 @@ GUI::GUI(EventBus *e) : event_bus(e)
 
 void GUI::update(double ts)
 {
-    this->inventory_panel.update_rect();
-    this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(this->inventory_panel.rect, {0x11, 0x11, 0x11, 0xF0}, true, 4));
-    this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(this->inventory_panel.rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, 5));
     this->inventory_panel.update(ts);
 };

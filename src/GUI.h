@@ -10,7 +10,7 @@ struct Text
 {
     Text();
     Text(EventBus *, size_t font_index, std::string texture_key);
-    void update(double ts);
+    void update(double ts, size_t z_index = 1);
     void set_text(std::string);
     V2 dimensions;
     V2 position;
@@ -45,6 +45,8 @@ struct UIPanel
     Anchor anchor_vertical;
     V2 dimensions;
     std::vector<Text> panel_text;
+    size_t z_index;
+    EventBus *event_bus;
 };
 
 struct GUI

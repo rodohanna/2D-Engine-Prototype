@@ -4,7 +4,7 @@
 OBJS = src/main.cpp src/EventBus.cpp src/InputSystem.cpp \
  src/Player.cpp src/RenderSystem.cpp src/SDLWrapper.cpp src/Assets.cpp \
  src/Scenery.cpp src/MapGen.cpp src/Camera.cpp src/Physics.cpp src/Events.cpp \
- src/Scene.cpp src/World.cpp src/GUI.cpp
+ src/Scene.cpp src/World.cpp src/GUI.cpp src/Console.cpp
 
 #CC specifies which compiler we're using
 CC = g++

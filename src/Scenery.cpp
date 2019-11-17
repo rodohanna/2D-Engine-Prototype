@@ -1,6 +1,7 @@
 #include "Scenery.h"
 #include "Camera.h"
 #include "Physics.h"
+#include <algorithm>
 
 Scenery::Scenery(EventBus *e, const Rect &clip, const V2 &position, size_t texture_index, size_t scale)
     : clip(clip), position(position), event_bus(e), texture_index(texture_index), scale(scale) {}
@@ -11,7 +12,7 @@ BackGround::BackGround(EventBus *e, const Rect &clip, const V2 &position, size_t
 void BackGround::update(double delta)
 {
     Rect camera = Camera::get_camera();
-    size_t scale = (camera.w / this->clip.w);
+    size_t scale = std::max((camera.w / this->clip.w) + 1, (camera.h / this->clip.h) + 1);
     this->event_bus->publish_render_event(Events::createRenderTextureEvent(this->texture_index, this->clip, this->position, nullptr, scale, 0u));
 }
 
