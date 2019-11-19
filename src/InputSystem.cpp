@@ -1,4 +1,5 @@
 #include "InputSystem.h"
+#include <cstring>
 
 InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false)
 {
@@ -61,6 +62,13 @@ void InputSystem::collect_input_events()
                 event_bus->publish_input_event(iE);
                 break;
             }
+        }
+        else if (e.type == SDL_TEXTINPUT)
+        {
+            iE.type = InputEventType::TEXT_INPUT;
+            iE.data.text_input_event.is_backspace = false;
+            strcpy(iE.data.text_input_event.text, e.text.text);
+            event_bus->publish_input_event(iE);
         }
         else if (e.type == SDL_WINDOWEVENT)
         {

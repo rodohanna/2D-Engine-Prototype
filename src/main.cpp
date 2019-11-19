@@ -24,6 +24,7 @@ double SDL_GetSecondsElapsed(int64_t old_counter, int64_t current_counter)
 
 int main(int argc, char *argv[])
 {
+    setbuf(stdout, NULL); // DEBUG
 #ifdef _WIN32
     if (timeBeginPeriod(1) == TIMERR_NOCANDO)
     {
@@ -91,6 +92,10 @@ int main(int argc, char *argv[])
             {
                 // Waiting...
             }
+        }
+        else
+        {
+            printf("Frame took %f seconds for a %f time step.\n", SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()), ts);
         }
         int64_t end_counter = SDL_GetPerformanceCounter();
 

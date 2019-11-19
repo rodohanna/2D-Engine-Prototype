@@ -27,7 +27,8 @@ enum AnchorType
     LEFT,
     RIGHT,
     TOP,
-    BOTTOM
+    BOTTOM,
+    CENTER
 };
 
 struct Anchor
@@ -47,6 +48,25 @@ struct UIPanel
     std::vector<Text> panel_text;
     size_t z_index;
     EventBus *event_bus;
+};
+
+struct TextInput : IInputEventSubscriber
+{
+    TextInput();
+    TextInput(EventBus *e);
+    ~TextInput();
+    void handle_input_events(const InputEvent *, size_t);
+    void update(double ts);
+    Anchor anchor_horizontal;
+    Anchor anchor_vertical;
+    V2 dimensions;
+    Text text;
+    double blink_interval_millis;
+    double blink_interval_counter;
+    size_t z_index;
+    std::string text_buffer;
+    EventBus *event_bus;
+    bool render_cursor;
 };
 
 struct GUI

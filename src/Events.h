@@ -10,7 +10,8 @@ enum InputEventType
 {
     KEY_DOWN,
     KEY_UP,
-    WINDOW_RESIZE
+    WINDOW_RESIZE,
+    TEXT_INPUT
 };
 
 enum KeyEventType
@@ -31,12 +32,19 @@ struct WindowResizeEvent
     V2 new_size;
 };
 
+struct TextInputEvent
+{
+    char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+    bool is_backspace;
+};
+
 struct InputEvent
 {
     InputEventType type;
     union {
         KeyEvent key_event;
         WindowResizeEvent resize_event;
+        TextInputEvent text_input_event;
     } data;
 };
 
