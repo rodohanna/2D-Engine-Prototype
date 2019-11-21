@@ -177,28 +177,27 @@ void TextInput::update(double ts)
         {
             input_event.type = InputEventType::GUI_FOCUSED;
             this->event_bus->publish_input_event(input_event);
+            this->render_cursor = false; // Ensure cursor is rendered on click.
+            this->blink_interval_counter = this->blink_interval_millis;
         }
     }
 
-    if (this->is_active)
+    this->blink_interval_counter += ts;
+    if (this->blink_interval_counter > this->blink_interval_millis)
     {
-        this->blink_interval_counter += ts;
-        if (this->blink_interval_counter > this->blink_interval_millis)
-        {
-            this->blink_interval_counter = 0;
-            this->render_cursor = !this->render_cursor;
-        }
-        int cursor_height = static_cast<int>(input_rect.h * 0.5);
-        this->text->overflow_clip = input_rect;
-        this->text->set_text(this->text_buffer);
-        Rect cursor_rect = {anchored_position.x + this->text->dimensions.x + 5, anchored_position.y + (input_rect.h / 4), 2, cursor_height};
-        this->text->position = {anchored_position.x + 5, cursor_rect.y};
-        this->text->update(ts, this->z_index + 1);
-        if (this->render_cursor)
-        {
-            this->event_bus->publish_render_event(
-                Events::createRenderRectangleEvent(cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
-        }
+        this->blink_interval_counter = 0;
+        this->render_cursor = !this->render_cursor;
+    }
+    int cursor_height = static_cast<int>(input_rect.h * 0.5);
+    this->text->overflow_clip = input_rect;
+    this->text->set_text(this->text_buffer);
+    Rect cursor_rect = {anchored_position.x + this->text->dimensions.x + 5, anchored_position.y + (input_rect.h / 4), 2, cursor_height};
+    this->text->position = {anchored_position.x + 5, cursor_rect.y};
+    this->text->update(ts, this->z_index + 1);
+    if (this->is_active && this->render_cursor)
+    {
+        this->event_bus->publish_render_event(
+            Events::createRenderRectangleEvent(cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
     }
 }
 
