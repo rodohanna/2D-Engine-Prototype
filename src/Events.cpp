@@ -1,6 +1,6 @@
 #include "Events.h"
 
-RenderEvent Events::createRenderTextureEvent(size_t texture_index, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
+RenderEvent Events::create_render_texture_event(size_t texture_index, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
 {
     RenderEvent e;
     e.type = RenderEventType::RENDER_TEXTURE;
@@ -18,7 +18,7 @@ RenderEvent Events::createRenderTextureEvent(size_t texture_index, V2 &position,
     return e;
 }
 
-RenderEvent Events::createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
+RenderEvent Events::create_render_texture_event(size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
 {
     RenderEvent e;
     e.type = RenderEventType::RENDER_TEXTURE;
@@ -37,7 +37,7 @@ RenderEvent Events::createRenderTextureEvent(size_t texture_index, Rect &clip, V
     return e;
 }
 
-RenderEvent Events::createRenderRectangleEvent(const Rect &box, const Color &color, bool filled, size_t z_index)
+RenderEvent Events::create_render_rectangle_event(const Rect &box, const Color &color, bool filled, size_t z_index)
 {
     RenderEvent e;
     e.type = RenderEventType::RENDER_RECTANGLE;

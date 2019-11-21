@@ -102,9 +102,9 @@ struct RenderEvent
 
 namespace Events
 {
-RenderEvent createRenderTextureEvent(size_t texture_index, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
-RenderEvent createRenderTextureEvent(size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
-RenderEvent createRenderRectangleEvent(const Rect &box, const Color &color, bool filled = false, size_t z_index = 1);
+RenderEvent create_render_texture_event(size_t texture_index, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
+RenderEvent create_render_texture_event(size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
+RenderEvent create_render_rectangle_event(const Rect &box, const Color &color, bool filled = false, size_t z_index = 1);
 }; // namespace Events
 
 #endif

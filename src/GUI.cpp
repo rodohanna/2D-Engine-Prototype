@@ -3,6 +3,7 @@
 #include "Assets.h"
 #include "Window.h"
 #include "Physics.h"
+#include <algorithm>
 
 Text::Text(EventBus *e, size_t font_index, std::string texture_key) : event_bus(e), font_index(font_index), texture_key(texture_key){};
 
@@ -35,7 +36,7 @@ void Text::update(double ts, size_t z_index)
         return;
     }
     this->event_bus->publish_render_event(
-        Events::createRenderTextureEvent(
+        Events::create_render_texture_event(
             this->texture_index,
             this->position,
             &this->overflow_clip,
@@ -101,9 +102,9 @@ void UIPanel::update(double ts)
         t.update(ts, this->z_index + 1);
     }
     this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
     this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
+        Events::create_render_rectangle_event(this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
 }
 
 TextInput::TextInput(EventBus *e, std::string texture_key) : event_bus(e)
@@ -146,7 +147,10 @@ void TextInput::handle_input_events(const InputEvent *input_events, size_t count
             }
             else if (e.data.key_event.key == KeyEventType::ENTER_KEY)
             {
-                printf("Enter pressed\n");
+                for (ITextInputEnterHandler *handler : this->enter_handlers)
+                {
+                    handler->handle_text_input_enter_pressed();
+                }
             }
         }
         else if (e.type == InputEventType::MOUSE_CLICK)
@@ -161,7 +165,7 @@ void TextInput::update(double ts)
     V2 anchored_position = get_position_from_anchors(Window::get_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
     Rect input_rect = {anchored_position.x, anchored_position.y, this->dimensions.x, this->dimensions.y};
     this->event_bus->publish_render_event(
-        Events::createRenderRectangleEvent(input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
 
     if (this->mouse_clicked)
     {
@@ -197,8 +201,28 @@ void TextInput::update(double ts)
     if (this->is_active && this->render_cursor)
     {
         this->event_bus->publish_render_event(
-            Events::createRenderRectangleEvent(cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
+            Events::create_render_rectangle_event(cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
     }
+}
+
+void TextInput::add_enter_pressed_handler(ITextInputEnterHandler *handler)
+{
+    this->enter_handlers.push_back(handler);
+}
+
+void TextInput::remove_enter_pressed_handler(ITextInputEnterHandler *handler)
+{
+    auto it = std::find(this->enter_handlers.begin(), this->enter_handlers.end(), handler);
+    if (it != this->enter_handlers.end())
+    {
+        this->enter_handlers.erase(it);
+    }
+}
+
+void TextInput::clear()
+{
+    this->text_buffer = "";
+    this->text->set_text("");
 }
 
 GUI::GUI(EventBus *e) : event_bus(e)

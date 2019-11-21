@@ -21,10 +21,22 @@ Console::Console(EventBus *e) : event_bus(e)
     this->text_input->anchor_horizontal = {AnchorType::CENTER, 0};
     this->text_input->anchor_vertical = {AnchorType::TOP, 110};
     this->text_input->z_index = 5;
+    this->text_input->add_enter_pressed_handler(this);
 };
+
+Console::~Console()
+{
+    this->text_input->remove_enter_pressed_handler(this);
+}
 
 void Console::update(double ts)
 {
     this->console_panel.update(ts);
     this->text_input->update(ts);
 };
+
+void Console::handle_text_input_enter_pressed()
+{
+    printf("Text Input Buffer: %s\n", this->text_input->text_buffer.c_str());
+    this->text_input->clear();
+}

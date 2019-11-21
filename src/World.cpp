@@ -131,11 +131,11 @@ void ChunkManager::update_chunks(double ts)
     for (Chunk &chunk : this->active_chunks)
     {
         this->event_bus->publish_render_event(
-            Events::createRenderRectangleEvent({static_cast<int>((chunk.world_coords.x * 32) - Window::get_camera()->x),
-                                                static_cast<int>((chunk.world_coords.y * 32) - Window::get_camera()->y),
-                                                static_cast<int>(32 * this->chunk_size),
-                                                static_cast<int>(32 * this->chunk_size)},
-                                               {0xFF, 0xFF, 0xFF, 0xFF}));
+            Events::create_render_rectangle_event({static_cast<int>((chunk.world_coords.x * 32) - Window::get_camera()->x),
+                                                   static_cast<int>((chunk.world_coords.y * 32) - Window::get_camera()->y),
+                                                   static_cast<int>(32 * this->chunk_size),
+                                                   static_cast<int>(32 * this->chunk_size)},
+                                                  {0xFF, 0xFF, 0xFF, 0xFF}));
         for (size_t i = 0; i < chunk.entities.size(); ++i)
         {
             chunk.entities[i].get()->update(ts);

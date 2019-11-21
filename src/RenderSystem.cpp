@@ -63,6 +63,7 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
                 if (texture == nullptr)
                 {
                     printf("Error: RenderSystem received event with texture index to nullptr: %d\n", texture_index);
+                    SDL_RenderSetClipRect(this->renderer, nullptr);
                     break;
                 }
                 Rect *clip = nullptr;

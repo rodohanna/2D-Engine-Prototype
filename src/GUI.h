@@ -7,6 +7,12 @@
 #include <vector>
 #include <memory>
 
+struct ITextInputEnterHandler
+{
+    virtual ~ITextInputEnterHandler() = default;
+    virtual void handle_text_input_enter_pressed() = 0;
+};
+
 struct Text
 {
     Text(EventBus *, size_t font_index, std::string texture_key);
@@ -56,6 +62,9 @@ struct TextInput : IInputEventSubscriber
     ~TextInput();
     void handle_input_events(const InputEvent *, size_t);
     void update(double ts);
+    void add_enter_pressed_handler(ITextInputEnterHandler *);
+    void remove_enter_pressed_handler(ITextInputEnterHandler *);
+    void clear();
     Anchor anchor_horizontal;
     Anchor anchor_vertical;
     V2 dimensions;
@@ -65,6 +74,7 @@ struct TextInput : IInputEventSubscriber
     std::string text_buffer;
     EventBus *event_bus;
     std::unique_ptr<Text> text;
+    std::vector<ITextInputEnterHandler *> enter_handlers;
     bool mouse_clicked;
     bool is_active;
     bool render_cursor;
