@@ -1,6 +1,6 @@
 #include "Player.h"
 #include "Assets.h"
-#include "Camera.h"
+#include "Window.h"
 #include <stdio.h>
 
 Player::Player(EventBus *eB, const V2 &p, const Color &c) : event_bus(eB), color(c), position(p)
@@ -35,9 +35,8 @@ void Player::update(double ts)
     {
         this->position.x += vel;
     }
-    Rect old_camera = Camera::get_camera();
-    Rect new_camera = {this->position.x, this->position.y, old_camera.w, old_camera.h};
-    Camera::set_camera(new_camera);
+    Rect *old_camera = Window::get_camera();
+    Window::set_camera({this->position.x, this->position.y, old_camera->w, old_camera->h});
 }
 void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
 {
@@ -84,11 +83,10 @@ void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
         }
         else if (e.type == InputEventType::WINDOW_RESIZE)
         {
-            Rect new_camera = {this->position.x,
-                               this->position.y,
-                               e.data.resize_event.new_size.x,
-                               e.data.resize_event.new_size.y};
-            Camera::set_camera(new_camera);
+            Window::set_camera({this->position.x,
+                                this->position.y,
+                                e.data.resize_event.new_size.x,
+                                e.data.resize_event.new_size.y});
         }
     }
 }

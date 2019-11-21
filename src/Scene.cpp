@@ -2,7 +2,7 @@
 
 #include "MapGen.h"
 #include "GameTypes.h"
-#include "Camera.h"
+#include "Window.h"
 #include <stdlib.h>
 #include <sstream>
 #include <fstream>
@@ -22,8 +22,7 @@ Scene::Scene(EventBus *e) : event_bus(e)
 
 void Scene::update(double ts)
 {
-    Rect camera = Camera::get_camera();
-    V2 player = {camera.x, camera.y};
+    V2 player = {Window::get_camera()->x, Window::get_camera()->y};
     this->gui->update(ts);
     this->chunk_manager.get()->sync_chunks_to_world_position(player);
     this->chunk_manager.get()->update_chunks(ts);

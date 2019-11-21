@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "Assets.h"
 #include "MapGen.h"
-#include "Camera.h"
+#include "Window.h"
 #include "Scene.h"
 #include <memory>
 #include <algorithm>
@@ -67,8 +67,7 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // testing
-    Rect camera = {0, 0, 800, 640};
-    Camera::set_camera(camera);
+    Window::set_camera({0, 0, 800, 640});
     Scene scene(&event_bus);
     while (!input_system.quit)
     {

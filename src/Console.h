@@ -3,13 +3,14 @@
 
 #include "GUI.h"
 #include "EventBus.h"
+#include <memory>
 
 struct Console
 {
     Console(EventBus *);
     void update(double ts);
     UIPanel console_panel;
-    TextInput text_input;
+    std::unique_ptr<TextInput> text_input;
     EventBus *event_bus;
 };
 

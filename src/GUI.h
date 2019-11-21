@@ -5,10 +5,10 @@
 #include "EventBus.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 struct Text
 {
-    Text();
     Text(EventBus *, size_t font_index, std::string texture_key);
     void update(double ts, size_t z_index = 1);
     void set_text(std::string);
@@ -52,20 +52,21 @@ struct UIPanel
 
 struct TextInput : IInputEventSubscriber
 {
-    TextInput();
-    TextInput(EventBus *e);
+    TextInput(EventBus *e, std::string texture_key);
     ~TextInput();
     void handle_input_events(const InputEvent *, size_t);
     void update(double ts);
     Anchor anchor_horizontal;
     Anchor anchor_vertical;
     V2 dimensions;
-    Text text;
     double blink_interval_millis;
     double blink_interval_counter;
     size_t z_index;
     std::string text_buffer;
     EventBus *event_bus;
+    std::unique_ptr<Text> text;
+    bool mouse_clicked;
+    bool is_active;
     bool render_cursor;
 };
 

@@ -1,5 +1,5 @@
 #include "World.h"
-#include "Camera.h"
+#include "Window.h"
 
 ChunkManager::ChunkManager(EventBus *e, World &world, size_t chunk_size) : world(world), event_bus(e), chunk_size(chunk_size){};
 
@@ -130,10 +130,9 @@ void ChunkManager::update_chunks(double ts)
 {
     for (Chunk &chunk : this->active_chunks)
     {
-        Rect camera = Camera::get_camera();
         this->event_bus->publish_render_event(
-            Events::createRenderRectangleEvent({static_cast<int>((chunk.world_coords.x * 32) - camera.x),
-                                                static_cast<int>((chunk.world_coords.y * 32) - camera.y),
+            Events::createRenderRectangleEvent({static_cast<int>((chunk.world_coords.x * 32) - Window::get_camera()->x),
+                                                static_cast<int>((chunk.world_coords.y * 32) - Window::get_camera()->y),
                                                 static_cast<int>(32 * this->chunk_size),
                                                 static_cast<int>(32 * this->chunk_size)},
                                                {0xFF, 0xFF, 0xFF, 0xFF}));

@@ -86,6 +86,7 @@ TextTextureInfo Assets::create_texture_from_text(SDL_Renderer *renderer, size_t 
         texture_index = texture_table.size();
         texture = new Texture(new_texture, {text_surface->w, text_surface->h}, texture_index);
         texture_table.push_back(std::unique_ptr<Texture>(texture));
+        texture_index_map[texture_key] = texture_index;
     }
     else
     {

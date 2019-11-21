@@ -1,8 +1,11 @@
 #include "InputSystem.h"
+#include "Window.h"
 #include <cstring>
 
 InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false)
 {
+    V2 *mouse_position = Window::get_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
 }
 InputSystem::~InputSystem()
 {
@@ -77,8 +80,18 @@ void InputSystem::collect_input_events()
                 iE.type = InputEventType::WINDOW_RESIZE;
                 iE.data.resize_event = {e.window.data1, e.window.data2};
                 event_bus->publish_input_event(iE);
-                break;
+            }
+        }
+        else if (e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            if (e.button.button == SDL_BUTTON_LEFT)
+            {
+                iE.type = InputEventType::MOUSE_CLICK;
+                iE.data.mouse_click_event.button = MouseButton::MOUSE_BUTTON_LEFT;
+                event_bus->publish_input_event(iE);
             }
         }
     }
+    V2 *mouse_position = Window::get_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
 }

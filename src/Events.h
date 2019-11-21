@@ -11,7 +11,8 @@ enum InputEventType
     KEY_DOWN,
     KEY_UP,
     WINDOW_RESIZE,
-    TEXT_INPUT
+    TEXT_INPUT,
+    MOUSE_CLICK,
 };
 
 enum KeyEventType
@@ -38,6 +39,17 @@ struct TextInputEvent
     bool is_backspace;
 };
 
+enum MouseButton
+{
+    MOUSE_BUTTON_LEFT,
+    MOUSE_BUTTON_RIGHT
+};
+
+struct MouseClickEvent
+{
+    MouseButton button;
+};
+
 struct InputEvent
 {
     InputEventType type;
@@ -45,6 +57,7 @@ struct InputEvent
         KeyEvent key_event;
         WindowResizeEvent resize_event;
         TextInputEvent text_input_event;
+        MouseClickEvent mouse_click_event;
     } data;
 };
 
