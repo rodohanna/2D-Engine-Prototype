@@ -134,6 +134,21 @@ void TextInput::handle_input_events(const InputEvent *input_events, size_t count
         {
             this->text_buffer.append(e.data.text_input_event.text);
         }
+        else if (e.type == InputEventType::KEY_DOWN && this->is_active)
+        {
+            if (e.data.key_event.key == KeyEventType::BACKSPACE_KEY)
+            {
+
+                if (this->text_buffer != "")
+                {
+                    this->text_buffer.pop_back();
+                }
+            }
+            else if (e.data.key_event.key == KeyEventType::ENTER_KEY)
+            {
+                printf("Enter pressed\n");
+            }
+        }
         else if (e.type == InputEventType::MOUSE_CLICK)
         {
             this->mouse_clicked = e.data.mouse_click_event.button == MouseButton::MOUSE_BUTTON_LEFT;
@@ -150,7 +165,19 @@ void TextInput::update(double ts)
 
     if (this->mouse_clicked)
     {
+        bool was_active = this->is_active;
         this->is_active = Physics::checkPointInRect(Window::get_mouse_position(), &input_rect);
+        InputEvent input_event;
+        if (was_active && !this->is_active)
+        {
+            input_event.type = InputEventType::GUI_UNFOCUSED;
+            this->event_bus->publish_input_event(input_event);
+        }
+        else if (!was_active && this->is_active)
+        {
+            input_event.type = InputEventType::GUI_FOCUSED;
+            this->event_bus->publish_input_event(input_event);
+        }
     }
 
     if (this->is_active)

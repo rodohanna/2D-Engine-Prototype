@@ -13,6 +13,8 @@ enum InputEventType
     WINDOW_RESIZE,
     TEXT_INPUT,
     MOUSE_CLICK,
+    GUI_FOCUSED,
+    GUI_UNFOCUSED
 };
 
 enum KeyEventType
@@ -21,6 +23,8 @@ enum KeyEventType
     A_KEY,
     S_KEY,
     D_KEY,
+    BACKSPACE_KEY,
+    ENTER_KEY
 };
 
 struct KeyEvent

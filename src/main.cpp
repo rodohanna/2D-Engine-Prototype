@@ -71,10 +71,16 @@ int main(int argc, char *argv[])
     Scene scene(&event_bus);
     while (!input_system.quit)
     {
+        // Let the input system handle any programmatically generated events from the last frame.
+        input_system.handle_input_events(event_bus.input_queue, event_bus.input_queue_length);
 
+        // Clear out last frames events;
         event_bus.clear_input_events();
+
+        // Collect input, let everyone know, then clear input events.
         input_system.collect_input_events();
         event_bus.notify_input_event_subscribers();
+        event_bus.clear_input_events();
 
         event_bus.clear_render_events();
         player.update(ts);

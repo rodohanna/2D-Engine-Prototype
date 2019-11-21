@@ -2,7 +2,7 @@
 #include "Window.h"
 #include <cstring>
 
-InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false)
+InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false), some_gui_is_focused(false)
 {
     V2 *mouse_position = Window::get_mouse_position();
     SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
@@ -20,50 +20,84 @@ void InputSystem::collect_input_events()
         {
             this->quit = true;
         }
-        else if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+        else if (e.type == SDL_KEYDOWN)
         {
             iE.type = InputEventType::KEY_DOWN;
-            switch (e.key.keysym.sym)
+            if (this->some_gui_is_focused)
             {
-            case SDLK_w:
-                iE.data.key_event.key = W_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_a:
-                iE.data.key_event.key = A_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_s:
-                iE.data.key_event.key = S_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_d:
-                iE.data.key_event.key = D_KEY;
-                event_bus->publish_input_event(iE);
-                break;
+                if (e.key.keysym.sym == SDLK_BACKSPACE)
+                {
+                    iE.data.key_event.key = BACKSPACE_KEY;
+                    event_bus->publish_input_event(iE);
+                }
+                else if (e.key.keysym.sym == SDLK_RETURN)
+                {
+                    iE.data.key_event.key = ENTER_KEY;
+                    event_bus->publish_input_event(iE);
+                }
+                continue;
+            }
+            if (e.key.repeat == 0)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_w:
+                    iE.data.key_event.key = W_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_a:
+                    iE.data.key_event.key = A_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_s:
+                    iE.data.key_event.key = S_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_d:
+                    iE.data.key_event.key = D_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                }
             }
         }
-        else if (e.type == SDL_KEYUP && e.key.repeat == 0)
+        else if (e.type == SDL_KEYUP)
         {
             iE.type = InputEventType::KEY_UP;
-            switch (e.key.keysym.sym)
+            if (this->some_gui_is_focused)
             {
-            case SDLK_w:
-                iE.data.key_event.key = W_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_a:
-                iE.data.key_event.key = A_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_s:
-                iE.data.key_event.key = S_KEY;
-                event_bus->publish_input_event(iE);
-                break;
-            case SDLK_d:
-                iE.data.key_event.key = D_KEY;
-                event_bus->publish_input_event(iE);
-                break;
+                if (e.key.keysym.sym == SDLK_BACKSPACE)
+                {
+                    iE.data.key_event.key = BACKSPACE_KEY;
+                    event_bus->publish_input_event(iE);
+                }
+                else if (e.key.keysym.sym == SDLK_KP_ENTER)
+                {
+                    iE.data.key_event.key = ENTER_KEY;
+                    event_bus->publish_input_event(iE);
+                }
+                continue;
+            }
+            if (e.key.repeat == 0)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_w:
+                    iE.data.key_event.key = W_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_a:
+                    iE.data.key_event.key = A_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_s:
+                    iE.data.key_event.key = S_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                case SDLK_d:
+                    iE.data.key_event.key = D_KEY;
+                    event_bus->publish_input_event(iE);
+                    break;
+                }
             }
         }
         else if (e.type == SDL_TEXTINPUT)
@@ -94,4 +128,20 @@ void InputSystem::collect_input_events()
     }
     V2 *mouse_position = Window::get_mouse_position();
     SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+}
+
+void InputSystem::handle_input_events(const InputEvent *input_events, size_t length)
+{
+    for (size_t i = 0; i < length; ++i)
+    {
+        InputEvent e = input_events[i];
+        if (e.type == InputEventType::GUI_FOCUSED)
+        {
+            this->some_gui_is_focused = true;
+        }
+        else if (e.type == InputEventType::GUI_UNFOCUSED)
+        {
+            this->some_gui_is_focused = false;
+        }
+    }
 }
