@@ -1,23 +1,29 @@
 #include "RenderSystem.h"
 #include "Assets.h"
+#include "Window.h"
 #include <stdio.h>
 #include <algorithm>
 
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
 {
+    SDL_RenderSetScale(r, 2.0, 2.0);
+    V2 *mouse_position = Window::get_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
     this->event_bus->subscribe_to_render_events(this);
+    this->event_bus->subscribe_to_input_events(this);
     this->texture_table = Assets::get_texture_table();
 }
 RenderSystem::~RenderSystem()
 {
     this->event_bus->subscribe_to_render_events(this);
+    this->event_bus->unsubscribe_to_input_events(this);
 }
 
 bool compare_render_events(RenderEvent a, RenderEvent b)
 {
     return a.z_index < b.z_index;
 }
-void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length, double alpha)
+void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length)
 {
     std::vector<RenderEvent> render_vector(render_events, render_events + length);
     std::sort(render_vector.begin(), render_vector.end(), compare_render_events);
@@ -79,11 +85,21 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
         }
     }
     SDL_RenderPresent(renderer);
+    V2 *mouse_position = Window::get_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+    mouse_position->x /= 2;
+    mouse_position->y /= 2;
 }
-void RenderSystem::render()
+void RenderSystem::handle_input_events(const InputEvent *input_events, size_t length)
 {
-    //
-}
-void RenderSystem::update()
-{
+    for (size_t i = 0; i < length; ++i)
+    {
+        InputEvent e = input_events[i];
+        if (e.type == InputEventType::WINDOW_RESIZE)
+        {
+            Rect *camera = Window::get_camera();
+            camera->w = e.data.resize_event.new_size.x / 2;
+            camera->h = e.data.resize_event.new_size.y / 2;
+        }
+    }
 }

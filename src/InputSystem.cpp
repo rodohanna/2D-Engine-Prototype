@@ -1,11 +1,8 @@
 #include "InputSystem.h"
-#include "Window.h"
 #include <cstring>
 
 InputSystem::InputSystem(EventBus *eB) : event_bus(eB), quit(false), some_gui_is_focused(false)
 {
-    V2 *mouse_position = Window::get_mouse_position();
-    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
 }
 InputSystem::~InputSystem()
 {
@@ -126,8 +123,6 @@ void InputSystem::collect_input_events()
             }
         }
     }
-    V2 *mouse_position = Window::get_mouse_position();
-    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
 }
 
 void InputSystem::handle_input_events(const InputEvent *input_events, size_t length)

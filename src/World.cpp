@@ -5,8 +5,8 @@ ChunkManager::ChunkManager(EventBus *e, World &world, size_t chunk_size) : world
 
 void ChunkManager::sync_chunks_to_world_position(V2 &world_position)
 {
-    int x_chunk = world_position.x / (int)(this->chunk_size * 32);
-    int y_chunk = world_position.y / (int)(this->chunk_size * 32);
+    int x_chunk = world_position.x / (int)(this->chunk_size * 16);
+    int y_chunk = world_position.y / (int)(this->chunk_size * 16);
     if (last_world_position_sync.x == x_chunk && last_world_position_sync.y == y_chunk)
     {
         return;
@@ -131,10 +131,10 @@ void ChunkManager::update_chunks(double ts)
     for (Chunk &chunk : this->active_chunks)
     {
         this->event_bus->publish_render_event(
-            Events::create_render_rectangle_event({static_cast<int>((chunk.world_coords.x * 32) - Window::get_camera()->x),
-                                                   static_cast<int>((chunk.world_coords.y * 32) - Window::get_camera()->y),
-                                                   static_cast<int>(32 * this->chunk_size),
-                                                   static_cast<int>(32 * this->chunk_size)},
+            Events::create_render_rectangle_event({static_cast<int>((chunk.world_coords.x * 16) - Window::get_camera()->x),
+                                                   static_cast<int>((chunk.world_coords.y * 16) - Window::get_camera()->y),
+                                                   static_cast<int>(16 * this->chunk_size),
+                                                   static_cast<int>(16 * this->chunk_size)},
                                                   {0xFF, 0xFF, 0xFF, 0xFF}));
         for (size_t i = 0; i < chunk.entities.size(); ++i)
         {

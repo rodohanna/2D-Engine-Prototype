@@ -1,5 +1,3 @@
-2
-
 background ground tilesheet-colored 0 0 16 16
 
 ground loose-dirt-1 tilesheet-transparent 17 0 16 16

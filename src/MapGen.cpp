@@ -19,7 +19,6 @@ Palette MapGen::load_palette(std::string path)
     }
     std::string type, key, texture_key;
     size_t x_offset, y_offset, width, height;
-    palette_manifest >> palette.scale;
     while (palette_manifest >> type >> key >> texture_key >> x_offset >> y_offset >> width >> height)
     {
         if (palette_manifest.fail())
@@ -70,7 +69,7 @@ std::vector<std::shared_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRu
                 size_t texture_index = p->tree_tiles[rand_index].texture_index;
                 Rect clip = p->tree_tiles[rand_index].clip;
                 size_t scale = p->tree_tiles[rand_index].scale;
-                Tree *tree = new Tree(e, clip, {(world_offset.x * 32) + (i * 32), (world_offset.y * 32) + (j * 32)}, texture_index, scale);
+                Tree *tree = new Tree(e, clip, {(world_offset.x * 16) + (i * 16), (world_offset.y * 16) + (j * 16)}, texture_index, scale);
                 map.push_back(std::shared_ptr<IEntity>(tree));
             }
             else if (static_cast<size_t>((rand() % 100)) < r->ground_weight)
@@ -79,7 +78,7 @@ std::vector<std::shared_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRu
                 size_t texture_index = p->ground_tiles[rand_index].texture_index;
                 Rect clip = p->ground_tiles[rand_index].clip;
                 size_t scale = p->ground_tiles[rand_index].scale;
-                Dirt *dirt = new Dirt(e, clip, {(world_offset.x * 32) + (i * 32), (world_offset.y * 32) + (j * 32)}, texture_index, scale);
+                Dirt *dirt = new Dirt(e, clip, {(world_offset.x * 16) + (i * 16), (world_offset.y * 16) + (j * 16)}, texture_index, scale);
                 map.push_back(std::shared_ptr<IEntity>(dirt));
             }
         }

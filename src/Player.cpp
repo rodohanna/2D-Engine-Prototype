@@ -81,12 +81,5 @@ void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
                 actions[PlayerActions::MOVE_RIGHT] = false;
             }
         }
-        else if (e.type == InputEventType::WINDOW_RESIZE)
-        {
-            Window::set_camera({this->position.x,
-                                this->position.y,
-                                e.data.resize_event.new_size.x,
-                                e.data.resize_event.new_size.y});
-        }
     }
 }

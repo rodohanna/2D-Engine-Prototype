@@ -70,11 +70,11 @@ void EventBus::unsubscribe_to_render_events(IRenderEventSubscriber *subscriber)
     }
 }
 
-void EventBus::notify_render_event_subscribers(double alpha)
+void EventBus::notify_render_event_subscribers()
 {
     for (auto it = this->renderEventSubscribers.begin(); it != this->renderEventSubscribers.end(); ++it)
     {
-        (*it)->handle_render_events(this->render_queue, this->render_queue_length, alpha);
+        (*it)->handle_render_events(this->render_queue, this->render_queue_length);
     }
 }
 

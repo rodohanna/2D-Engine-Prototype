@@ -17,7 +17,7 @@ struct IInputEventSubscriber
 struct IRenderEventSubscriber
 {
     virtual ~IRenderEventSubscriber() = default;
-    virtual void handle_render_events(const RenderEvent *, size_t, double) = 0;
+    virtual void handle_render_events(const RenderEvent *, size_t) = 0;
 };
 struct EventBus
 {
@@ -32,7 +32,7 @@ struct EventBus
     void publish_render_event(const RenderEvent &e);
     void subscribe_to_render_events(IRenderEventSubscriber *);
     void unsubscribe_to_render_events(IRenderEventSubscriber *);
-    void notify_render_event_subscribers(double alpha);
+    void notify_render_event_subscribers();
 
     void clear_input_events();
     void clear_render_events();
