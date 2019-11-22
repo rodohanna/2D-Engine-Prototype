@@ -13,6 +13,12 @@ struct ITextInputEnterHandler
     virtual void handle_text_input_enter_pressed() = 0;
 };
 
+struct IButtonClickHandler
+{
+    virtual ~IButtonClickHandler() = default;
+    virtual void handle_button_clicked() = 0;
+};
+
 struct Text
 {
     Text(EventBus *, size_t font_index, std::string texture_key);
@@ -40,7 +46,7 @@ enum AnchorType
 struct Anchor
 {
     AnchorType type;
-    size_t offset;
+    int offset;
 };
 
 struct UIPanel
@@ -54,6 +60,24 @@ struct UIPanel
     std::vector<Text> panel_text;
     size_t z_index;
     EventBus *event_bus;
+};
+
+struct Button : IInputEventSubscriber
+{
+    Button(EventBus *e, std::string text, std::string texture_key);
+    ~Button();
+    void update(double ts);
+    void handle_input_events(const InputEvent *, size_t);
+    void add_click_handler(IButtonClickHandler *);
+    void remove_click_handler(IButtonClickHandler *);
+    V2 dimensions;
+    Anchor anchor_horizontal;
+    Anchor anchor_vertical;
+    size_t z_index;
+    EventBus *event_bus;
+    std::unique_ptr<Text> text;
+    std::vector<IButtonClickHandler *> click_handlers;
+    bool mouse_clicked;
 };
 
 struct TextInput : IInputEventSubscriber

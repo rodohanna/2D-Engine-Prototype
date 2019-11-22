@@ -19,7 +19,7 @@ void render_if_on_screen(EventBus *event_bus, size_t texture_index, V2 &position
 {
     V2 render_position = {position.x - Window::get_camera()->x, position.y - Window::get_camera()->y};
     Rect box = {position.x, position.y, static_cast<int>(clip.w * scale), static_cast<int>(clip.h * scale)};
-    if (Physics::checkCollision(Window::get_camera(), &box))
+    if (Physics::check_collision(Window::get_camera(), &box))
     {
         event_bus->publish_render_event(Events::create_render_texture_event(texture_index, clip, render_position, nullptr, scale, 1u));
     }

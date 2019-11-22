@@ -5,8 +5,9 @@
 
 namespace Physics
 {
-bool checkCollision(Rect *a, Rect *b);
-bool checkPointInRect(V2 *point, SDL_Rect *rect);
+bool check_collision(Rect *a, Rect *b);
+bool check_point_in_rect(V2 *point, SDL_Rect *rect);
+int lerp(double start, double end, double normal);
 }; // namespace Physics
 
 #endif

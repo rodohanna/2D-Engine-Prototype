@@ -107,6 +107,75 @@ void UIPanel::update(double ts)
         Events::create_render_rectangle_event(this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
 }
 
+Button::Button(EventBus *e, std::string text, std::string texture_key) : event_bus(e), mouse_clicked(false)
+{
+    e->subscribe_to_input_events(this);
+    Text *t = new Text(e, 0, texture_key);
+    this->text = std::unique_ptr<Text>(t);
+    this->text->set_text(text);
+}
+
+Button::~Button()
+{
+    this->event_bus->subscribe_to_input_events(this);
+}
+
+void Button::update(double ts)
+{
+    Rect *camera = Window::get_camera();
+    V2 position = get_position_from_anchors(camera, this->dimensions, this->anchor_horizontal, this->anchor_vertical);
+    Rect rect = {position.x, position.y, this->dimensions.x, this->dimensions.y};
+    Color button_color = {0x11, 0x11, 0x11, 0xF0};
+
+    if (Physics::check_point_in_rect(Window::get_mouse_position(), &rect)) // is hovered
+    {
+        button_color = {0x22, 0x22, 0x22, 0xF0};
+        if (mouse_clicked)
+        {
+            for (IButtonClickHandler *handler : this->click_handlers)
+            {
+                handler->handle_button_clicked();
+            }
+        }
+    }
+    this->event_bus->publish_render_event(
+        Events::create_render_rectangle_event(rect, button_color, true, this->z_index));
+    this->text->position = {
+        position.x + (this->dimensions.x - this->text->dimensions.x) / 2,
+        position.y + (this->dimensions.y - this->text->dimensions.y) / 2,
+    };
+    // TODO: I shouldn't have to specify an overflow clip of the entire window just to get text to render.
+    this->text->overflow_clip = {0, 0, camera->w, camera->h};
+    this->text->update(ts, this->z_index + 1);
+}
+
+void Button::handle_input_events(const InputEvent *input_events, size_t count)
+{
+    this->mouse_clicked = false;
+    for (size_t i = 0; i < count; ++i)
+    {
+        InputEvent e = input_events[i];
+        if (e.type == InputEventType::MOUSE_CLICK)
+        {
+            this->mouse_clicked = e.data.mouse_click_event.button == MouseButton::MOUSE_BUTTON_LEFT;
+        }
+    }
+}
+
+void Button::add_click_handler(IButtonClickHandler *handler)
+{
+    this->click_handlers.push_back(handler);
+}
+
+void Button::remove_click_handler(IButtonClickHandler *handler)
+{
+    auto it = std::find(this->click_handlers.begin(), this->click_handlers.end(), handler);
+    if (it != this->click_handlers.end())
+    {
+        this->click_handlers.erase(it);
+    }
+}
+
 TextInput::TextInput(EventBus *e, std::string texture_key) : event_bus(e)
 {
     e->subscribe_to_input_events(this);
@@ -170,7 +239,7 @@ void TextInput::update(double ts)
     if (this->mouse_clicked)
     {
         bool was_active = this->is_active;
-        this->is_active = Physics::checkPointInRect(Window::get_mouse_position(), &input_rect);
+        this->is_active = Physics::check_point_in_rect(Window::get_mouse_position(), &input_rect);
         InputEvent input_event;
         if (was_active && !this->is_active)
         {
