@@ -43,6 +43,12 @@ enum AnchorType
     CENTER
 };
 
+enum TextAlign
+{
+    TEXT_ALIGN_TOP,
+    TEXT_ALIGN_BOTTOM
+};
+
 struct Anchor
 {
     AnchorType type;
@@ -57,6 +63,7 @@ struct UIPanel
     Anchor anchor_horizontal;
     Anchor anchor_vertical;
     V2 dimensions;
+    TextAlign text_align;
     std::vector<Text> panel_text;
     size_t z_index;
     EventBus *event_bus;
@@ -89,6 +96,8 @@ struct TextInput : IInputEventSubscriber
     void add_enter_pressed_handler(ITextInputEnterHandler *);
     void remove_enter_pressed_handler(ITextInputEnterHandler *);
     void clear();
+    void get_input_focus();
+    void release_input_focus();
     Anchor anchor_horizontal;
     Anchor anchor_vertical;
     V2 dimensions;

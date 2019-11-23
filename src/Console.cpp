@@ -1,19 +1,13 @@
 #include "Console.h"
 #include "Window.h"
-Console::Console(EventBus *e) : event_bus(e)
+Console::Console(EventBus *e) : event_bus(e), console_active(false), should_release_text_input_focus(false)
 {
-    // init UIPanel
     this->console_panel.event_bus = e;
     this->console_panel.dimensions = {400, 100};
     this->console_panel.anchor_horizontal = {AnchorType::LEFT, -this->console_panel.dimensions.x};
     this->console_panel.anchor_vertical = {AnchorType::TOP, 5};
     this->console_panel.z_index = 5;
-    Text t = Text(e, 0, "console-text");
-    t.set_text("TODO: Add Console Here");
-    this->console_panel.panel_text.push_back(t);
-    this->console_panel.panel_text.push_back(t);
-    this->console_panel.panel_text.push_back(t);
-    this->console_panel.panel_text.push_back(t);
+    this->console_panel.text_align = TextAlign::TEXT_ALIGN_BOTTOM;
 
     TextInput *text_input = new TextInput(e, "console-input");
     this->text_input = std::unique_ptr<TextInput>(text_input);
@@ -45,6 +39,11 @@ void Console::update(double ts)
     this->panel_animator.update(ts, &this->console_panel.anchor_horizontal.offset);
     this->text_input_animator.update(ts, &this->text_input->anchor_horizontal.offset);
     this->button->update(ts);
+    if (this->should_release_text_input_focus)
+    {
+        this->should_release_text_input_focus = false;
+        this->text_input->release_input_focus();
+    }
 };
 
 void Console::handle_text_input_enter_pressed()
@@ -52,11 +51,15 @@ void Console::handle_text_input_enter_pressed()
     printf("Text Input Buffer: %s\n", this->text_input->text_buffer.c_str());
     this->dispatch_console_command(this->text_input->text_buffer);
     this->text_input->clear();
+    this->should_release_text_input_focus = true;
 }
 
 void Console::dispatch_console_command(std::string command)
 {
     Events::DebugEvent e = {};
+    Text t = Text(this->event_bus, 0, command);
+    t.set_text(command);
+    this->console_panel.panel_text.push_back(t);
     if (command == "show chunks")
     {
         e.type = Events::DebugEventType::SHOW_CHUNK_BOUNDARY;
@@ -71,9 +74,26 @@ void Console::dispatch_console_command(std::string command)
 
 void Console::handle_button_clicked()
 {
-    this->panel_animator.reset();
-    this->panel_animator.start(.25, this->console_panel.anchor_horizontal.offset, 5);
+    if (this->console_active)
+    {
+        this->console_active = false;
+        this->button->text->set_text(">");
 
-    this->text_input_animator.reset();
-    this->text_input_animator.start(.25, this->text_input->anchor_horizontal.offset, 5, .15);
+        this->panel_animator.reset();
+        this->panel_animator.start(.25, this->console_panel.anchor_horizontal.offset, -this->console_panel.dimensions.x, .15);
+
+        this->text_input_animator.reset();
+        this->text_input_animator.start(.25, this->text_input->anchor_horizontal.offset, -this->text_input->dimensions.x);
+    }
+    else
+    {
+        this->console_active = true;
+        this->button->text->set_text("<");
+
+        this->panel_animator.reset();
+        this->panel_animator.start(.25, this->console_panel.anchor_horizontal.offset, 5);
+
+        this->text_input_animator.reset();
+        this->text_input_animator.start(.25, this->text_input->anchor_horizontal.offset, 5, .15);
+    }
 }

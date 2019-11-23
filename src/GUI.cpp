@@ -94,13 +94,28 @@ void UIPanel::update(double ts)
 {
     this->update_rect();
     int last_text_height = 0;
-    for (Text &t : this->panel_text)
+    if (this->text_align == TextAlign::TEXT_ALIGN_TOP)
     {
-        t.position = {
-            this->rect.x + (this->rect.w - t.dimensions.x) / 2,
-            this->rect.y + last_text_height + 10};
-        last_text_height += t.dimensions.y;
-        t.update(ts, this->z_index + 1);
+        for (Text &t : this->panel_text)
+        {
+            t.position = {
+                this->rect.x + (this->rect.w - t.dimensions.x) / 2,
+                this->rect.y + last_text_height + 10};
+            last_text_height += t.dimensions.y;
+            t.update(ts, this->z_index + 1);
+        }
+    }
+    else
+    {
+        for (int i = this->panel_text.size() - 1; i >= 0; --i)
+        {
+            Text *t = &this->panel_text[i];
+            last_text_height += t->dimensions.y;
+            t->position = {
+                this->rect.x + (this->rect.w - t->dimensions.x) / 2,
+                this->rect.y + this->rect.h - last_text_height - 10};
+            t->update(ts, this->z_index + 1);
+        }
     }
     this->event_bus->publish_render_event(
         Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
@@ -241,16 +256,13 @@ void TextInput::update(double ts)
     {
         bool was_active = this->is_active;
         this->is_active = Physics::check_point_in_rect(Window::get_gui_mouse_position(), &input_rect);
-        Events::InputEvent input_event;
         if (was_active && !this->is_active)
         {
-            input_event.type = Events::InputEventType::GUI_UNFOCUSED;
-            this->event_bus->publish_input_event(input_event);
+            this->release_input_focus();
         }
         else if (!was_active && this->is_active)
         {
-            input_event.type = Events::InputEventType::GUI_FOCUSED;
-            this->event_bus->publish_input_event(input_event);
+            this->get_input_focus();
             this->render_cursor = false; // Ensure cursor is rendered on click.
             this->blink_interval_counter = this->blink_interval_millis;
         }
@@ -295,6 +307,20 @@ void TextInput::clear()
     this->text->set_text("");
 }
 
+void TextInput::get_input_focus()
+{
+    Events::InputEvent input_event = {};
+    input_event.type = Events::InputEventType::GUI_FOCUSED;
+    this->event_bus->publish_input_event(input_event);
+}
+void TextInput::release_input_focus()
+{
+    Events::InputEvent input_event = {};
+    input_event.type = Events::InputEventType::GUI_UNFOCUSED;
+    this->event_bus->publish_input_event(input_event);
+    this->is_active = false;
+}
+
 GUI::GUI(EventBus *e) : event_bus(e)
 {
     this->inventory_panel.event_bus = e;
@@ -302,6 +328,7 @@ GUI::GUI(EventBus *e) : event_bus(e)
     this->inventory_panel.anchor_horizontal = {AnchorType::RIGHT, 10};
     this->inventory_panel.anchor_vertical = {AnchorType::BOTTOM, 10};
     this->inventory_panel.z_index = 4;
+    this->inventory_panel.text_align = TextAlign::TEXT_ALIGN_TOP;
     Text t = Text(e, 0, "test-text");
     t.set_text("Demo UI Panel");
     this->inventory_panel.panel_text.push_back(t);
