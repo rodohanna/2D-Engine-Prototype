@@ -5,6 +5,8 @@
 #include "GameTypes.h"
 #include "Assets.h"
 
+namespace Events
+{
 // Input Events
 enum InputEventType
 {
@@ -107,8 +109,21 @@ struct RenderEvent
     } data;
 };
 
-namespace Events
+// Debug events
+
+// I want a debug event:
+// To show chunk boundaries
+// To show grid
+
+enum DebugEventType
 {
+    //
+};
+
+struct DebugEvent
+{
+};
+
 RenderEvent create_render_texture_event(RenderLayer layer, size_t texture_index, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
 RenderEvent create_render_texture_event(RenderLayer layer, size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);
 RenderEvent create_render_rectangle_event(RenderLayer layer, const Rect &box, const Color &color, bool filled = false, size_t z_index = 1);

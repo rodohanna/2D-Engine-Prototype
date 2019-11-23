@@ -37,7 +37,7 @@ void Text::update(double ts, size_t z_index)
     }
     this->event_bus->publish_render_event(
         Events::create_render_texture_event(
-            RenderLayer::GUI_LAYER,
+            Events::RenderLayer::GUI_LAYER,
             this->texture_index,
             this->position,
             &this->overflow_clip,
@@ -103,9 +103,9 @@ void UIPanel::update(double ts)
         t.update(ts, this->z_index + 1);
     }
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
+        Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
 }
 
 Button::Button(EventBus *e, std::string text, std::string texture_key) : event_bus(e), mouse_clicked(false)
@@ -140,7 +140,7 @@ void Button::update(double ts)
         }
     }
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, rect, button_color, true, this->z_index));
+        Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, rect, button_color, true, this->z_index));
     this->text->position = {
         position.x + (this->dimensions.x - this->text->dimensions.x) / 2,
         position.y + (this->dimensions.y - this->text->dimensions.y) / 2,
@@ -150,15 +150,15 @@ void Button::update(double ts)
     this->text->update(ts, this->z_index + 1);
 }
 
-void Button::handle_input_events(const InputEvent *input_events, size_t count)
+void Button::handle_input_events(const Events::InputEvent *input_events, size_t count)
 {
     this->mouse_clicked = false;
     for (size_t i = 0; i < count; ++i)
     {
-        InputEvent e = input_events[i];
-        if (e.type == InputEventType::MOUSE_CLICK)
+        Events::InputEvent e = input_events[i];
+        if (e.type == Events::InputEventType::MOUSE_CLICK)
         {
-            this->mouse_clicked = e.data.mouse_click_event.button == MouseButton::MOUSE_BUTTON_LEFT;
+            this->mouse_clicked = e.data.mouse_click_event.button == Events::MouseButton::MOUSE_BUTTON_LEFT;
         }
     }
 }
@@ -195,19 +195,19 @@ TextInput::~TextInput()
     this->event_bus->unsubscribe_to_input_events(this);
 };
 
-void TextInput::handle_input_events(const InputEvent *input_events, size_t count)
+void TextInput::handle_input_events(const Events::InputEvent *input_events, size_t count)
 {
     this->mouse_clicked = false;
     for (size_t i = 0; i < count; ++i)
     {
-        InputEvent e = input_events[i];
-        if (e.type == InputEventType::TEXT_INPUT && this->is_active)
+        Events::InputEvent e = input_events[i];
+        if (e.type == Events::InputEventType::TEXT_INPUT && this->is_active)
         {
             this->text_buffer.append(e.data.text_input_event.text);
         }
-        else if (e.type == InputEventType::KEY_DOWN && this->is_active)
+        else if (e.type == Events::InputEventType::KEY_DOWN && this->is_active)
         {
-            if (e.data.key_event.key == KeyEventType::BACKSPACE_KEY)
+            if (e.data.key_event.key == Events::KeyEventType::BACKSPACE_KEY)
             {
 
                 if (this->text_buffer != "")
@@ -215,7 +215,7 @@ void TextInput::handle_input_events(const InputEvent *input_events, size_t count
                     this->text_buffer.pop_back();
                 }
             }
-            else if (e.data.key_event.key == KeyEventType::ENTER_KEY)
+            else if (e.data.key_event.key == Events::KeyEventType::ENTER_KEY)
             {
                 for (ITextInputEnterHandler *handler : this->enter_handlers)
                 {
@@ -223,9 +223,9 @@ void TextInput::handle_input_events(const InputEvent *input_events, size_t count
                 }
             }
         }
-        else if (e.type == InputEventType::MOUSE_CLICK)
+        else if (e.type == Events::InputEventType::MOUSE_CLICK)
         {
-            this->mouse_clicked = e.data.mouse_click_event.button == MouseButton::MOUSE_BUTTON_LEFT;
+            this->mouse_clicked = e.data.mouse_click_event.button == Events::MouseButton::MOUSE_BUTTON_LEFT;
         }
     }
 }
@@ -235,21 +235,21 @@ void TextInput::update(double ts)
     V2 anchored_position = get_position_from_anchors(Window::get_gui_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
     Rect input_rect = {anchored_position.x, anchored_position.y, this->dimensions.x, this->dimensions.y};
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
 
     if (this->mouse_clicked)
     {
         bool was_active = this->is_active;
         this->is_active = Physics::check_point_in_rect(Window::get_gui_mouse_position(), &input_rect);
-        InputEvent input_event;
+        Events::InputEvent input_event;
         if (was_active && !this->is_active)
         {
-            input_event.type = InputEventType::GUI_UNFOCUSED;
+            input_event.type = Events::InputEventType::GUI_UNFOCUSED;
             this->event_bus->publish_input_event(input_event);
         }
         else if (!was_active && this->is_active)
         {
-            input_event.type = InputEventType::GUI_FOCUSED;
+            input_event.type = Events::InputEventType::GUI_FOCUSED;
             this->event_bus->publish_input_event(input_event);
             this->render_cursor = false; // Ensure cursor is rendered on click.
             this->blink_interval_counter = this->blink_interval_millis;
@@ -271,7 +271,7 @@ void TextInput::update(double ts)
     if (this->is_active && this->render_cursor)
     {
         this->event_bus->publish_render_event(
-            Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
+            Events::create_render_rectangle_event(Events::RenderLayer::GUI_LAYER, cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
     }
 }
 

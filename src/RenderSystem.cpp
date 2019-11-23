@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <algorithm>
 
-RenderEvent world_layer_buffer[RENDER_QUEUE_SIZE];
-RenderEvent gui_layer_buffer[RENDER_QUEUE_SIZE];
+Events::RenderEvent world_layer_buffer[RENDER_QUEUE_SIZE];
+Events::RenderEvent gui_layer_buffer[RENDER_QUEUE_SIZE];
 
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : gui_render_scale(1.0), world_render_scale(2.0), renderer(r), event_bus(eB)
 {
@@ -22,20 +22,20 @@ RenderSystem::~RenderSystem()
     this->event_bus->unsubscribe_to_input_events(this);
 }
 
-bool compare_render_events(RenderEvent a, RenderEvent b)
+bool compare_render_events(Events::RenderEvent a, Events::RenderEvent b)
 {
     return a.z_index < b.z_index;
 }
 
-void RenderSystem::render(const RenderEvent *render_events, size_t length)
+void RenderSystem::render(const Events::RenderEvent *render_events, size_t length)
 {
-    std::vector<RenderEvent> render_vector(render_events, render_events + length);
+    std::vector<Events::RenderEvent> render_vector(render_events, render_events + length);
     std::sort(render_vector.begin(), render_vector.end(), compare_render_events);
-    for (RenderEvent &e : render_vector)
+    for (Events::RenderEvent &e : render_vector)
     {
         switch (e.type)
         {
-        case RenderEventType::RENDER_RECTANGLE:
+        case Events::RenderEventType::RENDER_RECTANGLE:
         {
             if (e.has_overflow_clip)
             {
@@ -58,7 +58,7 @@ void RenderSystem::render(const RenderEvent *render_events, size_t length)
             SDL_RenderSetClipRect(this->renderer, nullptr);
             break;
         }
-        case RenderEventType::RENDER_TEXTURE:
+        case Events::RenderEventType::RENDER_TEXTURE:
         {
             if (e.has_overflow_clip)
             {
@@ -88,14 +88,14 @@ void RenderSystem::render(const RenderEvent *render_events, size_t length)
     }
 }
 
-void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length)
+void RenderSystem::handle_render_events(const Events::RenderEvent *render_events, size_t length)
 {
     size_t world_buffer_length = 0;
     size_t gui_buffer_length = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        RenderEvent e = render_events[i];
-        if (e.layer == RenderLayer::GUI_LAYER)
+        Events::RenderEvent e = render_events[i];
+        if (e.layer == Events::RenderLayer::GUI_LAYER)
         {
             gui_layer_buffer[gui_buffer_length] = e;
             ++gui_buffer_length;
@@ -119,12 +119,12 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
 
     this->update_mouse_positions();
 }
-void RenderSystem::handle_input_events(const InputEvent *input_events, size_t length)
+void RenderSystem::handle_input_events(const Events::InputEvent *input_events, size_t length)
 {
     for (size_t i = 0; i < length; ++i)
     {
-        InputEvent e = input_events[i];
-        if (e.type == InputEventType::WINDOW_RESIZE)
+        Events::InputEvent e = input_events[i];
+        if (e.type == Events::InputEventType::WINDOW_RESIZE)
         {
             this->update_cameras(
                 e.data.resize_event.new_size.x,

@@ -19,7 +19,7 @@ struct Player : IEntity, IInputEventSubscriber
     Player(EventBus *, const V2 &, const Color &);
     ~Player();
     void update(double ts);
-    void handle_input_events(const InputEvent *, size_t);
+    void handle_input_events(const Events::InputEvent *, size_t);
     EventBus *event_bus;
     Color color;
     bool actions[TOTAL_PLAYER_ACTIONS];

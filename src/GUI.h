@@ -67,7 +67,7 @@ struct Button : IInputEventSubscriber
     Button(EventBus *e, std::string text, std::string texture_key);
     ~Button();
     void update(double ts);
-    void handle_input_events(const InputEvent *, size_t);
+    void handle_input_events(const Events::InputEvent *, size_t);
     void add_click_handler(IButtonClickHandler *);
     void remove_click_handler(IButtonClickHandler *);
     V2 dimensions;
@@ -84,7 +84,7 @@ struct TextInput : IInputEventSubscriber
 {
     TextInput(EventBus *e, std::string texture_key);
     ~TextInput();
-    void handle_input_events(const InputEvent *, size_t);
+    void handle_input_events(const Events::InputEvent *, size_t);
     void update(double ts);
     void add_enter_pressed_handler(ITextInputEnterHandler *);
     void remove_enter_pressed_handler(ITextInputEnterHandler *);

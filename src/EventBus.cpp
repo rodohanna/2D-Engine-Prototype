@@ -12,7 +12,7 @@ EventBus::~EventBus()
 {
 }
 
-void EventBus::publish_input_event(const InputEvent &e)
+void EventBus::publish_input_event(const Events::InputEvent &e)
 {
     if (input_queue_length == INPUT_QUEUE_SIZE - 1)
     {
@@ -45,7 +45,7 @@ void EventBus::notify_input_event_subscribers()
     }
 }
 
-void EventBus::publish_render_event(const RenderEvent &e)
+void EventBus::publish_render_event(const Events::RenderEvent &e)
 {
     if (render_queue_length == RENDER_QUEUE_SIZE - 1)
     {

@@ -11,9 +11,9 @@ struct RenderSystem : IRenderEventSubscriber, IInputEventSubscriber
 {
     RenderSystem(SDL_Renderer *, EventBus *);
     ~RenderSystem();
-    void handle_render_events(const RenderEvent *, size_t);
-    void handle_input_events(const InputEvent *, size_t);
-    void render(const RenderEvent *, size_t);
+    void handle_render_events(const Events::RenderEvent *, size_t);
+    void handle_input_events(const Events::InputEvent *, size_t);
+    void render(const Events::RenderEvent *, size_t);
     void update_cameras(double w, double h);
     void update_mouse_positions();
     double gui_render_scale, world_render_scale;

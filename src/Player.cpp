@@ -38,45 +38,45 @@ void Player::update(double ts)
     Rect *old_camera = Window::get_camera();
     Window::set_camera({this->position.x, this->position.y, old_camera->w, old_camera->h});
 }
-void Player::handle_input_events(const InputEvent *inputEvents, size_t length)
+void Player::handle_input_events(const Events::InputEvent *inputEvents, size_t length)
 {
     for (size_t i = 0; i < length; ++i)
     {
-        InputEvent e = inputEvents[i];
-        if (e.type == KEY_DOWN)
+        Events::InputEvent e = inputEvents[i];
+        if (e.type == Events::KEY_DOWN)
         {
-            if (e.data.key_event.key == W_KEY)
+            if (e.data.key_event.key == Events::W_KEY)
             {
                 actions[PlayerActions::MOVE_UP] = true;
             }
-            else if (e.data.key_event.key == S_KEY)
+            else if (e.data.key_event.key == Events::S_KEY)
             {
                 actions[PlayerActions::MOVE_DOWN] = true;
             }
-            else if (e.data.key_event.key == A_KEY)
+            else if (e.data.key_event.key == Events::A_KEY)
             {
                 actions[PlayerActions::MOVE_LEFT] = true;
             }
-            else if (e.data.key_event.key == D_KEY)
+            else if (e.data.key_event.key == Events::D_KEY)
             {
                 actions[PlayerActions::MOVE_RIGHT] = true;
             }
         }
-        else if (e.type == KEY_UP)
+        else if (e.type == Events::KEY_UP)
         {
-            if (e.data.key_event.key == W_KEY)
+            if (e.data.key_event.key == Events::W_KEY)
             {
                 actions[PlayerActions::MOVE_UP] = false;
             }
-            else if (e.data.key_event.key == S_KEY)
+            else if (e.data.key_event.key == Events::S_KEY)
             {
                 actions[PlayerActions::MOVE_DOWN] = false;
             }
-            else if (e.data.key_event.key == A_KEY)
+            else if (e.data.key_event.key == Events::A_KEY)
             {
                 actions[PlayerActions::MOVE_LEFT] = false;
             }
-            else if (e.data.key_event.key == D_KEY)
+            else if (e.data.key_event.key == Events::D_KEY)
             {
                 actions[PlayerActions::MOVE_RIGHT] = false;
             }
