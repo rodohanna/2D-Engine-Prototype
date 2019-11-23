@@ -67,7 +67,8 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // testing
-    Window::set_camera({0, 0, 800 / 2, 640 / 2});
+    Window::set_camera({0, 0, 800, 640});
+    Window::set_gui_camera({0, 0, 800, 640});
     Scene scene(&event_bus);
     while (!input_system.quit)
     {

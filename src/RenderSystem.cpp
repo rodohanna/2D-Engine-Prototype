@@ -4,11 +4,14 @@
 #include <stdio.h>
 #include <algorithm>
 
-RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : renderer(r), event_bus(eB)
+RenderEvent world_layer_buffer[RENDER_QUEUE_SIZE];
+RenderEvent gui_layer_buffer[RENDER_QUEUE_SIZE];
+
+RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : gui_render_scale(1.0), world_render_scale(2.0), renderer(r), event_bus(eB)
 {
-    SDL_RenderSetScale(r, 2.0, 2.0);
-    V2 *mouse_position = Window::get_mouse_position();
-    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+    Rect *camera = Window::get_camera();
+    this->update_cameras(camera->w, camera->h);
+    this->update_mouse_positions();
     this->event_bus->subscribe_to_render_events(this);
     this->event_bus->subscribe_to_input_events(this);
     this->texture_table = Assets::get_texture_table();
@@ -23,12 +26,11 @@ bool compare_render_events(RenderEvent a, RenderEvent b)
 {
     return a.z_index < b.z_index;
 }
-void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length)
+
+void RenderSystem::render(const RenderEvent *render_events, size_t length)
 {
     std::vector<RenderEvent> render_vector(render_events, render_events + length);
     std::sort(render_vector.begin(), render_vector.end(), compare_render_events);
-    SDL_SetRenderDrawColor(this->renderer, 0x11, 0x11, 0x11, 0xFF);
-    SDL_RenderClear(this->renderer);
     for (RenderEvent &e : render_vector)
     {
         switch (e.type)
@@ -84,11 +86,38 @@ void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t
         }
         }
     }
+}
+
+void RenderSystem::handle_render_events(const RenderEvent *render_events, size_t length)
+{
+    size_t world_buffer_length = 0;
+    size_t gui_buffer_length = 0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        RenderEvent e = render_events[i];
+        if (e.layer == RenderLayer::GUI_LAYER)
+        {
+            gui_layer_buffer[gui_buffer_length] = e;
+            ++gui_buffer_length;
+        }
+        else
+        {
+            world_layer_buffer[world_buffer_length] = e;
+            ++world_buffer_length;
+        }
+    }
+    SDL_SetRenderDrawColor(this->renderer, 0x11, 0x11, 0x11, 0xFF);
+    SDL_RenderClear(this->renderer);
+
+    SDL_RenderSetScale(this->renderer, this->world_render_scale, this->world_render_scale);
+    this->render(world_layer_buffer, world_buffer_length);
+
+    SDL_RenderSetScale(this->renderer, this->gui_render_scale, this->gui_render_scale);
+    this->render(gui_layer_buffer, gui_buffer_length);
+
     SDL_RenderPresent(renderer);
-    V2 *mouse_position = Window::get_mouse_position();
-    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
-    mouse_position->x /= 2;
-    mouse_position->y /= 2;
+
+    this->update_mouse_positions();
 }
 void RenderSystem::handle_input_events(const InputEvent *input_events, size_t length)
 {
@@ -97,9 +126,31 @@ void RenderSystem::handle_input_events(const InputEvent *input_events, size_t le
         InputEvent e = input_events[i];
         if (e.type == InputEventType::WINDOW_RESIZE)
         {
-            Rect *camera = Window::get_camera();
-            camera->w = e.data.resize_event.new_size.x / 2;
-            camera->h = e.data.resize_event.new_size.y / 2;
+            this->update_cameras(
+                e.data.resize_event.new_size.x,
+                e.data.resize_event.new_size.y);
         }
     }
+}
+
+void RenderSystem::update_cameras(double w, double h)
+{
+    Rect *camera = Window::get_camera();
+    Rect *gui_camera = Window::get_gui_camera();
+    camera->w = w / this->world_render_scale;
+    camera->h = h / this->world_render_scale;
+    gui_camera->w = w / this->gui_render_scale;
+    gui_camera->h = h / this->gui_render_scale;
+}
+
+void RenderSystem::update_mouse_positions()
+{
+    V2 *mouse_position = Window::get_mouse_position();
+    V2 *gui_mouse_position = Window::get_gui_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+    SDL_GetMouseState(&gui_mouse_position->x, &gui_mouse_position->y);
+    mouse_position->x /= this->world_render_scale;
+    mouse_position->y /= this->world_render_scale;
+    gui_mouse_position->x /= this->gui_render_scale;
+    gui_mouse_position->y /= this->gui_render_scale;
 }

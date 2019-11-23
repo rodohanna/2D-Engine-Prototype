@@ -37,6 +37,7 @@ void Text::update(double ts, size_t z_index)
     }
     this->event_bus->publish_render_event(
         Events::create_render_texture_event(
+            RenderLayer::GUI_LAYER,
             this->texture_index,
             this->position,
             &this->overflow_clip,
@@ -77,7 +78,7 @@ V2 get_position_from_anchors(Rect *camera, V2 &dimensions, Anchor &anchor_horizo
 
 void UIPanel::update_rect()
 {
-    V2 anchored_position = get_position_from_anchors(Window::get_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
+    V2 anchored_position = get_position_from_anchors(Window::get_gui_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
     this->rect = {
         anchored_position.x,
         anchored_position.y,
@@ -102,9 +103,9 @@ void UIPanel::update(double ts)
         t.update(ts, this->z_index + 1);
     }
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, this->rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
+        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, this->rect, {0xFF, 0xFF, 0xFF, 0xF0}, false, this->z_index + 1));
 }
 
 Button::Button(EventBus *e, std::string text, std::string texture_key) : event_bus(e), mouse_clicked(false)
@@ -122,12 +123,12 @@ Button::~Button()
 
 void Button::update(double ts)
 {
-    Rect *camera = Window::get_camera();
-    V2 position = get_position_from_anchors(camera, this->dimensions, this->anchor_horizontal, this->anchor_vertical);
+    Rect *gui_camera = Window::get_gui_camera();
+    V2 position = get_position_from_anchors(gui_camera, this->dimensions, this->anchor_horizontal, this->anchor_vertical);
     Rect rect = {position.x, position.y, this->dimensions.x, this->dimensions.y};
     Color button_color = {0x11, 0x11, 0x11, 0xF0};
 
-    if (Physics::check_point_in_rect(Window::get_mouse_position(), &rect)) // is hovered
+    if (Physics::check_point_in_rect(Window::get_gui_mouse_position(), &rect)) // is hovered
     {
         button_color = {0x22, 0x22, 0x22, 0xF0};
         if (mouse_clicked)
@@ -139,13 +140,13 @@ void Button::update(double ts)
         }
     }
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(rect, button_color, true, this->z_index));
+        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, rect, button_color, true, this->z_index));
     this->text->position = {
         position.x + (this->dimensions.x - this->text->dimensions.x) / 2,
         position.y + (this->dimensions.y - this->text->dimensions.y) / 2,
     };
     // TODO: I shouldn't have to specify an overflow clip of the entire window just to get text to render.
-    this->text->overflow_clip = {0, 0, camera->w, camera->h};
+    this->text->overflow_clip = {0, 0, gui_camera->w, gui_camera->h};
     this->text->update(ts, this->z_index + 1);
 }
 
@@ -231,15 +232,15 @@ void TextInput::handle_input_events(const InputEvent *input_events, size_t count
 
 void TextInput::update(double ts)
 {
-    V2 anchored_position = get_position_from_anchors(Window::get_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
+    V2 anchored_position = get_position_from_anchors(Window::get_gui_camera(), this->dimensions, this->anchor_horizontal, this->anchor_vertical);
     Rect input_rect = {anchored_position.x, anchored_position.y, this->dimensions.x, this->dimensions.y};
     this->event_bus->publish_render_event(
-        Events::create_render_rectangle_event(input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
+        Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, input_rect, {0x11, 0x11, 0x11, 0xF0}, true, this->z_index));
 
     if (this->mouse_clicked)
     {
         bool was_active = this->is_active;
-        this->is_active = Physics::check_point_in_rect(Window::get_mouse_position(), &input_rect);
+        this->is_active = Physics::check_point_in_rect(Window::get_gui_mouse_position(), &input_rect);
         InputEvent input_event;
         if (was_active && !this->is_active)
         {
@@ -270,7 +271,7 @@ void TextInput::update(double ts)
     if (this->is_active && this->render_cursor)
     {
         this->event_bus->publish_render_event(
-            Events::create_render_rectangle_event(cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
+            Events::create_render_rectangle_event(RenderLayer::GUI_LAYER, cursor_rect, {0xFF, 0xFF, 0xFF, 0xF0}, true, this->z_index + 1));
     }
 }
 

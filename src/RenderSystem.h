@@ -13,6 +13,10 @@ struct RenderSystem : IRenderEventSubscriber, IInputEventSubscriber
     ~RenderSystem();
     void handle_render_events(const RenderEvent *, size_t);
     void handle_input_events(const InputEvent *, size_t);
+    void render(const RenderEvent *, size_t);
+    void update_cameras(double w, double h);
+    void update_mouse_positions();
+    double gui_render_scale, world_render_scale;
     SDL_Renderer *renderer;
     EventBus *event_bus;
     std::vector<std::unique_ptr<Texture>> *texture_table;
