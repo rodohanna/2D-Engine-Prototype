@@ -5,7 +5,7 @@
 #include "SDLWrapper.h"
 #include <vector>
 
-const static size_t RENDER_QUEUE_SIZE = 2048;
+const static size_t RENDER_QUEUE_SIZE = 4096;
 const static size_t INPUT_QUEUE_SIZE = 1024;
 const static size_t DEBUG_QUEUE_SIZE = 1024;
 
