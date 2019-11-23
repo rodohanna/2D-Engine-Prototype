@@ -1,6 +1,6 @@
 #include "Console.h"
 #include "Window.h"
-Console::Console(EventBus *e) : event_bus(e), console_active(false), should_release_text_input_focus(false)
+Console::Console(EventBus *e) : event_bus(e), console_active(false), should_release_text_input_focus(false), should_request_text_input_focus(false)
 {
     this->console_panel.event_bus = e;
     this->console_panel.dimensions = {400, 100};
@@ -44,6 +44,11 @@ void Console::update(double ts)
         this->should_release_text_input_focus = false;
         this->text_input->release_input_focus();
     }
+    else if (this->should_request_text_input_focus)
+    {
+        this->should_request_text_input_focus = false;
+        this->text_input->get_input_focus();
+    }
 };
 
 void Console::handle_text_input_enter_pressed()
@@ -70,6 +75,16 @@ void Console::dispatch_console_command(std::string command)
         e.type = Events::DebugEventType::HIDE_CHUNK_BOUNDARY;
         this->event_bus->publish_debug_event(e);
     }
+    else if (command == "show grid")
+    {
+        e.type = Events::DebugEventType::SHOW_TILE_GRID;
+        this->event_bus->publish_debug_event(e);
+    }
+    else if (command == "hide grid")
+    {
+        e.type = Events::DebugEventType::HIDE_TILE_GRID;
+        this->event_bus->publish_debug_event(e);
+    }
 }
 
 void Console::handle_button_clicked()
@@ -88,6 +103,7 @@ void Console::handle_button_clicked()
     else
     {
         this->console_active = true;
+        this->should_request_text_input_focus = true;
         this->button->text->set_text("<");
 
         this->panel_animator.reset();

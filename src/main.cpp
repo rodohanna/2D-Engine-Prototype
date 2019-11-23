@@ -45,11 +45,14 @@ int main(int argc, char *argv[])
     // Load assets
     Assets::load_assets_from_manifest(sdl.renderer, "assets/asset-manifest.txt");
     // initialize systems
+    Window::set_camera({0, 0, 800, 640});
+    Window::set_gui_camera({0, 0, 800, 640});
     EventBus event_bus(sdl.renderer);
     RenderSystem render_system(sdl.renderer, &event_bus);
     InputSystem input_system(&event_bus);
     Color color = {0x11, 0x11, 0xFF, 0xFF};
     Player player(&event_bus, {0, 0}, color);
+    Scene scene(&event_bus);
     // start game loop
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)
@@ -62,14 +65,11 @@ int main(int argc, char *argv[])
     {
         ts = 1.f / (double)mode.refresh_rate;
     }
+    // ts = 1.f / 30.f;
     printf("Initializing with ts: %f\n", ts);
     printf("Refresh rate: %d\n", mode.refresh_rate);
     int64_t last_counter = SDL_GetPerformanceCounter();
 
-    // testing
-    Window::set_camera({0, 0, 800, 640});
-    Window::set_gui_camera({0, 0, 800, 640});
-    Scene scene(&event_bus);
     while (!input_system.quit)
     {
         // Let the input system handle any programmatically generated events from the last frame.

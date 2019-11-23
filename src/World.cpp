@@ -1,10 +1,12 @@
 #include "World.h"
 #include "Window.h"
+#include "Physics.h"
 
 ChunkManager::ChunkManager(EventBus *e, World &world, size_t chunk_size) : world(world), event_bus(e), chunk_size(chunk_size)
 {
     // DEBUG
     this->DEBUG_show_chunk_boundary = false;
+    this->DEBUG_show_tile_grid = false;
     this->event_bus->subscribe_to_debug_events(this);
 };
 
@@ -139,6 +141,7 @@ void ChunkManager::sync_chunks_to_world_position(V2 &world_position, bool force)
 void ChunkManager::update_chunks(double ts)
 {
     bool show_chunk_boundary = this->DEBUG_show_chunk_boundary;
+    bool show_tile_grid = this->DEBUG_show_tile_grid;
     for (Chunk &chunk : this->active_chunks)
     {
         if (show_chunk_boundary)
@@ -147,9 +150,30 @@ void ChunkManager::update_chunks(double ts)
                 Events::create_render_rectangle_event(Events::RenderLayer::WORLD_LAYER, {static_cast<int>((chunk.world_coords.x * 16) - Window::get_camera()->x), static_cast<int>((chunk.world_coords.y * 16) - Window::get_camera()->y), static_cast<int>(16 * this->chunk_size), static_cast<int>(16 * this->chunk_size)},
                                                       {0xFF, 0xFF, 0xFF, 0xFF}));
         }
+        if (show_tile_grid)
+        {
+            Rect *camera = Window::get_camera();
+            for (size_t i = chunk.world_coords.x; i < chunk.world_coords.x + this->chunk_size; ++i)
+            {
+                for (size_t j = chunk.world_coords.y; j < chunk.world_coords.y + this->chunk_size; ++j)
+                {
+                    Rect r = {static_cast<int>(i * 16), static_cast<int>(j * 16), 16, 16};
+                    if (Physics::check_collision(camera, &r))
+                    {
+                        this->event_bus->publish_render_event(
+                            Events::create_render_rectangle_event(
+                                Events::RenderLayer::WORLD_LAYER,
+                                {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
+                                {0x00, 0x00, 0x00, 0xFF},
+                                false,
+                                100));
+                    }
+                }
+            }
+        }
         for (size_t i = 0; i < chunk.entities.size(); ++i)
         {
-            chunk.entities[i].get()->update(ts);
+            chunk.entities[i]->update(ts);
         }
     }
 }
@@ -166,6 +190,14 @@ void ChunkManager::handle_debug_events(const Events::DebugEvent *debug_events, s
         else if (e.type == Events::DebugEventType::HIDE_CHUNK_BOUNDARY)
         {
             this->DEBUG_show_chunk_boundary = false;
+        }
+        else if (e.type == Events::DebugEventType::SHOW_TILE_GRID)
+        {
+            this->DEBUG_show_tile_grid = true;
+        }
+        else if (e.type == Events::DebugEventType::HIDE_TILE_GRID)
+        {
+            this->DEBUG_show_tile_grid = false;
         }
     }
 }

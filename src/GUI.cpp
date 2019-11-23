@@ -312,6 +312,7 @@ void TextInput::get_input_focus()
     Events::InputEvent input_event = {};
     input_event.type = Events::InputEventType::GUI_FOCUSED;
     this->event_bus->publish_input_event(input_event);
+    this->is_active = true;
 }
 void TextInput::release_input_focus()
 {

@@ -10,7 +10,8 @@ Events::RenderEvent gui_layer_buffer[RENDER_QUEUE_SIZE];
 RenderSystem::RenderSystem(SDL_Renderer *r, EventBus *eB) : gui_render_scale(1.0), world_render_scale(2.0), renderer(r), event_bus(eB)
 {
     Rect *camera = Window::get_camera();
-    this->update_cameras(camera->w, camera->h);
+    camera->w /= this->world_render_scale;
+    camera->h /= this->world_render_scale;
     this->update_mouse_positions();
     this->event_bus->subscribe_to_render_events(this);
     this->event_bus->subscribe_to_input_events(this);

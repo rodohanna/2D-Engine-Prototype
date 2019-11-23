@@ -20,7 +20,7 @@ struct Console : ITextInputEnterHandler, IButtonClickHandler
     std::unique_ptr<TextInput> text_input;
     std::unique_ptr<Button> button;
     EventBus *event_bus;
-    bool console_active, should_release_text_input_focus;
+    bool console_active, should_release_text_input_focus, should_request_text_input_focus;
 };
 
 #endif

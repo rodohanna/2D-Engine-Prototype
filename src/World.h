@@ -44,6 +44,7 @@ struct ChunkManager : IDebugEventSubscriber
 
     // debug flags
     bool DEBUG_show_chunk_boundary;
+    bool DEBUG_show_tile_grid;
 };
 
 #endif
