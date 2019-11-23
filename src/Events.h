@@ -111,17 +111,17 @@ struct RenderEvent
 
 // Debug events
 
-// I want a debug event:
-// To show chunk boundaries
-// To show grid
-
 enum DebugEventType
 {
-    //
+    SHOW_CHUNK_BOUNDARY,
+    HIDE_CHUNK_BOUNDARY,
+    SHOW_TILE_GRID,
+    HIDE_TILE_GRID
 };
 
 struct DebugEvent
 {
+    DebugEventType type;
 };
 
 RenderEvent create_render_texture_event(RenderLayer layer, size_t texture_index, V2 &position, Rect *overflow_clip = nullptr, size_t scale = 1, size_t z_index = 1);

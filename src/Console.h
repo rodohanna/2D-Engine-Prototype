@@ -13,6 +13,7 @@ struct Console : ITextInputEnterHandler, IButtonClickHandler
     void update(double ts);
     void handle_text_input_enter_pressed();
     void handle_button_clicked();
+    void dispatch_console_command(std::string);
     UIPanel console_panel;
     IntAnimate panel_animator;
     IntAnimate text_input_animator;

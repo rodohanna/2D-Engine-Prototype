@@ -25,7 +25,7 @@ Console::Console(EventBus *e) : event_bus(e)
 
     Button *button = new Button(e, ">", "console-button");
     this->button = std::unique_ptr<Button>(button);
-    this->button->anchor_horizontal = {AnchorType::LEFT, 0};
+    this->button->anchor_horizontal = {AnchorType::LEFT, 5};
     this->button->anchor_vertical = {AnchorType::TOP, 165};
     this->button->dimensions = {50, 25};
     this->button->z_index = 5;
@@ -50,7 +50,23 @@ void Console::update(double ts)
 void Console::handle_text_input_enter_pressed()
 {
     printf("Text Input Buffer: %s\n", this->text_input->text_buffer.c_str());
+    this->dispatch_console_command(this->text_input->text_buffer);
     this->text_input->clear();
+}
+
+void Console::dispatch_console_command(std::string command)
+{
+    Events::DebugEvent e = {};
+    if (command == "show chunks")
+    {
+        e.type = Events::DebugEventType::SHOW_CHUNK_BOUNDARY;
+        this->event_bus->publish_debug_event(e);
+    }
+    else if (command == "hide chunks")
+    {
+        e.type = Events::DebugEventType::HIDE_CHUNK_BOUNDARY;
+        this->event_bus->publish_debug_event(e);
+    }
 }
 
 void Console::handle_button_clicked()

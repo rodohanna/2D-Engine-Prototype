@@ -83,7 +83,9 @@ int main(int argc, char *argv[])
         event_bus.notify_input_event_subscribers();
         event_bus.clear_input_events();
 
-        event_bus.clear_render_events();
+        event_bus.notify_debug_event_subscribers();
+        event_bus.clear_debug_events();
+
         player.update(ts);
         scene.update(ts);
 
@@ -106,6 +108,7 @@ int main(int argc, char *argv[])
         int64_t end_counter = SDL_GetPerformanceCounter();
 
         event_bus.notify_render_event_subscribers();
+        event_bus.clear_render_events();
 
         last_counter = end_counter;
     }

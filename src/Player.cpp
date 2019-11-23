@@ -15,7 +15,7 @@ Player::~Player()
 {
     this->event_bus->unsubscribe_to_input_events(this);
 }
-const double SPEED = 500.0;
+const double SPEED = 200.0;
 void Player::update(double ts)
 {
     int vel = SPEED * ts;
