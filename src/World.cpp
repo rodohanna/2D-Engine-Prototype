@@ -163,30 +163,33 @@ void ChunkManager::update_chunks(double ts)
                     {
                         chunk.map.grid[i][j]->update(ts);
                     }
-                    if (show_tile_grid)
+                    Rect r = {
+                        static_cast<int>((i + chunk.world_coords.x) * 16),
+                        static_cast<int>((j + chunk.world_coords.y) * 16),
+                        16,
+                        16};
+                    if (Physics::check_collision(camera, &r))
                     {
-                        Rect r = {
-                            static_cast<int>((i + chunk.world_coords.x) * 16),
-                            static_cast<int>((j + chunk.world_coords.y) * 16),
-                            16,
-                            16};
-                        if (Physics::check_collision(camera, &r))
+                        Rect mouse_rect = {r.x - camera->x, r.y - camera->y, 16, 16};
+                        if (Physics::check_point_in_rect(Window::get_mouse_position(), &mouse_rect))
                         {
-                            Rect mouse_rect = {r.x - camera->x, r.y - camera->y, 16, 16};
-                            Color c = {0x00, 0x00, 0x00, 0xFF};
-                            size_t z_index = 2;
-                            if (Physics::check_point_in_rect(Window::get_mouse_position(), &mouse_rect))
-                            {
-                                c = {0xFF, 0xFF, 0xFF, 0xFF};
-                                z_index = 3;
-                            }
                             this->event_bus->publish_render_event(
                                 Events::create_render_rectangle_event(
                                     Events::RenderLayer::WORLD_LAYER,
                                     {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
-                                    c,
+                                    {0xFF, 0xFF, 0xFF, 0xFF},
                                     false,
-                                    z_index));
+                                    3));
+                        }
+                        if (show_tile_grid)
+                        {
+                            this->event_bus->publish_render_event(
+                                Events::create_render_rectangle_event(
+                                    Events::RenderLayer::WORLD_LAYER,
+                                    {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
+                                    {0x00, 0x00, 0x00, 0xFF},
+                                    false,
+                                    2));
                         }
                     }
                 }
