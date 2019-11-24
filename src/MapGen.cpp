@@ -54,11 +54,16 @@ Palette MapGen::load_palette(std::string path)
     return palette;
 }
 
-std::vector<std::shared_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions, const V2 &world_offset)
+Map MapGen::generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions, const V2 &world_offset)
 {
-    std::vector<std::shared_ptr<IEntity>> map;
+    Map map;
+    for (int i = 0; i < dimensions.x; ++i)
+    {
+        std::vector<std::shared_ptr<IEntity>> column;
+        map.grid.push_back(column);
+    }
     BackGround *ground = new BackGround(e, p->background_tile.clip, {0, 0}, p->background_tile.texture_index);
-    map.push_back(std::shared_ptr<IEntity>(ground));
+    map.background = std::shared_ptr<IEntity>(ground);
     for (int i = 0; i < dimensions.x; ++i)
     {
         for (int j = 0; j < dimensions.y; ++j)
@@ -70,7 +75,7 @@ std::vector<std::shared_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRu
                 Rect clip = p->tree_tiles[rand_index].clip;
                 size_t scale = p->tree_tiles[rand_index].scale;
                 Tree *tree = new Tree(e, clip, {(world_offset.x * 16) + (i * 16), (world_offset.y * 16) + (j * 16)}, texture_index, scale);
-                map.push_back(std::shared_ptr<IEntity>(tree));
+                map.grid[i].push_back(std::shared_ptr<IEntity>(tree));
             }
             else if (static_cast<size_t>((rand() % 100)) < r->ground_weight)
             {
@@ -79,7 +84,11 @@ std::vector<std::shared_ptr<IEntity>> MapGen::generate_map(Palette *p, ProcGenRu
                 Rect clip = p->ground_tiles[rand_index].clip;
                 size_t scale = p->ground_tiles[rand_index].scale;
                 Dirt *dirt = new Dirt(e, clip, {(world_offset.x * 16) + (i * 16), (world_offset.y * 16) + (j * 16)}, texture_index, scale);
-                map.push_back(std::shared_ptr<IEntity>(dirt));
+                map.grid[i].push_back(std::shared_ptr<IEntity>(dirt));
+            }
+            else
+            {
+                map.grid[i].push_back(nullptr);
             }
         }
     }

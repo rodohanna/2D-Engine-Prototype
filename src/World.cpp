@@ -113,9 +113,9 @@ void ChunkManager::sync_chunks_to_world_position(V2 &world_position, bool force)
             printf("Loading chunk at: %d %d\n",
                    chunk->world_coords.x / this->chunk_size,
                    chunk->world_coords.y / this->chunk_size);
-            if (chunk->entities.size() == 0)
+            if (chunk->map.grid.size() == 0)
             {
-                chunk->entities = MapGen::generate_map(
+                chunk->map = MapGen::generate_map(
                     &chunk->palette,
                     &chunk->rules,
                     this->event_bus,
@@ -152,37 +152,45 @@ void ChunkManager::update_chunks(double ts)
                     false,
                     3));
         }
-        if (show_tile_grid)
+        if (chunk.map.grid.size() > 0)
         {
-            for (size_t i = chunk.world_coords.x; i < chunk.world_coords.x + this->chunk_size; ++i)
+            chunk.map.background->update(ts);
+            for (size_t i = 0; i < chunk.map.grid.size(); ++i)
             {
-                for (size_t j = chunk.world_coords.y; j < chunk.world_coords.y + this->chunk_size; ++j)
+                for (size_t j = 0; j < chunk.map.grid[i].size(); ++j)
                 {
-                    Rect r = {static_cast<int>(i * 16), static_cast<int>(j * 16), 16, 16};
-                    if (Physics::check_collision(camera, &r))
+                    if (chunk.map.grid[i][j] != nullptr)
                     {
-                        Rect mouse_rect = {r.x - camera->x, r.y - camera->y, 16, 16};
-                        Color c = {0x00, 0x00, 0x00, 0xFF};
-                        size_t z_index = 2;
-                        if (Physics::check_point_in_rect(Window::get_mouse_position(), &mouse_rect))
+                        chunk.map.grid[i][j]->update(ts);
+                    }
+                    if (show_tile_grid)
+                    {
+                        Rect r = {
+                            static_cast<int>((i + chunk.world_coords.x) * 16),
+                            static_cast<int>((j + chunk.world_coords.y) * 16),
+                            16,
+                            16};
+                        if (Physics::check_collision(camera, &r))
                         {
-                            c = {0xFF, 0xFF, 0xFF, 0xFF};
-                            z_index = 3;
+                            Rect mouse_rect = {r.x - camera->x, r.y - camera->y, 16, 16};
+                            Color c = {0x00, 0x00, 0x00, 0xFF};
+                            size_t z_index = 2;
+                            if (Physics::check_point_in_rect(Window::get_mouse_position(), &mouse_rect))
+                            {
+                                c = {0xFF, 0xFF, 0xFF, 0xFF};
+                                z_index = 3;
+                            }
+                            this->event_bus->publish_render_event(
+                                Events::create_render_rectangle_event(
+                                    Events::RenderLayer::WORLD_LAYER,
+                                    {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
+                                    c,
+                                    false,
+                                    z_index));
                         }
-                        this->event_bus->publish_render_event(
-                            Events::create_render_rectangle_event(
-                                Events::RenderLayer::WORLD_LAYER,
-                                {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
-                                c,
-                                false,
-                                z_index));
                     }
                 }
             }
-        }
-        for (size_t i = 0; i < chunk.entities.size(); ++i)
-        {
-            chunk.entities[i]->update(ts);
         }
     }
 }

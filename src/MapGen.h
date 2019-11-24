@@ -32,10 +32,16 @@ struct Palette
     size_t scale;
 };
 
+struct Map
+{
+    std::shared_ptr<IEntity> background;
+    std::vector<std::vector<std::shared_ptr<IEntity>>> grid;
+};
+
 namespace MapGen
 {
 Palette load_palette(std::string path);
-std::vector<std::shared_ptr<IEntity>> generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions, const V2 &world_offset);
+Map generate_map(Palette *p, ProcGenRules *r, EventBus *e, const V2 &dimensions, const V2 &world_offset);
 }; // namespace MapGen
 
 #endif

@@ -13,7 +13,7 @@ struct Chunk
     V2 world_coords;
     Palette palette;
     ProcGenRules rules;
-    std::vector<std::shared_ptr<IEntity>> entities;
+    Map map;
 };
 
 struct World
