@@ -1,5 +1,6 @@
 #include "EventBus.h"
 #include "Assets.h"
+#include "Debug.h"
 #include <stdio.h>
 #include <memory>
 #include <algorithm>
@@ -89,26 +90,9 @@ void EventBus::publish_debug_event(const Events::DebugEvent &e)
     ++debug_queue_length;
 }
 
-void EventBus::subscribe_to_debug_events(IDebugEventSubscriber *subscriber)
+void EventBus::set_debug_flags()
 {
-    this->debug_event_subscribers.push_back(subscriber);
-}
-
-void EventBus::unsubscribe_to_debug_events(IDebugEventSubscriber *subscriber)
-{
-    auto it = std::find(this->debug_event_subscribers.begin(), this->debug_event_subscribers.end(), subscriber);
-    if (it != this->debug_event_subscribers.end())
-    {
-        this->debug_event_subscribers.erase(it);
-    }
-}
-
-void EventBus::notify_debug_event_subscribers()
-{
-    for (auto it = this->debug_event_subscribers.begin(); it != this->debug_event_subscribers.end(); ++it)
-    {
-        (*it)->handle_debug_events(this->debug_queue, this->debug_queue_length);
-    }
+    Debug::handle_debug_events(this->debug_queue, this->debug_queue_length);
 }
 
 void EventBus::clear_input_events()

@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         event_bus.notify_input_event_subscribers();
         event_bus.clear_input_events();
 
-        event_bus.notify_debug_event_subscribers();
+        event_bus.set_debug_flags();
         event_bus.clear_debug_events();
 
         player.update(ts);

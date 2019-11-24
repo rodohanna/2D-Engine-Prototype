@@ -25,13 +25,12 @@ struct World
     std::vector<std::vector<Chunk>> world_chunks;
 };
 
-struct ChunkManager : IDebugEventSubscriber
+struct ChunkManager
 {
     ChunkManager(EventBus *e, World &world, size_t chunk_size);
     ~ChunkManager();
     void sync_chunks_to_world_position(V2 &world_position, bool force = false);
     void update_chunks(double ts);
-    void handle_debug_events(const Events::DebugEvent *, size_t);
     // Active chunks include the chunk the player
     // is currently at, as well as all of the surrounding
     // chunks.
@@ -41,10 +40,6 @@ struct ChunkManager : IDebugEventSubscriber
     EventBus *event_bus;
     std::vector<Chunk> active_chunks;
     size_t chunk_size;
-
-    // debug flags
-    bool DEBUG_show_chunk_boundary;
-    bool DEBUG_show_tile_grid;
 };
 
 #endif

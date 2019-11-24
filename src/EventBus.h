@@ -21,11 +21,6 @@ struct IRenderEventSubscriber
     virtual void handle_render_events(const Events::RenderEvent *, size_t) = 0;
 };
 
-struct IDebugEventSubscriber
-{
-    virtual ~IDebugEventSubscriber() = default;
-    virtual void handle_debug_events(const Events::DebugEvent *, size_t) = 0;
-};
 struct EventBus
 {
     EventBus(SDL_Renderer *);
@@ -42,16 +37,13 @@ struct EventBus
     void notify_render_event_subscribers();
 
     void publish_debug_event(const Events::DebugEvent &e);
-    void subscribe_to_debug_events(IDebugEventSubscriber *);
-    void unsubscribe_to_debug_events(IDebugEventSubscriber *);
-    void notify_debug_event_subscribers();
+    void set_debug_flags();
 
     void clear_input_events();
     void clear_render_events();
     void clear_debug_events();
     std::vector<IInputEventSubscriber *> input_event_subscribers;
     std::vector<IRenderEventSubscriber *> render_event_subscribers;
-    std::vector<IDebugEventSubscriber *> debug_event_subscribers;
     Events::InputEvent input_queue[INPUT_QUEUE_SIZE];
     Events::RenderEvent render_queue[RENDER_QUEUE_SIZE];
     Events::DebugEvent debug_queue[DEBUG_QUEUE_SIZE];
