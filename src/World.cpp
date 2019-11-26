@@ -150,8 +150,8 @@ void ChunkManager::update_chunks(double ts)
                     Events::RenderLayer::WORLD_LAYER,
                     {static_cast<int>((chunk.world_coords.x * 16) - Window::get_camera()->x),
                      static_cast<int>((chunk.world_coords.y * 16) - Window::get_camera()->y),
-                     static_cast<int>(16 * this->chunk_size),
-                     static_cast<int>(16 * this->chunk_size)},
+                     static_cast<int>((16 * this->chunk_size) + 1),
+                     static_cast<int>((16 * this->chunk_size) + 1)},
                     {0xFF, 0xFF, 0xFF, 0xFF},
                     false,
                     3));
