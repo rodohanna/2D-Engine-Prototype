@@ -22,7 +22,7 @@ struct IButtonClickHandler
 struct Text
 {
     Text(EventBus *, size_t font_index, std::string texture_key);
-    void update(double ts, size_t z_index = 1);
+    void update(double ts, size_t z_index = 1, Events::RenderLayer = Events::RenderLayer::GUI_LAYER);
     void set_text(std::string);
     V2 dimensions;
     V2 position;

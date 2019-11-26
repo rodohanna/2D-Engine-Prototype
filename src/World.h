@@ -5,6 +5,7 @@
 #include "MapGen.h"
 #include "Entity.h"
 #include "EventBus.h"
+#include "GUI.h"
 #include <vector>
 #include <memory>
 
@@ -31,6 +32,7 @@ struct ChunkManager
     ~ChunkManager();
     void sync_chunks_to_world_position(V2 &world_position, bool force = false);
     void update_chunks(double ts);
+    std::unique_ptr<Text> coordinate_text;
     // Active chunks include the chunk the player
     // is currently at, as well as all of the surrounding
     // chunks.

@@ -25,6 +25,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         return;
     }
     std::string key, type, asset_path;
+    size_t font_size;
     while (manifest >> key >> type >> asset_path)
     {
         if (manifest.fail())
@@ -42,7 +43,8 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         }
         else if (type == "font")
         {
-            Font *font = TTF_OpenFont(asset_path.c_str(), 32);
+            manifest >> font_size;
+            Font *font = TTF_OpenFont(asset_path.c_str(), font_size);
             if (font != nullptr)
             {
                 size_t font_index = font_table.size();

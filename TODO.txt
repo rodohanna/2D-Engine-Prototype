@@ -1,3 +1,2 @@
-- Setup debug event to render tile coordinates on mouse over.
 - Connect entity hover over to UI panel to display description/statuses/etc.
 - Set up turn based movement.

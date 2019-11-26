@@ -29,7 +29,7 @@ void Text::set_text(std::string text)
     }
 }
 
-void Text::update(double ts, size_t z_index)
+void Text::update(double ts, size_t z_index, Events::RenderLayer render_layer)
 {
     if (this->text == "")
     {
@@ -37,7 +37,7 @@ void Text::update(double ts, size_t z_index)
     }
     this->event_bus->publish_render_event(
         Events::create_render_texture_event(
-            Events::RenderLayer::GUI_LAYER,
+            render_layer,
             this->texture_index,
             this->position,
             &this->overflow_clip,

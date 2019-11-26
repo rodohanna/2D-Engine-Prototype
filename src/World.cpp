@@ -2,8 +2,12 @@
 #include "Window.h"
 #include "Physics.h"
 #include "Debug.h"
+#include <sstream>
 
-ChunkManager::ChunkManager(EventBus *e, World &world, size_t chunk_size) : world(world), event_bus(e), chunk_size(chunk_size){};
+ChunkManager::ChunkManager(EventBus *e, World &world, size_t chunk_size) : world(world), event_bus(e), chunk_size(chunk_size)
+{
+    this->coordinate_text = std::unique_ptr<Text>(new Text(e, 1, "debug-coordinate-text"));
+};
 
 ChunkManager::~ChunkManager()
 {
@@ -180,6 +184,17 @@ void ChunkManager::update_chunks(double ts)
                                     {0xFF, 0xFF, 0xFF, 0xFF},
                                     false,
                                     3));
+                            if (show_tile_grid)
+                            {
+                                std::stringstream ss("");
+                                ss << i + chunk.world_coords.x << "," << j + chunk.world_coords.y;
+                                this->coordinate_text->set_text(ss.str());
+                                this->coordinate_text->overflow_clip = {0, 0, 800, 800};
+                                this->coordinate_text->position = {
+                                    (r.x + (r.w - this->coordinate_text->dimensions.x) / 2) - camera->x,
+                                    (r.y - (this->coordinate_text->dimensions.y)) - camera->y};
+                                this->coordinate_text->update(ts, 3, Events::RenderLayer::WORLD_LAYER);
+                            }
                         }
                         if (show_tile_grid)
                         {
