@@ -1,10 +1,11 @@
 #include "Input.h"
 #include "SDLWrapper.h"
+#include "Window.h"
 #include <stdio.h>
 
 const int EVENTS_SIZE = 100;
-int events_length = 0;
-Input::Event events[EVENTS_SIZE];
+int event_queue_length = 0;
+Input::Event event_queue[EVENTS_SIZE];
 bool running;
 
 void Input::init()
@@ -12,9 +13,35 @@ void Input::init()
     running = true;
     for (int i = 0; i < EVENTS_SIZE - 1; ++i)
     {
-        events[i] = EMPTY_INPUT_EVENT;
+        event_queue[i] = EMPTY_INPUT_EVENT;
     }
-    events_length = 0;
+    event_queue_length = 0;
+}
+
+void update_mouse_positions()
+{
+    double world_render_scale = Window::get_world_render_scale();
+    double gui_render_scale = Window::get_gui_render_scale();
+    V2 *mouse_position = Window::get_mouse_position();
+    V2 *gui_mouse_position = Window::get_gui_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+    SDL_GetMouseState(&gui_mouse_position->x, &gui_mouse_position->y);
+    mouse_position->x /= world_render_scale;
+    mouse_position->y /= world_render_scale;
+    gui_mouse_position->x /= gui_render_scale;
+    gui_mouse_position->y /= gui_render_scale;
+}
+
+void update_cameras(double w, double h)
+{
+    double world_render_scale = Window::get_world_render_scale();
+    double gui_render_scale = Window::get_gui_render_scale();
+    Rect *camera = Window::get_camera();
+    Rect *gui_camera = Window::get_gui_camera();
+    camera->w = w / world_render_scale;
+    camera->h = h / world_render_scale;
+    gui_camera->w = w / gui_render_scale;
+    gui_camera->h = h / gui_render_scale;
 }
 
 void Input::collect_input_events()
@@ -76,7 +103,7 @@ void Input::collect_input_events()
         {
             if (e.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                //
+                update_cameras(e.window.data1, e.window.data2);
             }
         }
         else if (e.type == SDL_MOUSEBUTTONDOWN)
@@ -87,30 +114,26 @@ void Input::collect_input_events()
             }
         }
     }
+    update_mouse_positions();
 }
 
 void Input::register_input(Input::Event e)
 {
-    if (events_length >= EVENTS_SIZE - 1)
+    if (event_queue_length >= EVENTS_SIZE - 1)
     {
-        printf("ERROR: input event queue is full and events are being dropped! Consider increasing event queue size.\n");
+        printf("ERROR: input event queue is full and event_queue are being dropped! Consider increasing event queue size.\n");
         return;
     }
     for (int i = 0; i < EVENTS_SIZE - 1; ++i)
     {
-        if (events[i] == Input::EMPTY_INPUT_EVENT)
+        if (event_queue[i] == Input::EMPTY_INPUT_EVENT)
         {
-            events[i] = e;
-            ++events_length;
+            event_queue[i] = e;
+            ++event_queue_length;
             return;
         }
     }
     printf("ERROR: Couldn't find spot for input event despite length being less than size!\n");
-}
-
-void Input::clear_input()
-{
-    events_length = 0;
 }
 
 bool Input::is_running()

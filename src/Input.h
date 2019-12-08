@@ -22,7 +22,6 @@ enum Event
 void init();
 void register_input(Input::Event);
 void collect_input_events();
-void clear_input();
 bool is_input_active(Input::Event);
 bool is_running();
 }; // namespace Input

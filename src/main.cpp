@@ -2,6 +2,7 @@
 #include "Assets.h"
 #include "Window.h"
 #include "Input.h"
+#include "Render.h"
 #include <memory>
 #include <algorithm>
 #include <stdio.h>
@@ -28,19 +29,16 @@ int main(int argc, char *argv[])
         printf("Successfully set timer granularity to 1ms\n");
     }
 #endif
-    // initialize SDL
     if (!SDL::initialize_SDL(800, 640))
     {
         printf("SDL failed to initialze.\n");
         return 1;
     }
-    // Load assets
     Assets::load_assets_from_manifest(SDL::get_renderer(), "assets/asset-manifest.txt");
-    // initialize systems
     Input::init();
     Window::set_camera({0, 0, 800, 640});
     Window::set_gui_camera({0, 0, 800, 640});
-    // start game loop
+
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)
     {
@@ -59,8 +57,9 @@ int main(int argc, char *argv[])
 
     while (Input::is_running())
     {
-        Input::clear_input();
         Input::collect_input_events();
+
+        // update
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {
@@ -79,6 +78,8 @@ int main(int argc, char *argv[])
             printf("Frame took %f seconds for a %f time step.\n", SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()), ts);
         }
         int64_t end_counter = SDL_GetPerformanceCounter();
+
+        Render::perform_render();
 
         last_counter = end_counter;
     }

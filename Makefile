@@ -2,7 +2,7 @@
 
 #OBJS specifies which files to compile as part of the project
 OBJS = src/main.cpp src/Input.cpp src/SDLWrapper.cpp src/Assets.cpp \
- src/Window.cpp
+ src/Window.cpp src/Render.cpp
 
 #CC specifies which compiler we're using
 CC = g++
