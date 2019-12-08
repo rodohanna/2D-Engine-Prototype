@@ -58,7 +58,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     }
 
     // Placement
-    for (int i = 0; i < trees.size(); ++i)
+    for (unsigned int i = 0; i < trees.size(); ++i)
     {
         bool placed = false;
         while (!placed)
@@ -77,7 +77,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             }
         }
     }
-    for (int i = 0; i < ground.size(); ++i)
+    for (unsigned int i = 0; i < ground.size(); ++i)
     {
         bool placed = false;
         while (!placed)

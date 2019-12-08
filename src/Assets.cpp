@@ -61,7 +61,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
 
 TextTextureInfo Assets::create_texture_from_text(SDL_Renderer *renderer, int font_index, std::string texture_key, std::string text, const Color &color)
 {
-    if (font_index < 0 || font_index >= font_table.size())
+    if (font_index < 0 || font_index >= static_cast<int>(font_table.size()))
     {
         printf("Error: create_texture_from_text received a bad font_index %d\n", font_index);
         return {-1};
@@ -115,7 +115,7 @@ V2 Assets::get_texture_dimensions(std::string texture_key)
     if (texture_index_map.find(texture_key) != texture_index_map.end())
     {
         int texture_index = texture_index_map[texture_key];
-        assert(texture_index >= 0 && texture_index < texture_table.size());
+        assert(texture_index >= 0 && texture_index < static_cast<int>(texture_table.size()));
         return texture_table[texture_index]->dimensions;
     }
     printf("get_texture_dimensions: Error finding texture %s.\n", texture_key.c_str());

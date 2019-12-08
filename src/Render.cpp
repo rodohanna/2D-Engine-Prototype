@@ -104,7 +104,7 @@ void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events,
                 SDL_RenderSetClipRect(renderer, &e.overflow_clip);
             }
             int texture_index = e.data.render_texture_event.texture_index;
-            if (texture_index >= 0 && texture_index < texture_table->size())
+            if (texture_index >= 0 && texture_index < static_cast<int>(texture_table->size()))
             {
                 Texture *texture = texture_table->at(texture_index).get();
                 if (texture == nullptr)
