@@ -1,2 +1,45 @@
-- Connect entity hover over to UI panel to display description/statuses/etc.
-- Set up turn based movement.
+Game:
+ - Turn-based exploration.
+ - Open world w/ different "biomes".
+ - Quests.
+
+Big Question:
+ - Serialization?
+ - The world is split into chunks. Chunks contain general data until they are
+   fully generated. Once they are fully generated they can be interacted with and the player
+   can make changes that persist.
+
+Alternate strategy:
+ - The world is "open world" but connected by "portals"
+ - This simplifies things becase I don't have to worry about dynamically loading
+   chunks and unloading them seamlessly. 
+ - The portals can be part of lore which could be cool. A level can have multiple
+   portals.
+
+Game designed around "portals".
+
+Portals:
+ - A level is generated and populated with one or more portals. Some portals
+   are harder to find/buy/reach than other portals.
+ - The player can get an item that allows them to travel freely between portals they have already
+   discovered. This can be useful for quests & shiz.
+ - Once a new map is discovered whatever choices the player makes persists after the
+   the player leaves the world/closes and reopens the game/etc.
+Biomes:
+ - A "biome" is a recipe for generating a map. This includes the architecture, enemies,
+   items, scenery, quests, etc.
+Map:
+ - Each map has finite resources. If you stay in an area too long you risk running out of
+   supplies. 
+ - NPCs in a map also depend on the finite resources. This will require "Producer" NPCs/objects that feed
+   resources into the world. If "Producers" are removed from a Map, the Map will eventually "die" out.
+Gameplay:
+ - The player starts on a map. There are some NPCs that give some exposition for new players.
+ - Combat?
+
+
+ Proc Gen:
+  - Take in a ruleset for the generation: Biome, dimensions, etc.
+  - Instantiate structures, place them in ECS, place ID in map
+  - Instantiate scenery, place them in ECS, place ID in map
+  - Instantiate NPCs, place them in ECS, place ID in map

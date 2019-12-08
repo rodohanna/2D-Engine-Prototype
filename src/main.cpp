@@ -3,8 +3,8 @@
 #include "Window.h"
 #include "Input.h"
 #include "Render.h"
-#include <memory>
-#include <algorithm>
+#include "ProcGen.h"
+#include "GameTypes.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -55,11 +55,17 @@ int main(int argc, char *argv[])
     printf("Refresh rate: %d\n", mode.refresh_rate);
     int64_t last_counter = SDL_GetPerformanceCounter();
 
+    // debug
+    ProcGen::Rules rules = {50, 50};
+    V2 dimensions = {50, 50};
+    Map m = ProcGen::generate_map(&rules, &dimensions);
+
     while (Input::is_running())
     {
         Input::collect_input_events();
 
         // update
+        m.entity_manager.update(ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {

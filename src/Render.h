@@ -26,9 +26,9 @@ struct RenderRectangleEvent
 
 struct RenderTextureEvent
 {
-    int texture_index;
     Rect clip;
     V2 position;
+    int texture_index;
     int scale;
     bool has_clip;
 };
@@ -44,9 +44,27 @@ struct Event
         Render::RenderTextureEvent render_texture_event;
     } data;
 };
-void render_texture(Render::Layer layer, int texture_index, V2 &position, Rect *overflow_clip = nullptr, int scale = 1, int z_index = 1);
-void render_texture(Render::Layer layer, int texture_index, Rect &clip, V2 &position, Rect *overflow_clip = nullptr, int scale = 1, int z_index = 1);
-void render_rectangle(Render::Layer layer, const Rect &box, const Color &color, bool filled = false, int z_index = 1);
+void render_texture(
+    Render::Layer layer,
+    int texture_index,
+    V2 &position,
+    Rect *overflow_clip = nullptr,
+    int scale = 1,
+    int z_index = 1);
+void render_texture(
+    Render::Layer layer,
+    int texture_index,
+    Rect &clip,
+    V2 &position,
+    Rect *overflow_clip = nullptr,
+    int scale = 1,
+    int z_index = 1);
+void render_rectangle(
+    Render::Layer layer,
+    const Rect &box,
+    const Color &color,
+    bool filled = false,
+    int z_index = 1);
 void perform_render();
 }; // namespace Render
 

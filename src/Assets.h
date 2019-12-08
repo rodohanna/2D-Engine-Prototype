@@ -25,7 +25,6 @@ struct TextTextureInfo
 
 namespace Assets
 {
-void initialize(SDL_Renderer *);
 void load_assets_from_manifest(SDL_Renderer *, std::string);
 TextTextureInfo create_texture_from_text(SDL_Renderer *renderer, int font_index, std::string texture_key, std::string text, const Color &color);
 int get_texture_index(std::string texture_key);

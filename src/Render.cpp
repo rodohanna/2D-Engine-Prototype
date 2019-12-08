@@ -25,7 +25,7 @@ void Render::render_texture(Render::Layer layer, int texture_index, V2 &position
         e.overflow_clip = *overflow_clip;
     }
     e.z_index = z_index;
-    e.data.render_texture_event = {texture_index, {}, position, scale, false};
+    e.data.render_texture_event = {{}, position, texture_index, scale, false};
     render_queue[render_queue_length++] = e;
 }
 
@@ -45,7 +45,7 @@ void Render::render_texture(Render::Layer layer, int texture_index, Rect &clip, 
     }
     e.z_index = z_index;
     e.has_overflow_clip = false;
-    e.data.render_texture_event = {texture_index, clip, position, scale, true};
+    e.data.render_texture_event = {clip, position, texture_index, scale, true};
     render_queue[render_queue_length++] = e;
 }
 
