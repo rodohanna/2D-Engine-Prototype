@@ -5,11 +5,11 @@
 #include <unordered_map>
 #include <assert.h>
 
-std::unordered_map<std::string, size_t> texture_index_map;
-std::unordered_map<std::string, size_t> font_index_map;
+std::unordered_map<std::string, int> texture_index_map;
+std::unordered_map<std::string, int> font_index_map;
 std::vector<std::unique_ptr<Texture>> texture_table;
 std::vector<Font *> font_table;
-std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, size_t index);
+std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, int index);
 
 void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
 {
@@ -25,7 +25,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         return;
     }
     std::string key, type, asset_path;
-    size_t font_size;
+    int font_size;
     while (manifest >> key >> type >> asset_path)
     {
         if (manifest.fail())
@@ -36,7 +36,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
         printf("Loading key: %s, type: %s, path: %s\n", key.c_str(), type.c_str(), asset_path.c_str());
         if (type == "sprite")
         {
-            size_t index = texture_table.size();
+            int index = texture_table.size();
             std::unique_ptr<Texture> texture = create_texture_from_file(asset_path, renderer, index);
             texture_index_map[key] = index;
             texture_table.push_back(std::move(texture));
@@ -47,7 +47,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
             Font *font = TTF_OpenFont(asset_path.c_str(), font_size);
             if (font != nullptr)
             {
-                size_t font_index = font_table.size();
+                int font_index = font_table.size();
                 font_index_map[key] = font_index;
                 font_table.push_back(font);
             }
@@ -59,7 +59,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
     }
 }
 
-TextTextureInfo Assets::create_texture_from_text(SDL_Renderer *renderer, size_t font_index, std::string texture_key, std::string text, const Color &color)
+TextTextureInfo Assets::create_texture_from_text(SDL_Renderer *renderer, int font_index, std::string texture_key, std::string text, const Color &color)
 {
     if (font_index < 0 || font_index >= font_table.size())
     {
@@ -114,7 +114,7 @@ V2 Assets::get_texture_dimensions(std::string texture_key)
 {
     if (texture_index_map.find(texture_key) != texture_index_map.end())
     {
-        size_t texture_index = texture_index_map[texture_key];
+        int texture_index = texture_index_map[texture_key];
         assert(texture_index >= 0 && texture_index < texture_table.size());
         return texture_table[texture_index]->dimensions;
     }
@@ -122,7 +122,7 @@ V2 Assets::get_texture_dimensions(std::string texture_key)
     return {0, 0};
 }
 
-std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, size_t index)
+std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, int index)
 {
     SDL_Surface *loaded_surface = IMG_Load(path.c_str());
     if (loaded_surface == nullptr)
@@ -150,7 +150,7 @@ std::vector<std::unique_ptr<Texture>> *Assets::get_texture_table()
 
 // Texture
 
-Texture::Texture(SDL_Texture *texture, const V2 &dimensions, size_t index) : texture(texture), dimensions(dimensions), index(index) {}
+Texture::Texture(SDL_Texture *texture, const V2 &dimensions, int index) : texture(texture), dimensions(dimensions), index(index) {}
 
 Texture::~Texture()
 {
@@ -161,7 +161,7 @@ Texture::~Texture()
     }
 }
 
-void Texture::render(SDL_Renderer *renderer, const V2 &position, SDL_Rect *clip, size_t scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
+void Texture::render(SDL_Renderer *renderer, const V2 &position, SDL_Rect *clip, int scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
 {
     if (this->texture == nullptr)
     {

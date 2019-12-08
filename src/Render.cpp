@@ -10,7 +10,7 @@ Render::Event world_layer_buffer[RENDER_QUEUE_SIZE];
 Render::Event gui_layer_buffer[RENDER_QUEUE_SIZE];
 int render_queue_length = 0;
 
-void Render::render_texture(Render::Layer layer, size_t texture_index, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
+void Render::render_texture(Render::Layer layer, int texture_index, V2 &position, Rect *overflow_clip, int scale, int z_index)
 {
     Render::Event e;
     e.layer = layer;
@@ -26,10 +26,10 @@ void Render::render_texture(Render::Layer layer, size_t texture_index, V2 &posit
     }
     e.z_index = z_index;
     e.data.render_texture_event = {texture_index, {}, position, scale, false};
-    render_queue[render_queue_length++];
+    render_queue[render_queue_length++] = e;
 }
 
-void Render::render_texture(Render::Layer layer, size_t texture_index, Rect &clip, V2 &position, Rect *overflow_clip, size_t scale, size_t z_index)
+void Render::render_texture(Render::Layer layer, int texture_index, Rect &clip, V2 &position, Rect *overflow_clip, int scale, int z_index)
 {
     Render::Event e;
     e.layer = layer;
@@ -46,10 +46,10 @@ void Render::render_texture(Render::Layer layer, size_t texture_index, Rect &cli
     e.z_index = z_index;
     e.has_overflow_clip = false;
     e.data.render_texture_event = {texture_index, clip, position, scale, true};
-    render_queue[render_queue_length++];
+    render_queue[render_queue_length++] = e;
 }
 
-void Render::render_rectangle(Render::Layer layer, const Rect &box, const Color &color, bool filled, size_t z_index)
+void Render::render_rectangle(Render::Layer layer, const Rect &box, const Color &color, bool filled, int z_index)
 {
     Render::Event e;
     e.layer = layer;
@@ -57,7 +57,7 @@ void Render::render_rectangle(Render::Layer layer, const Rect &box, const Color 
     e.has_overflow_clip = false;
     e.z_index = z_index;
     e.data.render_rectangle_event = {box, color, filled};
-    render_queue[render_queue_length++];
+    render_queue[render_queue_length++] = e;
 }
 
 bool compare_render_events(Render::Event a, Render::Event b)
@@ -65,7 +65,7 @@ bool compare_render_events(Render::Event a, Render::Event b)
     return a.z_index < b.z_index;
 }
 
-void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events, size_t length)
+void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events, int length)
 {
     auto texture_table = Assets::get_texture_table();
     std::vector<Render::Event> render_vector(render_events, render_events + length);
@@ -103,7 +103,7 @@ void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events,
             {
                 SDL_RenderSetClipRect(renderer, &e.overflow_clip);
             }
-            size_t texture_index = e.data.render_texture_event.texture_index;
+            int texture_index = e.data.render_texture_event.texture_index;
             if (texture_index >= 0 && texture_index < texture_table->size())
             {
                 Texture *texture = texture_table->at(texture_index).get();
