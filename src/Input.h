@@ -1,6 +1,8 @@
 #ifndef INPUT_h_
 #define INPUT_h_
 
+#include "GameTypes.h"
+
 namespace Input
 {
 
@@ -19,7 +21,7 @@ enum Event
     D_KEY_UP
 };
 
-void init();
+void init(V2 window_dimensions);
 void register_input(Input::Event);
 void collect_input_events();
 bool is_input_active(Input::Event);

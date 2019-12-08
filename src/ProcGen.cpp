@@ -96,5 +96,33 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             }
         }
     }
+    // Place player
+    bool player_placed = false;
+    while (!player_placed)
+    {
+        int x = rand() % dimensions->x;
+        int y = rand() % dimensions->y;
+        if (map.grid[x][y].entity_id == -1)
+        {
+            ECS::Entity player;
+            ECS::Component position;
+            position.type = ECS::Type::POSITION;
+            position.data.p.position = {x * 16, y * 16};
+            player.components[position.type] = position;
+            ECS::Component render;
+            render.type = ECS::Type::RENDER;
+            render.data.r = {{408, 0, 16, 16},
+                             Render::Layer::WORLD_LAYER,
+                             texture_index,
+                             1,
+                             1,
+                             true};
+            player.components[render.type] = render;
+            player.components[ECS::Type::CAMERA] = {};
+            map.entity_manager.entities.push_back(player);
+            map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
+            player_placed = true;
+        }
+    }
     return map;
 }

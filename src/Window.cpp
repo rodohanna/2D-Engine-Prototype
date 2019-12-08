@@ -23,6 +23,16 @@ void Window::set_camera(Rect *rect)
 {
     camera = *rect;
 }
+void Window::set_camera_position(V2 position)
+{
+    camera.x = position.x;
+    camera.y = position.y;
+}
+void Window::set_camera_position(V2 *position)
+{
+    camera.x = position->x;
+    camera.y = position->y;
+}
 void Window::set_gui_camera(Rect rect)
 {
     gui_camera = rect;

@@ -8,7 +8,10 @@ int event_queue_length = 0;
 Input::Event event_queue[EVENTS_SIZE];
 bool running;
 
-void Input::init()
+void update_cameras(double w, double h);
+void update_mouse_positions();
+
+void Input::init(V2 window_dimensions)
 {
     running = true;
     for (int i = 0; i < EVENTS_SIZE - 1; ++i)
@@ -16,32 +19,7 @@ void Input::init()
         event_queue[i] = EMPTY_INPUT_EVENT;
     }
     event_queue_length = 0;
-}
-
-void update_mouse_positions()
-{
-    double world_render_scale = Window::get_world_render_scale();
-    double gui_render_scale = Window::get_gui_render_scale();
-    V2 *mouse_position = Window::get_mouse_position();
-    V2 *gui_mouse_position = Window::get_gui_mouse_position();
-    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
-    SDL_GetMouseState(&gui_mouse_position->x, &gui_mouse_position->y);
-    mouse_position->x /= world_render_scale;
-    mouse_position->y /= world_render_scale;
-    gui_mouse_position->x /= gui_render_scale;
-    gui_mouse_position->y /= gui_render_scale;
-}
-
-void update_cameras(double w, double h)
-{
-    double world_render_scale = Window::get_world_render_scale();
-    double gui_render_scale = Window::get_gui_render_scale();
-    Rect *camera = Window::get_camera();
-    Rect *gui_camera = Window::get_gui_camera();
-    camera->w = w / world_render_scale;
-    camera->h = h / world_render_scale;
-    gui_camera->w = w / gui_render_scale;
-    gui_camera->h = h / gui_render_scale;
+    update_cameras(window_dimensions.x, window_dimensions.y);
 }
 
 void Input::collect_input_events()
@@ -139,4 +117,30 @@ void Input::register_input(Input::Event e)
 bool Input::is_running()
 {
     return running;
+}
+
+void update_mouse_positions()
+{
+    double world_render_scale = Window::get_world_render_scale();
+    double gui_render_scale = Window::get_gui_render_scale();
+    V2 *mouse_position = Window::get_mouse_position();
+    V2 *gui_mouse_position = Window::get_gui_mouse_position();
+    SDL_GetMouseState(&mouse_position->x, &mouse_position->y);
+    SDL_GetMouseState(&gui_mouse_position->x, &gui_mouse_position->y);
+    mouse_position->x /= world_render_scale;
+    mouse_position->y /= world_render_scale;
+    gui_mouse_position->x /= gui_render_scale;
+    gui_mouse_position->y /= gui_render_scale;
+}
+
+void update_cameras(double w, double h)
+{
+    double world_render_scale = Window::get_world_render_scale();
+    double gui_render_scale = Window::get_gui_render_scale();
+    Rect *camera = Window::get_camera();
+    Rect *gui_camera = Window::get_gui_camera();
+    camera->w = w / world_render_scale;
+    camera->h = h / world_render_scale;
+    gui_camera->w = w / gui_render_scale;
+    gui_camera->h = h / gui_render_scale;
 }

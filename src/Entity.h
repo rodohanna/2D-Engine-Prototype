@@ -12,7 +12,8 @@ namespace ECS
 enum Type
 {
     POSITION,
-    RENDER
+    RENDER,
+    CAMERA
 };
 
 struct PositionComponent
@@ -46,6 +47,7 @@ struct Entity
 };
 
 void render_system(Entity *);
+void camera_system(Entity *);
 
 struct Manager
 {

@@ -9,6 +9,8 @@ Rect *get_camera();
 Rect *get_gui_camera();
 void set_camera(Rect);
 void set_camera(Rect *);
+void set_camera_position(V2);
+void set_camera_position(V2*);
 void set_gui_camera(Rect);
 void set_gui_camera(Rect *);
 void set_world_render_scale(double);

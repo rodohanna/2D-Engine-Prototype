@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
         printf("SDL failed to initialze.\n");
         return 1;
     }
-    Assets::load_assets_from_manifest(SDL::get_renderer(), "assets/asset-manifest.txt");
-    Input::init();
     Window::set_camera({0, 0, 800, 640});
     Window::set_gui_camera({0, 0, 800, 640});
+    Input::init({800, 640});
+    Assets::load_assets_from_manifest(SDL::get_renderer(), "assets/asset-manifest.txt");
 
     SDL_DisplayMode mode = {SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0};
     if (SDL_GetDisplayMode(0, 0, &mode) != 0)
