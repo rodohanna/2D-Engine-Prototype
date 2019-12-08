@@ -196,13 +196,13 @@ void ChunkManager::update_chunks(double ts)
                                 this->coordinate_text->update(ts, 3, Events::RenderLayer::WORLD_LAYER);
                             }
                         }
-                        if (show_tile_grid)
+                        if (show_tile_grid || true)
                         {
                             this->event_bus->publish_render_event(
                                 Events::create_render_rectangle_event(
                                     Events::RenderLayer::WORLD_LAYER,
                                     {r.x - camera->x, r.y - camera->y, r.w + 1, r.h + 1},
-                                    {0x00, 0x00, 0x00, 0xFF},
+                                    {0x2E, 0xCC, 0x40, 0x05},
                                     false,
                                     2));
                         }

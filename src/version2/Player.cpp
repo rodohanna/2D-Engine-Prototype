@@ -38,6 +38,10 @@ void Player::update(double ts)
     Rect *old_camera = Window::get_camera();
     Window::set_camera({this->position.x, this->position.y, old_camera->w, old_camera->h});
 }
+void Player::take_turn()
+{
+    //
+}
 void Player::handle_input_events(const Events::InputEvent *inputEvents, size_t length)
 {
     for (size_t i = 0; i < length; ++i)

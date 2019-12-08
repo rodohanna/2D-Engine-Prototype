@@ -9,11 +9,11 @@
 
 Scene::Scene(EventBus *e) : event_bus(e)
 {
-    V2 world_dimensions = {100, 100};
+    V2 world_dimensions = {1, 1};
     Palette p = MapGen::load_palette("assets/palette.txt");
-    World world(p, world_dimensions, 64);
+    World world(p, world_dimensions, 128);
     world.generate_world();
-    ChunkManager *c_m = new ChunkManager(e, world, 64);
+    ChunkManager *c_m = new ChunkManager(e, world, 128);
     this->chunk_manager = std::unique_ptr<ChunkManager>(c_m);
     V2 player = {0, 0};
     this->chunk_manager->sync_chunks_to_world_position(player, true);

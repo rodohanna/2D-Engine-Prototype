@@ -1,13 +1,12 @@
 #include "SDLWrapper.h"
 #include <stdio.h>
 
-SDL_Window *window;
-SDL_Renderer *renderer;
-bool vsync;
+SDLWrapper::SDLWrapper() {}
+SDLWrapper::~SDLWrapper() {}
 
-bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
+bool SDLWrapper::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
 {
-    vsync = vsync;
+    this->vsync = vsync;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
@@ -21,8 +20,8 @@ bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
             printf("Warning: Linear texture filtering not enabled!");
         }
 
-        window = SDL_CreateWindow("Simulation Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-        if (window == NULL)
+        this->window = SDL_CreateWindow("Simulation Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        if (this->window == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             return false;
@@ -30,20 +29,20 @@ bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
         else
         {
             Uint32 flags = SDL_RENDERER_ACCELERATED;
-            if (vsync)
+            if (this->vsync)
             {
                 flags |= SDL_RENDERER_PRESENTVSYNC;
             }
-            renderer = SDL_CreateRenderer(window, -1, flags);
-            if (renderer == NULL)
+            this->renderer = SDL_CreateRenderer(this->window, -1, flags);
+            if (this->renderer == NULL)
             {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
                 return false;
             }
             else
             {
-                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-                SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_SetRenderDrawBlendMode(this->renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags))
@@ -62,14 +61,4 @@ bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync)
     }
 
     return true;
-}
-
-SDL_Renderer *SDL::get_renderer()
-{
-    return renderer;
-}
-
-bool SDL::is_vsync()
-{
-    return vsync;
 }

@@ -15,11 +15,14 @@
 
 #endif
 
-namespace SDL
+struct SDLWrapper
 {
-bool initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync = true);
-SDL_Renderer *get_renderer();
-bool is_vsync();
-}; // namespace SDL
+    SDLWrapper();
+    ~SDLWrapper();
+    bool initialize_SDL(size_t screenWidth, size_t screenHeight, bool vsync = true);
+    SDL_Renderer *renderer;
+    SDL_Window *window;
+    bool vsync;
+};
 
 #endif

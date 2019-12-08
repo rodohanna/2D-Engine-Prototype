@@ -335,7 +335,6 @@ GUI::GUI(EventBus *e) : event_bus(e)
     this->inventory_panel.panel_text.push_back(t);
 }
 
-void GUI::update(double ts)
-{
-    this->inventory_panel.update(ts);
+void GUI::update(double ts){
+    // this->inventory_panel.update(ts);
 };
