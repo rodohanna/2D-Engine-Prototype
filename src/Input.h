@@ -23,6 +23,7 @@ enum Event
 
 void init(V2 window_dimensions);
 void register_input(Input::Event);
+void clear_input(Input::Event);
 void collect_input_events();
 bool is_input_active(Input::Event);
 bool is_running();

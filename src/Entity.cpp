@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Window.h"
+#include "Input.h"
 #include <stdio.h>
 
 // Systems
@@ -44,10 +45,37 @@ void ECS::camera_system(Entity *e)
     }
 }
 
+void ECS::input_system(Entity *e)
+{
+    auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
+    auto position_it = e->components.find(ECS::Type::POSITION);
+    if (player_input_it != e->components.end() && position_it != e->components.end())
+    {
+        auto position = &position_it->second.data.p.position;
+        if (Input::is_input_active(Input::Event::W_KEY_DOWN))
+        {
+            position->y -= 1;
+        }
+        if (Input::is_input_active(Input::Event::S_KEY_DOWN))
+        {
+            position->y += 1;
+        }
+        if (Input::is_input_active(Input::Event::A_KEY_DOWN))
+        {
+            position->x -= 1;
+        }
+        if (Input::is_input_active(Input::Event::D_KEY_DOWN))
+        {
+            position->x += 1;
+        }
+    }
+}
+
 void ECS::Manager::update(double)
 {
     for (Entity &e : this->entities)
     {
+        ECS::input_system(&e);
         ECS::camera_system(&e);
         ECS::render_system(&e);
     }

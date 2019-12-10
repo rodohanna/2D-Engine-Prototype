@@ -115,10 +115,11 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                              Render::Layer::WORLD_LAYER,
                              texture_index,
                              1,
-                             1,
+                             2,
                              true};
             player.components[render.type] = render;
             player.components[ECS::Type::CAMERA] = {};
+            player.components[ECS::Type::PLAYER_INPUT] = {};
             map.entity_manager.entities.push_back(player);
             map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
             player_placed = true;

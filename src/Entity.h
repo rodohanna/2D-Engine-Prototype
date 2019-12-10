@@ -13,7 +13,8 @@ enum Type
 {
     POSITION,
     RENDER,
-    CAMERA
+    CAMERA,
+    PLAYER_INPUT
 };
 
 struct PositionComponent
@@ -48,6 +49,7 @@ struct Entity
 
 void render_system(Entity *);
 void camera_system(Entity *);
+void input_system(Entity *);
 
 struct Manager
 {

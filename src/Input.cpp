@@ -16,7 +16,7 @@ void Input::init(V2 window_dimensions)
     running = true;
     for (int i = 0; i < EVENTS_SIZE - 1; ++i)
     {
-        event_queue[i] = EMPTY_INPUT_EVENT;
+        event_queue[i] = Input::EMPTY_INPUT_EVENT;
     }
     event_queue_length = 0;
     update_cameras(window_dimensions.x, window_dimensions.y);
@@ -59,17 +59,29 @@ void Input::collect_input_events()
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_w:
+                {
+                    clear_input(Input::W_KEY_DOWN);
                     register_input(Input::W_KEY_UP);
                     break;
+                }
                 case SDLK_a:
+                {
+                    clear_input(Input::A_KEY_DOWN);
                     register_input(Input::A_KEY_UP);
                     break;
+                }
                 case SDLK_s:
+                {
+                    clear_input(Input::S_KEY_DOWN);
                     register_input(Input::S_KEY_UP);
                     break;
+                }
                 case SDLK_d:
+                {
+                    clear_input(Input::D_KEY_DOWN);
                     register_input(Input::D_KEY_UP);
                     break;
+                }
                 }
             }
         }
@@ -112,6 +124,30 @@ void Input::register_input(Input::Event e)
         }
     }
     printf("ERROR: Couldn't find spot for input event despite length being less than size!\n");
+}
+
+void Input::clear_input(Input::Event e)
+{
+    for (int i = 0; i < EVENTS_SIZE - 1; ++i)
+    {
+        if (event_queue[i] == e)
+        {
+            event_queue[i] = Input::EMPTY_INPUT_EVENT;
+            --event_queue_length;
+        }
+    }
+}
+
+bool Input::is_input_active(Input::Event e)
+{
+    for (int i = 0; i < EVENTS_SIZE; ++i)
+    {
+        if (event_queue[i] == e)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Input::is_running()
