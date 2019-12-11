@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // debug
-    ProcGen::Rules rules = {50, 50};
-    V2 dimensions = {50, 50};
+    ProcGen::Rules rules = {100, 100};
+    V2 dimensions = {100, 100};
     Map m = ProcGen::generate_map(&rules, &dimensions);
 
     while (Input::is_running())

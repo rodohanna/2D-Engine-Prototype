@@ -156,13 +156,13 @@ void Render::perform_render()
     // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
     SDL_SetRenderDrawColor(renderer, 0x2E, 0xCC, 0x40, 0x0F);
     Rect *camera = Window::get_camera();
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i <= 100; ++i)
     {
-        SDL_RenderDrawLine(renderer, (i * 16) - camera->x, 0 - camera->y, (i * 16) - camera->x, (16 * 50) - camera->y);
+        SDL_RenderDrawLine(renderer, (i * 16) - camera->x, 0 - camera->y, (i * 16) - camera->x, (16 * 100) - camera->y);
     }
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i <= 100; ++i)
     {
-        SDL_RenderDrawLine(renderer, 0 - camera->x, (i * 16) - camera->y, (16 * 50) - camera->x, (i * 16) - camera->y);
+        SDL_RenderDrawLine(renderer, 0 - camera->x, (i * 16) - camera->y, (16 * 100) - camera->x, (i * 16) - camera->y);
     }
     _perform_render(renderer, world_layer_buffer, world_buffer_length);
 

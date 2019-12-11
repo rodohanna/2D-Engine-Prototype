@@ -14,7 +14,8 @@ enum Type
     POSITION,
     RENDER,
     CAMERA,
-    PLAYER_INPUT
+    PLAYER_INPUT,
+    POSITION_ANIMATE
 };
 
 struct PositionComponent
@@ -32,12 +33,21 @@ struct RenderComponent
     bool has_clip;
 };
 
+struct PositionAnimateComponent
+{
+    V2 start;
+    V2 end;
+    double counter;
+    double duration;
+};
+
 struct Component
 {
     ECS::Type type;
     union {
         PositionComponent p;
         RenderComponent r;
+        PositionAnimateComponent p_a;
     } data;
 };
 
@@ -50,6 +60,7 @@ struct Entity
 void render_system(Entity *);
 void camera_system(Entity *);
 void input_system(Entity *);
+void position_animate_system(Entity *, double ts);
 
 struct Manager
 {
