@@ -64,19 +64,14 @@ void ECS::camera_system(Entity *e)
     }
 }
 
-void ECS::input_system(Entity *e)
+bool ECS::input_system(Entity *e)
 {
     auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
     auto position_it = e->components.find(ECS::Type::POSITION);
     if (player_input_it != e->components.end() && position_it != e->components.end())
     {
         auto position = &position_it->second.data.p.position;
-        ECS::Component position_animate;
-        position_animate.type = ECS::Type::POSITION_ANIMATE;
-        position_animate.data.p_a.counter = 0;
-        position_animate.data.p_a.duration = .20;
-        V2 start = *position;
-        V2 end = *position;
+        auto target_position = &position_it->second.data.p.target_position;
         int tile_size = 16;
         int x_movement = 0;
         int y_movement = 0;
@@ -84,12 +79,7 @@ void ECS::input_system(Entity *e)
         auto s_pressed = Input::is_input_active(Input::Event::S_KEY_DOWN);
         auto a_pressed = Input::is_input_active(Input::Event::A_KEY_DOWN);
         auto d_pressed = Input::is_input_active(Input::Event::D_KEY_DOWN);
-        auto existing_position_animate = e->components.find(ECS::Type::POSITION_ANIMATE);
-        if (existing_position_animate != e->components.end() && (w_pressed || s_pressed || a_pressed || d_pressed))
-        {
-            auto where_entity_was_supposed_to_end = existing_position_animate->second.data.p_a.end;
-            end = where_entity_was_supposed_to_end;
-        }
+        auto some_input_pressed = w_pressed || s_pressed || a_pressed || d_pressed;
         if (w_pressed)
         {
             y_movement = -tile_size;
@@ -106,15 +96,23 @@ void ECS::input_system(Entity *e)
         {
             x_movement = tile_size;
         }
-        end.x += x_movement;
-        end.y += y_movement;
-        if (start.x != end.x || start.y != end.y)
+        target_position->x += x_movement;
+        target_position->y += y_movement;
+        V2 start = *position;
+        V2 end = *target_position;
+        if (some_input_pressed && (start.x != end.x || start.y != end.y))
         {
+            ECS::Component position_animate;
+            position_animate.type = ECS::Type::POSITION_ANIMATE;
+            position_animate.data.p_a.counter = 0;
+            position_animate.data.p_a.duration = .20;
             position_animate.data.p_a.start = start;
             position_animate.data.p_a.end = end;
             e->components[position_animate.type] = position_animate;
         }
+        return some_input_pressed;
     }
+    return false;
 }
 
 void ECS::position_animate_system(Entity *e, double ts)
@@ -146,13 +144,79 @@ void ECS::position_animate_system(Entity *e, double ts)
     }
 }
 
+void ECS::dumb_ai_system(Entity *e)
+{
+    auto dumb_ai_it = e->components.find(ECS::DUMB_AI_COMPONENT);
+    auto position_it = e->components.find(ECS::Type::POSITION);
+    if (dumb_ai_it != e->components.end() && position_it != e->components.end())
+    {
+        auto position = &position_it->second.data.p.position;
+        auto target_position = &position_it->second.data.p.target_position;
+        int x_movement = 0;
+        int y_movement = 0;
+        if (rand() % 2 == 0)
+        {
+            x_movement = 16;
+        }
+        else if (rand() % 2 == 0)
+        {
+            y_movement = 16;
+        }
+
+        if (rand() % 2 == 0)
+        {
+            x_movement = -x_movement;
+        }
+        else if (rand() % 2 == 0)
+        {
+            y_movement = -y_movement;
+        }
+        target_position->x += x_movement;
+        target_position->y += y_movement;
+        V2 start = *position;
+        V2 end = *target_position;
+
+        ECS::Component position_animate;
+        position_animate.type = ECS::Type::POSITION_ANIMATE;
+        position_animate.data.p_a.counter = 0;
+        position_animate.data.p_a.duration = .20;
+        position_animate.data.p_a.start = start;
+        position_animate.data.p_a.end = end;
+        e->components[position_animate.type] = position_animate;
+    }
+}
+
+ECS::Manager::Manager() : player(nullptr) {}
+
 void ECS::Manager::update(double ts)
 {
     for (Entity &e : this->entities)
     {
-        ECS::input_system(&e);
         ECS::position_animate_system(&e, ts);
         ECS::camera_system(&e);
         ECS::render_system(&e);
     }
 };
+
+void ECS::Manager::take_turns()
+{
+    if (this->player == nullptr)
+    {
+        for (Entity &e : this->entities)
+        {
+            auto player_input_it = e.components.find(ECS::Type::PLAYER_INPUT);
+            if (player_input_it != e.components.end())
+            {
+                this->player = &e;
+                break;
+            }
+        }
+    }
+    if (ECS::input_system(this->player))
+    {
+        for (Entity &e : this->entities)
+        {
+            ECS::dumb_ai_system(&e);
+        }
+    }
+}

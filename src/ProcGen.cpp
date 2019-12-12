@@ -71,7 +71,9 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
+                position.data.p.target_position = {x * 16, y * 16};
                 entity->components[position.type] = position;
+                entity->components[ECS::Type::DUMB_AI_COMPONENT] = {};
                 map.grid[x][y].entity_id = trees[i];
                 placed = true;
             }
@@ -90,6 +92,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
+                position.data.p.target_position = {x * 16, y * 16};
                 entity->components[position.type] = position;
                 map.grid[x][y].entity_id = ground[i];
                 placed = true;
@@ -108,6 +111,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             ECS::Component position;
             position.type = ECS::Type::POSITION;
             position.data.p.position = {x * 16, y * 16};
+            position.data.p.target_position = {x * 16, y * 16};
             player.components[position.type] = position;
             ECS::Component render;
             render.type = ECS::Type::RENDER;
@@ -123,6 +127,37 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             map.entity_manager.entities.push_back(player);
             map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
             player_placed = true;
+        }
+    }
+    for (int i = 0; i < 100; ++i)
+    {
+        bool npc_placed = false;
+        while (!npc_placed)
+        {
+            int x = rand() % dimensions->x;
+            int y = rand() % dimensions->y;
+            if (map.grid[x][y].entity_id == -1)
+            {
+                ECS::Entity npc;
+                ECS::Component position;
+                position.type = ECS::Type::POSITION;
+                position.data.p.position = {x * 16, y * 16};
+                position.data.p.target_position = {x * 16, y * 16};
+                npc.components[position.type] = position;
+                ECS::Component render;
+                render.type = ECS::Type::RENDER;
+                render.data.r = {{425, 0, 16, 16},
+                                 Render::Layer::WORLD_LAYER,
+                                 texture_index,
+                                 1,
+                                 2,
+                                 true};
+                npc.components[render.type] = render;
+                // npc.components[ECS::Type::DUMB_AI_COMPONENT] = {};
+                map.entity_manager.entities.push_back(npc);
+                map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
+                npc_placed = true;
+            }
         }
     }
     return map;

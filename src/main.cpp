@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
         Input::collect_input_events();
 
         // update
+        m.entity_manager.take_turns();
         m.entity_manager.update(ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
