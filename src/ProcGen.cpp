@@ -113,15 +113,6 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             position.data.p.position = {x * 16, y * 16};
             position.data.p.target_position = {x * 16, y * 16};
             player.components[position.type] = position;
-            ECS::Component render;
-            render.type = ECS::Type::RENDER;
-            render.data.r = {{408, 0, 16, 16},
-                             Render::Layer::WORLD_LAYER,
-                             texture_index,
-                             1,
-                             2,
-                             true};
-            player.components[render.type] = render;
             player.components[ECS::Type::CAMERA] = {};
             player.components[ECS::Type::PLAYER_INPUT] = {};
             map.entity_manager.entities.push_back(player);

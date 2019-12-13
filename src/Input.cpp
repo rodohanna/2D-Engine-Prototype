@@ -24,11 +24,6 @@ void Input::init(V2 window_dimensions)
 
 void Input::collect_input_events()
 {
-    for (int i = 0; i < EVENTS_SIZE - 1; ++i)
-    {
-        event_queue[i] = Input::EMPTY_INPUT_EVENT;
-    }
-    event_queue_length = 0;
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
     {
@@ -65,22 +60,22 @@ void Input::collect_input_events()
                 {
                 case SDLK_w:
                 {
-                    register_input(Input::W_KEY_UP);
+                    clear_input(Input::W_KEY_DOWN);
                     break;
                 }
                 case SDLK_a:
                 {
-                    register_input(Input::A_KEY_UP);
+                    clear_input(Input::A_KEY_DOWN);
                     break;
                 }
                 case SDLK_s:
                 {
-                    register_input(Input::S_KEY_UP);
+                    clear_input(Input::S_KEY_DOWN);
                     break;
                 }
                 case SDLK_d:
                 {
-                    register_input(Input::D_KEY_UP);
+                    clear_input(Input::D_KEY_DOWN);
                     break;
                 }
                 }
@@ -137,6 +132,15 @@ void Input::clear_input(Input::Event e)
             --event_queue_length;
         }
     }
+}
+
+void Input::clear_inputs()
+{
+    for (int i = 0; i < EVENTS_SIZE - 1; ++i)
+    {
+        event_queue[i] = Input::EMPTY_INPUT_EVENT;
+    }
+    event_queue_length = 0;
 }
 
 bool Input::is_input_active(Input::Event e)

@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // debug
-    ProcGen::Rules rules = {100, 100};
+    ProcGen::Rules rules = {1000, 100};
     V2 dimensions = {100, 100};
     Map m = ProcGen::generate_map(&rules, &dimensions);
 
@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
         Input::collect_input_events();
 
         // update
-        m.entity_manager.take_turns();
         m.entity_manager.update(ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)

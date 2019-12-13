@@ -59,16 +59,13 @@ struct Entity
     int energy;
 };
 
-bool input_system(Entity *);
+void input_system(Entity *, double ts);
 void render_system(Entity *);
 void camera_system(Entity *);
-void position_animate_system(Entity *, double ts);
-void dumb_ai_system(Entity *);
 
 struct Manager
 {
     Manager();
-    void take_turns();
     void update(double);
     std::vector<Entity> entities;
     Entity *player;
