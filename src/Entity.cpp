@@ -91,6 +91,14 @@ void ECS::input_system(Entity *e, double ts)
         {
             position->y = map_dimensions.y - camera->h;
         }
+        if (camera->w > map_dimensions.x)
+        {
+            position->x = -((camera->w - map_dimensions.x) / 2);
+        }
+        if (camera->h > map_dimensions.y)
+        {
+            position->y = -((camera->h - map_dimensions.y) / 2);
+        }
     }
 }
 
