@@ -72,7 +72,6 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
-                position.data.p.target_position = {x * 16, y * 16};
                 entity->components[position.type] = position;
                 entity->components[ECS::Type::DUMB_AI_COMPONENT] = {};
                 map.grid[x][y].entity_id = trees[i];
@@ -93,49 +92,21 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
-                position.data.p.target_position = {x * 16, y * 16};
                 entity->components[position.type] = position;
                 map.grid[x][y].entity_id = ground[i];
                 placed = true;
             }
         }
     }
-    // lumberyard
-    bool lumber_yard_placed = false;
-    while (!lumber_yard_placed)
-    {
-        int x = rand() % dimensions->x;
-        int y = rand() % dimensions->y;
-        if (map.grid[x][y].entity_id == -1)
-        {
-            ECS::Entity lumber_yard;
-            ECS::Component position;
-            position.type = ECS::Type::POSITION;
-            position.data.p.position = {x * 16, y * 16};
-            position.data.p.target_position = {x * 16, y * 16};
-            ECS::Component render_component;
-            render_component.type = ECS::Type::RENDER;
-            render_component.data.r = {
-                {85, 272, 16, 16},
-                Render::Layer::WORLD_LAYER,
-                texture_index,
-                1,
-                1,
-                true};
-            lumber_yard.components[position.type] = position;
-            lumber_yard.components[render_component.type] = render_component;
-            map.entity_manager.entities.push_back(lumber_yard);
-            map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
-            lumber_yard_placed = true;
-            // add player
-            ECS::Entity player;
-            player.components[position.type] = position;
-            player.components[ECS::Type::CAMERA] = {};
-            player.components[ECS::Type::PLAYER_INPUT] = {};
-            map.entity_manager.entities.push_back(player);
-        }
-    }
 
+    ECS::Entity player;
+    ECS::Component position;
+    position.type = ECS::Type::POSITION;
+    position.data.p.position = {0, 0};
+    player.components[position.type] = position;
+    player.components[ECS::Type::CAMERA] = {};
+    player.components[ECS::Type::PLAYER_INPUT] = {};
+    map.entity_manager.entities.push_back(player);
     // for (int i = 0; i < 100; ++i)
     // {
     //     bool npc_placed = false;
@@ -149,7 +120,6 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     //             ECS::Component position;
     //             position.type = ECS::Type::POSITION;
     //             position.data.p.position = {x * 16, y * 16};
-    //             position.data.p.target_position = {x * 16, y * 16};
     //             npc.components[position.type] = position;
     //             ECS::Component render;
     //             render.type = ECS::Type::RENDER;

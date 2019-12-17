@@ -22,7 +22,6 @@ enum Type
 struct PositionComponent
 {
     V2 position;
-    V2 target_position;
 };
 
 struct RenderComponent
@@ -68,7 +67,6 @@ struct Manager
     Manager();
     void update(double);
     std::vector<Entity> entities;
-    Entity *player;
 };
 
 }; // namespace ECS

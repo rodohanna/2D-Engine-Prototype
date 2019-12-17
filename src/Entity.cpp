@@ -102,7 +102,7 @@ void ECS::input_system(Entity *e, double ts)
     }
 }
 
-ECS::Manager::Manager() : player(nullptr) {}
+ECS::Manager::Manager(){};
 
 void ECS::Manager::update(double ts)
 {
