@@ -1,7 +1,7 @@
 #ifndef MAP_h_
 #define MAP_h_
 
-#include "Entity.h"
+#include "GameTypes.h"
 #include <vector>
 
 struct Cell
@@ -11,8 +11,10 @@ struct Cell
 
 struct Map
 {
-    ECS::Manager entity_manager;
     std::vector<std::vector<Cell>> grid;
+    V2 dimensions;
+    V2 pixel_dimensions;
+    int cell_size;
 };
 
 #endif

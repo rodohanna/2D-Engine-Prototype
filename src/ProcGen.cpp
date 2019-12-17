@@ -1,11 +1,12 @@
 #include "ProcGen.h"
 #include "Assets.h"
+#include "Map.h"
 #include <stdlib.h>
 
-Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
+ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
 {
+    ECS::Manager entity_manager = ECS::Manager();
     Map map;
-    map.entity_manager = ECS::Manager();
     // Initialize map.
     for (int i = 0; i < dimensions->x; ++i)
     {
@@ -38,8 +39,8 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             1,
             true};
         tree_entity.components[render_component.type] = render_component;
-        map.entity_manager.entities.push_back(tree_entity);
-        trees.push_back(map.entity_manager.entities.size() - 1);
+        entity_manager.entities.push_back(tree_entity);
+        trees.push_back(entity_manager.entities.size() - 1);
     }
     for (int i = 0; i < num_ground; ++i)
     {
@@ -54,8 +55,8 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             1,
             true};
         ground_entity.components[render_component.type] = render_component;
-        map.entity_manager.entities.push_back(ground_entity);
-        ground.push_back(map.entity_manager.entities.size() - 1);
+        entity_manager.entities.push_back(ground_entity);
+        ground.push_back(entity_manager.entities.size() - 1);
     }
 
     // Placement
@@ -68,7 +69,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             int y = rand() % dimensions->y;
             if (map.grid[x][y].entity_id == -1)
             {
-                ECS::Entity *entity = &map.entity_manager.entities[trees[i]];
+                ECS::Entity *entity = &entity_manager.entities[trees[i]];
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
@@ -88,7 +89,7 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             int y = rand() % dimensions->y;
             if (map.grid[x][y].entity_id == -1)
             {
-                ECS::Entity *entity = &map.entity_manager.entities[ground[i]];
+                ECS::Entity *entity = &entity_manager.entities[ground[i]];
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
@@ -106,36 +107,11 @@ Map ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     player.components[position.type] = position;
     player.components[ECS::Type::CAMERA] = {};
     player.components[ECS::Type::PLAYER_INPUT] = {};
-    map.entity_manager.entities.push_back(player);
-    // for (int i = 0; i < 100; ++i)
-    // {
-    //     bool npc_placed = false;
-    //     while (!npc_placed)
-    //     {
-    //         int x = rand() % dimensions->x;
-    //         int y = rand() % dimensions->y;
-    //         if (map.grid[x][y].entity_id == -1)
-    //         {
-    //             ECS::Entity npc;
-    //             ECS::Component position;
-    //             position.type = ECS::Type::POSITION;
-    //             position.data.p.position = {x * 16, y * 16};
-    //             npc.components[position.type] = position;
-    //             ECS::Component render;
-    //             render.type = ECS::Type::RENDER;
-    //             render.data.r = {{425, 0, 16, 16},
-    //                              Render::Layer::WORLD_LAYER,
-    //                              texture_index,
-    //                              1,
-    //                              2,
-    //                              true};
-    //             npc.components[render.type] = render;
-    //             // npc.components[ECS::Type::DUMB_AI_COMPONENT] = {};
-    //             map.entity_manager.entities.push_back(npc);
-    //             map.grid[x][y].entity_id = map.entity_manager.entities.size() - 1;
-    //             npc_placed = true;
-    //         }
-    //     }
-    // }
-    return map;
+    entity_manager.entities.push_back(player);
+
+    map.dimensions = *dimensions;
+    map.cell_size = 16;
+    map.pixel_dimensions = {map.dimensions.x * map.cell_size, map.dimensions.y * map.cell_size};
+
+    return {entity_manager, map};
 }

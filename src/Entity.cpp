@@ -42,7 +42,7 @@ void ECS::camera_system(Entity *e)
     }
 }
 
-void ECS::input_system(Entity *e, double ts)
+void ECS::input_system(Map *map, Entity *e, double ts)
 {
     double speed = 200;
     auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
@@ -71,44 +71,43 @@ void ECS::input_system(Entity *e, double ts)
         {
             position->x += vel;
         }
-        V2 map_dimensions = {100 * 16,
-                             100 * 16};
+
         auto camera = Window::get_camera();
 
         if (position->x < 0)
         {
             position->x = 0;
         }
-        if (position->x + camera->w > map_dimensions.x)
+        if (position->x + camera->w > map->pixel_dimensions.x)
         {
-            position->x = map_dimensions.x - camera->w;
+            position->x = map->pixel_dimensions.x - camera->w;
         }
         if (position->y < 0)
         {
             position->y = 0;
         }
-        if (position->y + camera->h > map_dimensions.y)
+        if (position->y + camera->h > map->pixel_dimensions.y)
         {
-            position->y = map_dimensions.y - camera->h;
+            position->y = map->pixel_dimensions.y - camera->h;
         }
-        if (camera->w > map_dimensions.x)
+        if (camera->w > map->pixel_dimensions.x)
         {
-            position->x = -((camera->w - map_dimensions.x) / 2);
+            position->x = -((camera->w - map->pixel_dimensions.x) / 2);
         }
-        if (camera->h > map_dimensions.y)
+        if (camera->h > map->pixel_dimensions.y)
         {
-            position->y = -((camera->h - map_dimensions.y) / 2);
+            position->y = -((camera->h - map->pixel_dimensions.y) / 2);
         }
     }
 }
 
 ECS::Manager::Manager(){};
 
-void ECS::Manager::update(double ts)
+void ECS::Manager::update(Map *map, double ts)
 {
     for (Entity &e : this->entities)
     {
-        ECS::input_system(&e, ts);
+        ECS::input_system(map, &e, ts);
         ECS::camera_system(&e);
         ECS::render_system(&e);
     }

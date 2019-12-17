@@ -58,14 +58,14 @@ int main(int argc, char *argv[])
     // debug
     ProcGen::Rules rules = {1000, 100};
     V2 dimensions = {100, 100};
-    Map m = ProcGen::generate_map(&rules, &dimensions);
+    ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
 
     while (Input::is_running())
     {
         Input::collect_input_events();
 
         // update
-        m.entity_manager.update(ts);
+        r.entity_manager.update(&r.map, ts);
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {

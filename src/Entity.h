@@ -3,6 +3,7 @@
 
 #include "GameTypes.h"
 #include "Render.h"
+#include "Map.h"
 #include <vector>
 #include <unordered_map>
 
@@ -58,14 +59,14 @@ struct Entity
     int energy;
 };
 
-void input_system(Entity *, double ts);
+void input_system(Map *, Entity *, double ts);
 void render_system(Entity *);
 void camera_system(Entity *);
 
 struct Manager
 {
     Manager();
-    void update(double);
+    void update(Map *, double);
     std::vector<Entity> entities;
 };
 
