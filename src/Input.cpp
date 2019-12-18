@@ -24,6 +24,7 @@ void Input::init(V2 window_dimensions)
 
 void Input::collect_input_events()
 {
+    clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
     {
@@ -96,7 +97,15 @@ void Input::collect_input_events()
         {
             if (e.button.button == SDL_BUTTON_LEFT)
             {
+                register_input(Input::LEFT_MOUSE_JUST_PRESSED);
                 register_input(Input::LEFT_MOUSE_PRESSED);
+            }
+        }
+        else if (e.type == SDL_MOUSEBUTTONUP)
+        {
+            if (e.button.button == SDL_BUTTON_LEFT)
+            {
+                clear_input(Input::LEFT_MOUSE_PRESSED);
             }
         }
     }
