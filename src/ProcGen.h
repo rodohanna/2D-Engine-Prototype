@@ -3,7 +3,6 @@
 
 #include "GameTypes.h"
 #include "Entity.h"
-#include "Map.h"
 #include <unordered_map>
 
 namespace ProcGen
@@ -16,7 +15,6 @@ struct Rules
 struct Return
 {
     ECS::Manager entity_manager;
-    Map map;
 };
 Return generate_map(Rules *rules, V2 *dimensions);
 }; // namespace ProcGen

@@ -42,7 +42,7 @@ void ECS::camera_system(Entity *e)
     }
 }
 
-void ECS::input_system(Map *map, Entity *e, double ts)
+void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 {
     double speed = 200;
     auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
@@ -103,11 +103,11 @@ void ECS::input_system(Map *map, Entity *e, double ts)
 
 ECS::Manager::Manager(){};
 
-void ECS::Manager::update(Map *map, double ts)
+void ECS::Manager::update(double ts)
 {
     for (Entity &e : this->entities)
     {
-        ECS::input_system(map, &e, ts);
+        ECS::input_system(&this->map, &e, ts);
         ECS::camera_system(&e);
         ECS::render_system(&e);
     }

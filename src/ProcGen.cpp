@@ -1,16 +1,15 @@
 #include "ProcGen.h"
 #include "Assets.h"
-#include "Map.h"
 #include <stdlib.h>
 
 ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
 {
     ECS::Manager entity_manager = ECS::Manager();
-    Map map;
+    ECS::Map map;
     // Initialize map.
     for (int i = 0; i < dimensions->x; ++i)
     {
-        std::vector<Cell> column;
+        std::vector<ECS::Cell> column;
         for (int j = 0; j < dimensions->y; ++j)
         {
             column.push_back({-1});
@@ -113,5 +112,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     map.cell_size = 16;
     map.pixel_dimensions = {map.dimensions.x * map.cell_size, map.dimensions.y * map.cell_size};
 
-    return {entity_manager, map};
+    entity_manager.map = map;
+
+    return {entity_manager};
 }

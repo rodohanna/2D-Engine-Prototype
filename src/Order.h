@@ -3,6 +3,7 @@
 
 #include "Zone.h"
 #include "MessageBus.h"
+#include "Entity.h"
 
 namespace Order
 {
@@ -14,8 +15,8 @@ enum State
 struct Manager
 {
     Manager();
-    void update(Map *, double);
-    void receive_order_messages(Map *map, MBus::Message *, int length);
+    void update(ECS::Map *, double);
+    void process_messages(ECS::Map *map);
     Zone::Manager zone_manager;
     Order::State state;
 };

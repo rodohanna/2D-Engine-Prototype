@@ -3,12 +3,24 @@
 
 #include "GameTypes.h"
 #include "Render.h"
-#include "Map.h"
 #include <vector>
 #include <unordered_map>
 
 namespace ECS
 {
+
+struct Cell
+{
+    int entity_id;
+};
+
+struct Map
+{
+    std::vector<std::vector<ECS::Cell>> grid;
+    V2 dimensions;
+    V2 pixel_dimensions;
+    int cell_size;
+};
 
 enum Type
 {
@@ -59,14 +71,15 @@ struct Entity
     int energy;
 };
 
-void input_system(Map *, Entity *, double ts);
+void input_system(ECS::Map *, Entity *, double ts);
 void render_system(Entity *);
 void camera_system(Entity *);
 
 struct Manager
 {
     Manager();
-    void update(Map *, double);
+    void update(double);
+    ECS::Map map;
     std::vector<Entity> entities;
 };
 

@@ -1,8 +1,8 @@
 #ifndef ZONE_h_
 #define ZONE_h_
 
-#include "Map.h"
 #include "GameTypes.h"
+#include "Entity.h"
 
 // TODO: Zones are managed by some other system.
 // A zone only knows meta data (which grid cells are encapsulated, zone name, other future properties (crop type?))
@@ -15,10 +15,10 @@ void render_zone_rect(std::vector<V2> *);
 struct Manager
 {
     Manager();
-    void update(Map *, double);
-    void begin_zone_placement(Map *);
-    void quit_and_save_zone_placement(Map *);
-    void quit_zone_placement(Map *);
+    void update(ECS::Map *, double);
+    void begin_zone_placement(ECS::Map *);
+    void quit_and_save_zone_placement(ECS::Map *);
+    void quit_zone_placement(ECS::Map *);
 
     std::vector<std::vector<V2>> zones;
     V2 start_zone_grid_position;

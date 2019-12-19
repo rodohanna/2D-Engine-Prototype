@@ -6,7 +6,7 @@
 
 Zone::Manager::Manager() : placing_zone(false){};
 
-void Zone::Manager::update(Map *map, double ts)
+void Zone::Manager::update(ECS::Map *map, double ts)
 {
     if (this->placing_zone)
     {
@@ -38,7 +38,7 @@ void Zone::Manager::update(Map *map, double ts)
         }
     }
 };
-void Zone::Manager::begin_zone_placement(Map *map)
+void Zone::Manager::begin_zone_placement(ECS::Map *map)
 {
     this->placing_zone = true;
     Rect *camera = Window::get_camera();
@@ -51,5 +51,5 @@ void Zone::Manager::begin_zone_placement(Map *map)
         world_mouse_position.x / cell_size,
         world_mouse_position.y / cell_size};
 }
-void Zone::Manager::quit_zone_placement(Map *map) { this->placing_zone = false; }
-void Zone::Manager::quit_and_save_zone_placement(Map *map) { this->placing_zone = false; }
+void Zone::Manager::quit_zone_placement(ECS::Map *map) { this->placing_zone = false; }
+void Zone::Manager::quit_and_save_zone_placement(ECS::Map *map) { this->placing_zone = false; }

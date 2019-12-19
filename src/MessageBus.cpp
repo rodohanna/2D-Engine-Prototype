@@ -1,19 +1,49 @@
 #include "MessageBus.h"
 #include <stdio.h>
 
-MBus::Bus::Bus() : message_queue_length(0){};
+MBus::Message order_message_queue[MBus::ORDER_MESSAGE_QUEUE_SIZE];
+MBus::Message ecs_message_queue[MBus::ECS_MESSAGE_QUEUE_SIZE];
+int order_message_queue_length = 0;
+int ecs_message_queue_length = 0;
 
-void MBus::Bus::send_order_message(MBus::Message *m)
+void MBus::send_order_message(MBus::Message *m)
 {
-    if (this->message_queue_length > MBus::MESSAGE_QUEUE_SIZE - 1)
-    {
-        printf("Warning: message_queue is full, consider increasing the size from %d\n", MBus::MESSAGE_QUEUE_SIZE);
-        return;
-    }
-    this->message_queue[this->message_queue_length++] = *m;
+    MBus::send_message(order_message_queue, m, &order_message_queue_length, MBus::ORDER_MESSAGE_QUEUE_SIZE);
 };
 
-void MBus::Bus::clear_messages()
+void MBus::send_ecs_message(MBus::Message *m)
 {
-    this->message_queue_length = 0;
+    MBus::send_message(ecs_message_queue, m, &ecs_message_queue_length, MBus::ECS_MESSAGE_QUEUE_SIZE);
+}
+
+void MBus::send_message(MBus::Message message_queue[], MBus::Message *message, int *message_queue_length, int message_queue_size)
+{
+    if (*message_queue_length > message_queue_size - 1)
+    {
+        printf("Warning: message_queue is full, consider increasing the size from %d\n", message_queue_size);
+        return;
+    }
+    message_queue[(*message_queue_length)++] = *message;
+}
+
+MBus::MessageQueue MBus::get_queue(MBus::QueueType q_type)
+{
+    MBus::MessageQueue mq = {nullptr, 0};
+    if (q_type == MBus::QueueType::ORDER)
+    {
+        mq.queue = order_message_queue;
+        mq.length = order_message_queue_length;
+    }
+    else if (q_type == MBus::QueueType::ECS)
+    {
+        mq.queue = ecs_message_queue;
+        mq.length = ecs_message_queue_length;
+    }
+    return mq;
+}
+
+void MBus::clear_messages()
+{
+    order_message_queue_length = 0;
+    ecs_message_queue_length = 0;
 }

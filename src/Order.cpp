@@ -1,8 +1,9 @@
 #include "Order.h"
 #include "Input.h"
+#include "MessageBus.h"
 
 Order::Manager::Manager() : state(Order::State::IDLE){};
-void Order::Manager::update(Map *map, double ts)
+void Order::Manager::update(ECS::Map *map, double ts)
 {
     switch (this->state)
     {
@@ -23,11 +24,12 @@ void Order::Manager::update(Map *map, double ts)
     this->zone_manager.update(map, ts);
 };
 
-void Order::Manager::receive_order_messages(Map *map, MBus::Message *messages, int length)
+void Order::Manager::process_messages(ECS::Map *map)
 {
-    for (int i = 0; i < length; ++i)
+    MBus::MessageQueue mq = MBus::get_queue(MBus::QueueType::ORDER);
+    for (int i = 0; i < mq.length; ++i)
     {
-        MBus::Message m = messages[i];
+        MBus::Message m = mq.queue[i];
         switch (m.type)
         {
         case MBus::Type::BEGIN_ZONE_PLACEMENT:
