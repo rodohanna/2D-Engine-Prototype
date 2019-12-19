@@ -5,7 +5,8 @@
 #include "Render.h"
 #include "ProcGen.h"
 #include "GameTypes.h"
-#include "Zone.h"
+#include "Order.h"
+#include "MessageBus.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -60,8 +61,8 @@ int main(int argc, char *argv[])
     ProcGen::Rules rules = {1000, 100};
     V2 dimensions = {100, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
-    Zone::Manager zone_manager = Zone::Manager();
-    bool placing_zone = false;
+    Order::Manager order_manager = Order::Manager();
+    MBus::Bus bus = MBus::Bus();
 
     while (Input::is_running())
     {
@@ -70,16 +71,13 @@ int main(int argc, char *argv[])
         // update
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
-            placing_zone = true;
-            zone_manager.begin_zone_placement(&r.map);
+            MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
+            bus.send_order_message(&message);
         }
-        if (placing_zone && !Input::is_input_active(Input::LEFT_MOUSE_PRESSED))
-        {
-            placing_zone = false;
-            zone_manager.quit_and_save_zone_placement(&r.map);
-        }
-        zone_manager.update(&r.map, ts);
+        order_manager.receive_order_messages(&r.map, bus.message_queue, bus.message_queue_length);
+        order_manager.update(&r.map, ts);
         r.entity_manager.update(&r.map, ts);
+        bus.clear_messages();
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {
