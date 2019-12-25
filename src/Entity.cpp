@@ -19,15 +19,19 @@ void ECS::render_system(Entity *e)
             render_component.clip = {};
         }
         Rect *camera = Window::get_camera();
-        V2 render_position = {position_component.position.x - camera->x, position_component.position.y - camera->y};
-        Render::render_texture(
-            render_component.layer,
-            render_component.texture_index,
-            render_component.clip,
-            render_position,
-            nullptr,
-            render_component.scale,
-            render_component.z_index);
+        Rect entity_rect = {position_component.position.x, position_component.position.y, 16, 16};
+        if (Physics::check_collision(camera, &entity_rect))
+        {
+            V2 render_position = {position_component.position.x - camera->x, position_component.position.y - camera->y};
+            Render::render_texture(
+                render_component.layer,
+                render_component.texture_index,
+                render_component.clip,
+                render_position,
+                nullptr,
+                render_component.scale,
+                render_component.z_index);
+        }
     }
 }
 
@@ -97,6 +101,31 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
         if (camera->h > map->pixel_dimensions.y)
         {
             position->y = -((camera->h - map->pixel_dimensions.y) / 2);
+        }
+    }
+}
+
+void ECS::render_map(ECS::Map *m, double ts)
+{
+    Rect *camera = Window::get_camera();
+    for (int i = 0; i < m->grid.size(); ++i)
+    {
+        for (int j = 0; j < m->grid[i].size(); ++j)
+        {
+            Tile t = m->grid[i][j].tile;
+            V2 render_position = {t.position.x - camera->x, t.position.y - camera->y};
+            Rect r = {t.position.x, t.position.y, 16, 16};
+            if (Physics::check_collision(camera, &r))
+            {
+                Render::render_texture(
+                    Render::Layer::WORLD_LAYER,
+                    t.texture_index,
+                    t.clip,
+                    render_position,
+                    nullptr,
+                    1,
+                    0);
+            }
         }
     }
 }

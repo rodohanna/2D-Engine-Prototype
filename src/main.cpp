@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
             MBus::send_order_message(&message);
         }
         order_manager.update(&r.entity_manager.map, ts);
+        ECS::render_map(&r.entity_manager.map, ts);
         r.entity_manager.update(ts);
         order_manager.process_messages(&r.entity_manager.map);
         MBus::clear_messages();

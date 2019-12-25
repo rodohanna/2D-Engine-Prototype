@@ -111,7 +111,17 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     map.dimensions = *dimensions;
     map.cell_size = 16;
     map.pixel_dimensions = {map.dimensions.x * map.cell_size, map.dimensions.y * map.cell_size};
-
+    for (int i = 0; i < dimensions->x; ++i)
+    {
+        for (int j = 0; j < dimensions->y; ++j)
+        {
+            ECS::Tile t;
+            t.texture_index = Assets::get_texture_index("tilesheet-colored");
+            t.position = {i * map.cell_size, j * map.cell_size};
+            t.clip = {0, 0, 16, 16};
+            map.grid[i][j].tile = t;
+        }
+    }
     entity_manager.map = map;
 
     return {entity_manager};

@@ -3,7 +3,7 @@
 
 #include "GameTypes.h"
 
-const static int RENDER_QUEUE_SIZE = 4096;
+const static int RENDER_QUEUE_SIZE = 16384;
 
 namespace Render
 {

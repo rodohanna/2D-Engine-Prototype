@@ -9,9 +9,17 @@
 namespace ECS
 {
 
+struct Tile
+{
+    Rect clip;
+    V2 position;
+    int texture_index;
+};
+
 struct Cell
 {
     int entity_id;
+    Tile tile;
 };
 
 struct Map
@@ -74,6 +82,8 @@ struct Entity
 void input_system(ECS::Map *, Entity *, double ts);
 void render_system(Entity *);
 void camera_system(Entity *);
+
+void render_map(ECS::Map *, double ts);
 
 struct Manager
 {

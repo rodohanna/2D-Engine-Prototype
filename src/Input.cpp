@@ -108,6 +108,29 @@ void Input::collect_input_events()
                 clear_input(Input::LEFT_MOUSE_PRESSED);
             }
         }
+        else if (e.type == SDL_MOUSEWHEEL)
+        {
+            // double world_render_scale = Window::get_world_render_scale();
+            // double new_render_scale = world_render_scale;
+            // if (e.wheel.y > 0) // scroll up
+            // {
+            //     world_render_scale += .01;
+            //     if (world_render_scale > 2.0)
+            //     {
+            //         world_render_scale = 2.0;
+            //     }
+            // }
+            // else if (e.wheel.y < 0) // scroll down
+            // {
+            //     // Put code for handling "scroll down" here!
+            //     world_render_scale -= .01;
+            //     if (world_render_scale < 1.0)
+            //     {
+            //         world_render_scale = 1.0;
+            //     }
+            // }
+            // Window::set_world_render_scale(new_render_scale);
+        }
     }
     update_mouse_positions();
 }

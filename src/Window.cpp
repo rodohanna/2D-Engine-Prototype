@@ -4,7 +4,7 @@ Rect camera;
 Rect gui_camera;
 V2 mouse_position;
 V2 gui_mouse_position;
-float world_render_scale = 2.0;
+float world_render_scale = 1.0;
 float gui_render_scale = 1.0;
 
 Rect *Window::get_camera()
