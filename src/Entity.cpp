@@ -2,6 +2,8 @@
 #include "Window.h"
 #include "Input.h"
 #include "Physics.h"
+#include "MessageBus.h"
+#include "Assets.h"
 #include <stdio.h>
 
 // Systems
@@ -130,14 +132,60 @@ void ECS::render_map(ECS::Map *m, double ts)
     }
 }
 
-ECS::Manager::Manager(){};
+ECS::Manager::Manager() : player_entity_index(-1){};
 
 void ECS::Manager::update(double ts)
 {
+    if (this->player_entity_index == -1)
+    {
+        for (int i = 0; i < this->entities.size(); ++i)
+        {
+            Entity *e = &this->entities[i];
+            auto input_component_it = e->components.find(ECS::Type::PLAYER_INPUT);
+            auto camera_component_it = e->components.find(ECS::Type::CAMERA);
+            if (input_component_it != e->components.end() && camera_component_it != e->components.end())
+            {
+                this->player_entity_index = i;
+                break;
+            }
+        }
+        if (this->player_entity_index == -1)
+        {
+            printf("WARNING: Could not find player entity\n");
+            return;
+        }
+    }
+    MBus::MessageQueue queue = MBus::get_queue(MBus::QueueType::ECS);
+    for (int i = 0; i < queue.length; ++i)
+    {
+        MBus::Message message = queue.queue[i];
+        if (message.type == MBus::CREATE_PLANT_ENTITY)
+        {
+            Entity e;
+            Component render_component;
+            render_component.type = RENDER;
+            render_component.data.r = {
+                {0, 17, 16, 16},
+                Render::Layer::WORLD_LAYER,
+                Assets::get_texture_index("tilesheet-transparent"),
+                1,
+                1,
+                true};
+            Component position_component;
+            position_component.type = POSITION;
+            position_component.data.p = {message.data.cpe.grid_position.x * 16, message.data.cpe.grid_position.y * 16};
+            e.components[position_component.type] = position_component;
+            e.components[render_component.type] = render_component;
+            this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].entity_id = this->entities.size();
+            this->entities.push_back(e);
+        }
+    }
+
+    ECS::input_system(&this->map, &this->entities[this->player_entity_index], ts);
+    ECS::camera_system(&this->entities[this->player_entity_index]);
+
     for (Entity &e : this->entities)
     {
-        ECS::input_system(&this->map, &e, ts);
-        ECS::camera_system(&e);
         ECS::render_system(&e);
     }
 };

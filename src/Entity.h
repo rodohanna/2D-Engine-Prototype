@@ -91,6 +91,7 @@ struct Manager
     void update(double);
     ECS::Map map;
     std::vector<Entity> entities;
+    int player_entity_index;
 };
 
 }; // namespace ECS

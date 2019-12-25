@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // debug
-    ProcGen::Rules rules = {1000, 100};
+    ProcGen::Rules rules = {100, 100};
     V2 dimensions = {100, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();

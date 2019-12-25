@@ -154,7 +154,7 @@ void Render::perform_render()
 
     SDL_RenderSetScale(renderer, world_render_scale, world_render_scale);
     // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
-    SDL_SetRenderDrawColor(renderer, 0x2E, 0xCC, 0x40, 0x0F);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x0F);
     Rect *camera = Window::get_camera();
     for (int i = 0; i <= 100; ++i)
     {

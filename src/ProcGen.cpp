@@ -18,7 +18,6 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     }
     // We are only placing trees right now:
     int num_trees = rand() % rules->tree_weight;
-    num_trees = 1000;
     int num_ground = rand() % rules->ground_weight;
 
     // Instantiate
@@ -73,7 +72,6 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 position.type = ECS::Type::POSITION;
                 position.data.p.position = {x * 16, y * 16};
                 entity->components[position.type] = position;
-                entity->components[ECS::Type::DUMB_AI_COMPONENT] = {};
                 map.grid[x][y].entity_id = trees[i];
                 placed = true;
             }
