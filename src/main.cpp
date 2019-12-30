@@ -6,7 +6,7 @@
 #include "ProcGen.h"
 #include "GameTypes.h"
 #include "Order.h"
-#include "UI.h"
+#include "BottomBar.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -62,25 +62,14 @@ int main(int argc, char *argv[])
     V2 dimensions = {100, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();
-    UI::TextButton text_button;
-    text_button.button.rect = {10, 10, 100, 50};
-    text_button.button.idle_color = {0x11, 0x11, 0x11, 0xF0};
-    text_button.button.hover_color = {0xFF, 0x11, 0x11, 0xFF};
-    text_button.button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
-    text_button.button.z_index = 1;
-
-    text_button.text.font_index = 0;
-    text_button.text.has_overflow_clip = true;
-    text_button.text.overflow_clip = text_button.button.rect;
-    text_button.text.render_layer = Render::GUI_LAYER;
-    text_button.text.set_text("Click Me");
+    BottomBar bottom_bar;
 
     while (Input::is_running())
     {
         Input::collect_input_events();
 
         // update
-        text_button.update(ts);
+        bottom_bar.update(ts);
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
             MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
