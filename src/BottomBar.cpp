@@ -1,5 +1,6 @@
 #include "BottomBar.h"
 #include "Window.h"
+#include "MessageBus.h"
 
 BottomBar::BottomBar()
 {
@@ -28,6 +29,12 @@ BottomBar::BottomBar()
 
 void BottomBar::update(double ts)
 {
+    if (this->build_button.button.mouse_clicked)
+    {
+        MBus::Message message;
+        message.type = MBus::Type::TOGGLE_BUILD_MENU;
+        MBus::send_gui_message(&message);
+    }
     Rect *camera = Window::get_gui_camera();
     int bottom_of_screen = camera->h - this->build_button.button.rect.h;
     this->build_button.button.rect.x = 0;

@@ -6,7 +6,7 @@
 #include "ProcGen.h"
 #include "GameTypes.h"
 #include "Order.h"
-#include "BottomBar.h"
+#include "GUI.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -62,25 +62,32 @@ int main(int argc, char *argv[])
     V2 dimensions = {100, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();
-    BottomBar bottom_bar;
+    GUI::GUI gui;
 
     while (Input::is_running())
     {
         Input::collect_input_events();
 
         // update
-        bottom_bar.update(ts);
+        gui.process_messages();
+        MBus::clear_gui_messages();
+        gui.update(ts);
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
             MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
             MBus::send_order_message(&message);
         }
+
+        r.entity_manager.process_messages();
+        MBus::clear_ecs_messages();
         r.entity_manager.update_player(ts);
-        order_manager.update(&r.entity_manager.map, ts);
-        order_manager.process_messages(&r.entity_manager.map);
         r.entity_manager.update(ts);
+
+        order_manager.process_messages(&r.entity_manager.map);
+        MBus::clear_order_messages();
+        order_manager.update(&r.entity_manager.map, ts);
+
         ECS::render_map(&r.entity_manager.map, ts);
-        MBus::clear_messages();
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)
         {

@@ -4,7 +4,7 @@
 OBJS = src/Assets.cpp src/Entity.cpp src/Input.cpp src/main.cpp \
 		src/ProcGen.cpp src/Render.cpp src/SDLWrapper.cpp src/Window.cpp \
 		src/Physics.cpp src/Zone.cpp src/Order.cpp src/MessageBus.cpp src/UI.cpp \
-		src/BottomBar.cpp
+		src/BottomBar.cpp src/GUI.cpp src/BuildMenu.cpp
 
 #CC specifies which compiler we're using
 CC = g++

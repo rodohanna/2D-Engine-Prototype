@@ -5,6 +5,12 @@
 #include "SDLWrapper.h"
 #include "Assets.h"
 
+void UI::Panel::update(double ts)
+{
+    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->rect_color, true, this->z_index);
+    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->outline_color, false, this->z_index);
+}
+
 void UI::Button::update(double ts)
 {
     this->mouse_clicked = false;

@@ -90,6 +90,7 @@ struct Manager
     Manager();
     void update_player(double);
     void update(double);
+    void process_messages();
     ECS::Map map;
     std::vector<Entity> entities;
     int player_entity_index;

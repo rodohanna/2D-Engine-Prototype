@@ -7,6 +7,14 @@
 
 namespace UI
 {
+struct Panel
+{
+    void update(double ts);
+    Rect rect;
+    Color rect_color;
+    Color outline_color;
+    int z_index;
+};
 struct Button
 {
     void update(double ts);

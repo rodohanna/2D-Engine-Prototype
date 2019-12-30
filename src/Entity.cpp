@@ -161,7 +161,14 @@ void ECS::Manager::update_player(double ts)
 
 void ECS::Manager::update(double ts)
 {
-    // handle messages
+    for (Entity &e : this->entities)
+    {
+        ECS::render_system(&e);
+    }
+};
+
+void ECS::Manager::process_messages()
+{
     MBus::MessageQueue queue = MBus::get_queue(MBus::QueueType::ECS);
     for (int i = 0; i < queue.length; ++i)
     {
@@ -187,9 +194,4 @@ void ECS::Manager::update(double ts)
             this->entities.push_back(e);
         }
     }
-
-    for (Entity &e : this->entities)
-    {
-        ECS::render_system(&e);
-    }
-};
+}
