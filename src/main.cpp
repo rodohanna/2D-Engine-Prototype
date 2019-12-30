@@ -6,6 +6,7 @@
 #include "ProcGen.h"
 #include "GameTypes.h"
 #include "Order.h"
+#include "UI.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -61,12 +62,19 @@ int main(int argc, char *argv[])
     V2 dimensions = {100, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();
+    UI::Button button;
+    button.rect = {10, 10, 100, 50};
+    button.idle_color = {0x11, 0x11, 0x11, 0xF0};
+    button.hover_color = {0xFF, 0x11, 0x11, 0xFF};
+    button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
+    button.z_index = 1;
 
     while (Input::is_running())
     {
         Input::collect_input_events();
 
         // update
+        button.update(ts);
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
             MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
