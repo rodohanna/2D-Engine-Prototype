@@ -88,6 +88,7 @@ void render_map(ECS::Map *, double ts);
 struct Manager
 {
     Manager();
+    void update_player(double);
     void update(double);
     ECS::Map map;
     std::vector<Entity> entities;

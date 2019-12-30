@@ -110,9 +110,9 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 void ECS::render_map(ECS::Map *m, double ts)
 {
     Rect *camera = Window::get_camera();
-    for (int i = 0; i < m->grid.size(); ++i)
+    for (unsigned int i = 0; i < m->grid.size(); ++i)
     {
-        for (int j = 0; j < m->grid[i].size(); ++j)
+        for (unsigned int j = 0; j < m->grid[i].size(); ++j)
         {
             Tile t = m->grid[i][j].tile;
             V2 render_position = {t.position.x - camera->x, t.position.y - camera->y};
@@ -134,11 +134,11 @@ void ECS::render_map(ECS::Map *m, double ts)
 
 ECS::Manager::Manager() : player_entity_index(-1){};
 
-void ECS::Manager::update(double ts)
+void ECS::Manager::update_player(double ts)
 {
     if (this->player_entity_index == -1)
     {
-        for (int i = 0; i < this->entities.size(); ++i)
+        for (unsigned int i = 0; i < this->entities.size(); ++i)
         {
             Entity *e = &this->entities[i];
             auto input_component_it = e->components.find(ECS::Type::PLAYER_INPUT);
@@ -155,6 +155,13 @@ void ECS::Manager::update(double ts)
             return;
         }
     }
+    ECS::input_system(&this->map, &this->entities[this->player_entity_index], ts);
+    ECS::camera_system(&this->entities[this->player_entity_index]);
+}
+
+void ECS::Manager::update(double ts)
+{
+    // handle messages
     MBus::MessageQueue queue = MBus::get_queue(MBus::QueueType::ECS);
     for (int i = 0; i < queue.length; ++i)
     {
@@ -180,9 +187,6 @@ void ECS::Manager::update(double ts)
             this->entities.push_back(e);
         }
     }
-
-    ECS::input_system(&this->map, &this->entities[this->player_entity_index], ts);
-    ECS::camera_system(&this->entities[this->player_entity_index]);
 
     for (Entity &e : this->entities)
     {

@@ -72,10 +72,11 @@ int main(int argc, char *argv[])
             MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
             MBus::send_order_message(&message);
         }
+        r.entity_manager.update_player(ts);
         order_manager.update(&r.entity_manager.map, ts);
-        ECS::render_map(&r.entity_manager.map, ts);
-        r.entity_manager.update(ts);
         order_manager.process_messages(&r.entity_manager.map);
+        r.entity_manager.update(ts);
+        ECS::render_map(&r.entity_manager.map, ts);
         MBus::clear_messages();
 
         if (SDL_GetSecondsElapsed(last_counter, SDL_GetPerformanceCounter()) < ts)

@@ -5,8 +5,8 @@
 
 namespace MBus
 {
-const static int ORDER_MESSAGE_QUEUE_SIZE = 1024;
-const static int ECS_MESSAGE_QUEUE_SIZE = 1024;
+const static int ORDER_MESSAGE_QUEUE_SIZE = 8192;
+const static int ECS_MESSAGE_QUEUE_SIZE = 8192;
 enum Type
 {
     BEGIN_ZONE_PLACEMENT,
