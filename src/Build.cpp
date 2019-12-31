@@ -22,7 +22,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
             {
                 Color green = {0x00, 0xFF, 0x00, 0x5F};
                 Color red = {0xBB, 0x0A, 0x1E, 0x5F};
-                Rect rect = {i * map->cell_size, j * map->cell_size, map->cell_size, map->cell_size};
+                Rect rect = {(i * map->cell_size) - camera->x, (j * map->cell_size) - camera->y, map->cell_size, map->cell_size};
                 if (map->grid[i][j].entity_id != -1)
                 {
                     Render::render_rectangle(Render::Layer::WORLD_LAYER, rect, red, true, 2);
