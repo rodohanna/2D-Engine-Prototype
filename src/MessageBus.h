@@ -10,8 +10,11 @@ const static int ECS_MESSAGE_QUEUE_SIZE = 8192;
 const static int GUI_MESSAGE_QUEUE_SIZE = 8192;
 enum Type
 {
+    // ORDER
     BEGIN_ZONE_PLACEMENT,
     END_ZONE_PLACEMENT,
+    BEGIN_STRUCTURE_PLACEMENT,
+    // ECS
     CREATE_PLANT_ENTITY,
     // GUI
     TOGGLE_BUILD_MENU
@@ -20,11 +23,17 @@ struct CreatePlantEntity
 {
     V2 grid_position;
 };
+struct BeginStructurePlacement
+{
+    // preview texture????
+    V2 dimensions;
+};
 struct Message
 {
     Type type;
     union {
         CreatePlantEntity cpe;
+        BeginStructurePlacement bsp;
     } data;
 };
 enum QueueType

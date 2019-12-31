@@ -16,12 +16,22 @@ void Order::Manager::update(ECS::Map *map, double ts)
         }
         break;
     }
+    case Order::State::PLACING_STRUCTURE:
+    {
+        if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+        {
+            this->build_manager.quit_and_save_structure_placement(map);
+            this->state = Order::State::IDLE;
+        }
+        break;
+    }
     default:
     {
         // no op
     }
     }
     this->zone_manager.update(map, ts);
+    this->build_manager.update(map, ts);
 };
 
 void Order::Manager::process_messages(ECS::Map *map)
@@ -36,6 +46,13 @@ void Order::Manager::process_messages(ECS::Map *map)
         {
             this->state = Order::State::PLACING_ZONE;
             this->zone_manager.begin_zone_placement(map);
+            break;
+        }
+        case MBus::Type::BEGIN_STRUCTURE_PLACEMENT:
+        {
+            printf("Handling structure placement\n");
+            this->state = Order::State::PLACING_STRUCTURE;
+            this->build_manager.begin_structure_placement(&m.data.bsp.dimensions);
             break;
         }
         default:
