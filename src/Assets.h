@@ -7,6 +7,14 @@
 #include <memory>
 #include <vector>
 
+struct AssetManifestRecord
+{
+    std::string texture_key;
+    std::string path;
+    std::string type;
+    int font_size;
+};
+
 struct Texture
 {
     Texture(SDL_Texture *, const V2 &dimensions, int index);

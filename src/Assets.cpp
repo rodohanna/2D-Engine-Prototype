@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unordered_map>
 #include <assert.h>
+#include "json/picojson.h"
 
 std::unordered_map<std::string, int> texture_index_map;
 std::unordered_map<std::string, int> font_index_map;
@@ -13,48 +14,82 @@ std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer
 
 void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
 {
-    if (renderer == nullptr)
+    assert(renderer != nullptr);
+    std::ifstream t("assets/data/asset-manifest.json");
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    std::string json = buffer.str();
+    picojson::value v;
+    std::string err = picojson::parse(v, json);
+    if (!err.empty())
     {
-        printf("load_assets_from_manifest received null renderer\n");
-    }
-    std::ifstream manifest(path);
-    if (manifest.fail())
-    {
-        manifest.close();
-        printf("Error: Unable to load manifest file at %s\n", path.c_str());
+        printf("JSON Err: %s", err.c_str());
         return;
     }
-    std::string key, type, asset_path;
-    int font_size;
-    while (manifest >> key >> type >> asset_path)
+    if (!v.is<picojson::array>())
     {
-        if (manifest.fail())
+        printf("JSON Err: asset-manifest.json should be an array\n");
+        return;
+    }
+    picojson::value::array &array = v.get<picojson::array>();
+    for (picojson::value::array::const_iterator array_it = array.begin(); array_it != array.end(); ++array_it)
+    {
+        if (array_it->is<picojson::object>())
         {
-            printf("Reading manifest %s failed, quiting early\n", path.c_str());
-            break;
-        }
-        printf("Loading key: %s, type: %s, path: %s\n", key.c_str(), type.c_str(), asset_path.c_str());
-        if (type == "sprite")
-        {
-            int index = texture_table.size();
-            std::unique_ptr<Texture> texture = create_texture_from_file(asset_path, renderer, index);
-            texture_index_map[key] = index;
-            texture_table.push_back(std::move(texture));
-        }
-        else if (type == "font")
-        {
-            manifest >> font_size;
-            Font *font = TTF_OpenFont(asset_path.c_str(), font_size);
-            if (font != nullptr)
+            AssetManifestRecord record;
+            const picojson::value::object &obj = array_it->get<picojson::object>();
+            for (picojson::value::object::const_iterator obj_it = obj.begin(); obj_it != obj.end(); ++obj_it)
             {
-                int font_index = font_table.size();
-                font_index_map[key] = font_index;
-                font_table.push_back(font);
+                if (obj_it->first == "texture_key")
+                {
+                    record.texture_key = obj_it->second.to_str();
+                }
+                else if (obj_it->first == "type")
+                {
+                    record.type = obj_it->second.to_str();
+                }
+                else if (obj_it->first == "path")
+                {
+                    record.path = obj_it->second.to_str();
+                }
+                else if (obj_it->first == "font_size")
+                {
+                    record.font_size = static_cast<int>(obj_it->second.get<double>());
+                }
+                else
+                {
+                    printf("JSON Err: Unrecognized AssetManifestRecord key\n");
+                }
+            }
+            if (record.type == "sprite")
+            {
+                int index = texture_table.size();
+                std::unique_ptr<Texture> texture = create_texture_from_file(record.path, renderer, index);
+                texture_index_map[record.texture_key] = index;
+                texture_table.push_back(std::move(texture));
+            }
+            else if (record.type == "font")
+            {
+                Font *font = TTF_OpenFont(record.path.c_str(), record.font_size);
+                if (font != nullptr)
+                {
+                    int font_index = font_table.size();
+                    font_index_map[record.texture_key] = font_index;
+                    font_table.push_back(font);
+                }
+                else
+                {
+                    printf("Error loading font %s from %s.\n", record.texture_key.c_str(), record.path.c_str());
+                }
             }
             else
             {
-                printf("Error loading font %s from %s.\n", key.c_str(), asset_path.c_str());
+                printf("Warning: Unrecognized asset type: %s\n", record.type.c_str());
             }
+        }
+        else
+        {
+            printf("JSON Err: asset-manifest.json should be an array of objects\n");
         }
     }
 }

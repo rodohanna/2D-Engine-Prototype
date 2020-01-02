@@ -1,0 +1,24 @@
+[
+    {
+        "texture_key": "tilesheet-colored",
+        "type": "sprite",
+        "path": "assets/Tilesheet/colored.png"
+    },
+    {
+        "texture_key": "tilesheet-transparent",
+        "type": "sprite",
+        "path": "assets/Tilesheet/colored_transparent.png"
+    },
+    {
+        "texture_key": "standard-font",
+        "type": "font",
+        "path": "assets/m5x7.ttf",
+        "font_size": 32
+    },
+    {
+        "texture_key": "standard-font-small",
+        "type": "font",
+        "path": "assets/m5x7.ttf",
+        "font_size": 16
+    }
+]
