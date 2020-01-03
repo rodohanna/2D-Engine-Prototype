@@ -58,7 +58,7 @@ void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
                 }
                 else
                 {
-                    printf("JSON Err: Unrecognized AssetManifestRecord key\n");
+                    printf("JSON Err: Unrecognized AssetManifestRecord key: %s\n", obj_it->first.c_str());
                 }
             }
             if (record.type == "sprite")
