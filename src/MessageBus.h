@@ -17,7 +17,9 @@ enum Type
     // ECS
     CREATE_PLANT_ENTITY,
     // GUI
-    TOGGLE_BUILD_MENU
+    TOGGLE_BUILD_MENU,
+    CLOSE_BUILD_MENU,
+    OPEN_BUILD_MENU
 };
 struct CreatePlantEntity
 {

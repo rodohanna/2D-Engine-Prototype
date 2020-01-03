@@ -37,7 +37,10 @@ void BottomBar::update(double ts)
     }
     else if (this->zone_button.button.mouse_clicked)
     {
-        MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
+        MBus::Message message;
+        message = {MBus::Type::CLOSE_BUILD_MENU};
+        MBus::send_gui_message(&message);
+        message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
         MBus::send_order_message(&message);
     }
     Rect *camera = Window::get_gui_camera();

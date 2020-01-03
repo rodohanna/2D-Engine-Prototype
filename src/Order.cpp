@@ -2,32 +2,9 @@
 #include "Input.h"
 #include "MessageBus.h"
 
-Order::Manager::Manager() : state(Order::State::IDLE){};
+Order::Manager::Manager(){};
 void Order::Manager::update(ECS::Map *map, double ts)
 {
-    switch (this->state)
-    {
-    case Order::State::PLACING_ZONE:
-    {
-        if (zone_manager.state == Zone::IDLE)
-        {
-            this->state = Order::State::IDLE;
-        }
-        break;
-    }
-    case Order::State::PLACING_STRUCTURE:
-    {
-        if (this->build_manager.state == Build::IDLE)
-        {
-            this->state = Order::State::IDLE;
-        }
-        break;
-    }
-    default:
-    {
-        // no op
-    }
-    }
     this->zone_manager.update(map, ts);
     this->build_manager.update(map, ts);
 };
@@ -43,20 +20,34 @@ void Order::Manager::process_messages(ECS::Map *map)
         case MBus::Type::BEGIN_ZONE_PLACEMENT:
         {
             printf("Beginning zone placement\n");
-            this->state = Order::State::PLACING_ZONE;
-            this->zone_manager.wait_for_zone_placement(map);
+            if (this->zone_manager.state == Zone::IDLE)
+            {
+                this->zone_manager.wait_for_zone_placement(map);
+            }
+            else
+            {
+                this->zone_manager.quit_zone_placement();
+            }
+
+            if (this->build_manager.state != Build::IDLE)
+            {
+                this->build_manager.quit_structure_placement();
+            }
             break;
         }
         case MBus::Type::BEGIN_STRUCTURE_PLACEMENT:
         {
             printf("Handling structure placement\n");
-            this->state = Order::State::PLACING_STRUCTURE;
             this->build_manager.begin_structure_placement(&m.data.bsp.dimensions);
+            if (this->zone_manager.state != Zone::IDLE)
+            {
+                this->zone_manager.quit_zone_placement();
+            }
             break;
         }
         default:
         {
-            this->state = Order::State::IDLE;
+            // NOOP
         }
         }
     }

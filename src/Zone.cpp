@@ -14,7 +14,7 @@ void Zone::Manager::update(ECS::Map *map, double ts)
     {
         if (!Input::is_input_active(Input::LEFT_MOUSE_PRESSED))
         {
-            this->quit_and_save_zone_placement(map);
+            this->save_zone_placement(map);
             return;
         }
         Rect *camera = Window::get_camera();
@@ -49,6 +49,11 @@ void Zone::Manager::update(ECS::Map *map, double ts)
     }
     else if (this->state == Zone::WAITING_TO_PLACE_ZONE)
     {
+        if (Input::is_input_active(Input::RIGHT_MOUSE_JUST_PRESSED) || Input::is_input_active(Input::Q_KEY_DOWN))
+        {
+            this->quit_zone_placement();
+            return;
+        }
         Rect *camera = Window::get_camera();
         V2 *mouse_position = Window::get_mouse_position();
         V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
@@ -73,11 +78,11 @@ void Zone::Manager::wait_for_zone_placement(ECS::Map *map)
 {
     this->state = Zone::WAITING_TO_PLACE_ZONE;
 }
-void Zone::Manager::quit_zone_placement(ECS::Map *map) { this->state = IDLE; }
-void Zone::Manager::quit_and_save_zone_placement(ECS::Map *map)
+void Zone::Manager::quit_zone_placement() { this->state = IDLE; }
+void Zone::Manager::save_zone_placement(ECS::Map *map)
 {
     // TODO: consolidate similar code in Zone::Manager::update
-    this->state = IDLE;
+    this->state = Zone::WAITING_TO_PLACE_ZONE;
     Rect *camera = Window::get_camera();
     V2 *mouse_position = Window::get_mouse_position();
     V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};

@@ -23,8 +23,8 @@ struct Manager
     Manager();
     void update(ECS::Map *, double);
     void wait_for_zone_placement(ECS::Map *);
-    void quit_and_save_zone_placement(ECS::Map *);
-    void quit_zone_placement(ECS::Map *);
+    void save_zone_placement(ECS::Map *);
+    void quit_zone_placement();
 
     std::vector<std::vector<V2>> zones;
     V2 start_zone_grid_position;

@@ -11,7 +11,12 @@ void Build::Manager::update(ECS::Map *map, double ts)
     {
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
-            this->quit_and_save_structure_placement(map);
+            this->save_structure_placement(map);
+            return;
+        }
+        else if (Input::is_input_active(Input::RIGHT_MOUSE_JUST_PRESSED) || Input::is_input_active(Input::Q_KEY_DOWN))
+        {
+            this->quit_structure_placement();
             return;
         }
         Rect *camera = Window::get_camera();
@@ -46,9 +51,9 @@ void Build::Manager::begin_structure_placement(V2 *build_dimensions)
     this->build_dimensions = *build_dimensions;
     this->state = Build::WAITING_TO_PLACE_STRUCTURE;
 };
-void Build::Manager::quit_and_save_structure_placement(ECS::Map *)
+void Build::Manager::save_structure_placement(ECS::Map *)
 {
-    this->state = Build::IDLE;
+    this->state = Build::WAITING_TO_PLACE_STRUCTURE;
 };
 void Build::Manager::quit_structure_placement()
 {

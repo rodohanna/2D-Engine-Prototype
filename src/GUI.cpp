@@ -16,6 +16,14 @@ void GUI::GUI::process_messages()
         {
             this->build_menu_shown = !this->build_menu_shown;
         }
+        else if (message.type == MBus::Type::CLOSE_BUILD_MENU)
+        {
+            this->build_menu_shown = false;
+        }
+        else if (message.type == MBus::Type::OPEN_BUILD_MENU)
+        {
+            this->build_menu_shown = true;
+        }
     }
 }
 

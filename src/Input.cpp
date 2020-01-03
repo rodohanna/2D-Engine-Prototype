@@ -25,6 +25,7 @@ void Input::init(V2 window_dimensions)
 void Input::collect_input_events()
 {
     clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
+    clear_input(Input::RIGHT_MOUSE_JUST_PRESSED);
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
     {
@@ -39,17 +40,30 @@ void Input::collect_input_events()
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_w:
+                {
                     register_input(Input::W_KEY_DOWN);
                     break;
+                }
                 case SDLK_a:
+                {
                     register_input(Input::A_KEY_DOWN);
                     break;
+                }
                 case SDLK_s:
+                {
                     register_input(Input::S_KEY_DOWN);
                     break;
+                }
                 case SDLK_d:
+                {
                     register_input(Input::D_KEY_DOWN);
                     break;
+                }
+                case SDLK_q:
+                {
+                    register_input(Input::Q_KEY_DOWN);
+                    break;
+                }
                 }
             }
         }
@@ -79,6 +93,11 @@ void Input::collect_input_events()
                     clear_input(Input::D_KEY_DOWN);
                     break;
                 }
+                case SDLK_q:
+                {
+                    clear_input(Input::Q_KEY_DOWN);
+                    break;
+                }
                 }
             }
         }
@@ -100,12 +119,21 @@ void Input::collect_input_events()
                 register_input(Input::LEFT_MOUSE_JUST_PRESSED);
                 register_input(Input::LEFT_MOUSE_PRESSED);
             }
+            else if (e.button.button == SDL_BUTTON_RIGHT)
+            {
+                register_input(Input::RIGHT_MOUSE_JUST_PRESSED);
+                register_input(Input::RIGHT_MOUSE_PRESSED);
+            }
         }
         else if (e.type == SDL_MOUSEBUTTONUP)
         {
             if (e.button.button == SDL_BUTTON_LEFT)
             {
                 clear_input(Input::LEFT_MOUSE_PRESSED);
+            }
+            else if (e.button.button == SDL_BUTTON_RIGHT)
+            {
+                clear_input(Input::RIGHT_MOUSE_PRESSED);
             }
         }
         else if (e.type == SDL_MOUSEWHEEL)

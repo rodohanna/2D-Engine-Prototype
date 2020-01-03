@@ -8,12 +8,6 @@
 
 namespace Order
 {
-enum State
-{
-    IDLE,
-    PLACING_ZONE,
-    PLACING_STRUCTURE
-};
 struct Manager
 {
     Manager();
@@ -21,7 +15,6 @@ struct Manager
     void process_messages(ECS::Map *map);
     Zone::Manager zone_manager;
     Build::Manager build_manager;
-    Order::State state;
 };
 }; // namespace Order
 
