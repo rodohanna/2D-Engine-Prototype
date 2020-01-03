@@ -15,7 +15,7 @@ std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer
 void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
 {
     assert(renderer != nullptr);
-    std::ifstream t("assets/data/asset-manifest.json");
+    std::ifstream t("resources/data/asset-manifest.json");
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string json = buffer.str();
