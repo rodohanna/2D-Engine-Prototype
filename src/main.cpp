@@ -72,11 +72,6 @@ int main(int argc, char *argv[])
         gui.process_messages();
         MBus::clear_gui_messages();
         gui.update(ts);
-        // if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
-        // {
-        //     MBus::Message message = {MBus::Type::BEGIN_ZONE_PLACEMENT};
-        //     MBus::send_order_message(&message);
-        // }
 
         r.entity_manager.process_messages();
         MBus::clear_ecs_messages();

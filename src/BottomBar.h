@@ -8,7 +8,7 @@ struct BottomBar
     BottomBar();
     void update(double ts);
     UI::TextButton build_button;
-    UI::TextButton test_button;
+    UI::TextButton zone_button;
 };
 
 #endif

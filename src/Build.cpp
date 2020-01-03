@@ -1,13 +1,19 @@
 #include "Build.h"
 #include "Window.h"
 #include "Render.h"
+#include "Input.h"
 
-Build::Manager::Manager() : placing_structure(false){};
+Build::Manager::Manager() : state(Build::IDLE){};
 
 void Build::Manager::update(ECS::Map *map, double ts)
 {
-    if (this->placing_structure)
+    if (this->state == Build::WAITING_TO_PLACE_STRUCTURE)
     {
+        if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+        {
+            this->quit_and_save_structure_placement(map);
+            return;
+        }
         Rect *camera = Window::get_camera();
         V2 *mouse_position = Window::get_mouse_position();
         int cell_size = map->cell_size;
@@ -38,13 +44,13 @@ void Build::Manager::update(ECS::Map *map, double ts)
 void Build::Manager::begin_structure_placement(V2 *build_dimensions)
 {
     this->build_dimensions = *build_dimensions;
-    this->placing_structure = true;
+    this->state = Build::WAITING_TO_PLACE_STRUCTURE;
 };
 void Build::Manager::quit_and_save_structure_placement(ECS::Map *)
 {
-    this->placing_structure = false;
+    this->state = Build::IDLE;
 };
 void Build::Manager::quit_structure_placement()
 {
-    this->placing_structure = false;
+    this->state = Build::IDLE;
 };

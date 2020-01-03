@@ -11,18 +11,24 @@
 // be managed somewhere else and this namespace just gives tools on how to create/interact with zones. (props the latter)
 namespace Zone
 {
+enum State
+{
+    IDLE,
+    WAITING_TO_PLACE_ZONE,
+    PLACING_ZONE
+};
 void render_zone_rect(std::vector<V2> *);
 struct Manager
 {
     Manager();
     void update(ECS::Map *, double);
-    void begin_zone_placement(ECS::Map *);
+    void wait_for_zone_placement(ECS::Map *);
     void quit_and_save_zone_placement(ECS::Map *);
     void quit_zone_placement(ECS::Map *);
 
     std::vector<std::vector<V2>> zones;
     V2 start_zone_grid_position;
-    bool placing_zone;
+    State state;
 };
 }; // namespace Zone
 

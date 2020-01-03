@@ -2,15 +2,21 @@
 #include "Window.h"
 #include "Render.h"
 #include "MessageBus.h"
+#include "Input.h"
 #include <algorithm>
 #include <stdio.h>
 
-Zone::Manager::Manager() : placing_zone(false){};
+Zone::Manager::Manager() : state(Zone::IDLE){};
 
 void Zone::Manager::update(ECS::Map *map, double ts)
 {
-    if (this->placing_zone)
+    if (this->state == Zone::PLACING_ZONE)
     {
+        if (!Input::is_input_active(Input::LEFT_MOUSE_PRESSED))
+        {
+            this->quit_and_save_zone_placement(map);
+            return;
+        }
         Rect *camera = Window::get_camera();
         V2 *mouse_position = Window::get_mouse_position();
         V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
@@ -41,25 +47,37 @@ void Zone::Manager::update(ECS::Map *map, double ts)
             }
         }
     }
+    else if (this->state == Zone::WAITING_TO_PLACE_ZONE)
+    {
+        Rect *camera = Window::get_camera();
+        V2 *mouse_position = Window::get_mouse_position();
+        V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
+        V2 mouse_grid_position = {
+            world_mouse_position.x / map->cell_size,
+            world_mouse_position.y / map->cell_size};
+        Rect cell_to_render = {
+            (static_cast<int>(mouse_grid_position.x) * map->cell_size) - camera->x,
+            (static_cast<int>(mouse_grid_position.y) * map->cell_size) - camera->y,
+            map->cell_size,
+            map->cell_size};
+        Color color = {0xFF, 0xFF, 0xFF, 0x0F};
+        Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 3);
+        if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+        {
+            this->state = Zone::PLACING_ZONE;
+            this->start_zone_grid_position = mouse_grid_position;
+        }
+    }
 };
-void Zone::Manager::begin_zone_placement(ECS::Map *map)
+void Zone::Manager::wait_for_zone_placement(ECS::Map *map)
 {
-    this->placing_zone = true;
-    Rect *camera = Window::get_camera();
-    V2 *mouse_position = Window::get_mouse_position();
-    int cell_size = map->cell_size;
-
-    V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
-
-    this->start_zone_grid_position = {
-        world_mouse_position.x / cell_size,
-        world_mouse_position.y / cell_size};
+    this->state = Zone::WAITING_TO_PLACE_ZONE;
 }
-void Zone::Manager::quit_zone_placement(ECS::Map *map) { this->placing_zone = false; }
+void Zone::Manager::quit_zone_placement(ECS::Map *map) { this->state = IDLE; }
 void Zone::Manager::quit_and_save_zone_placement(ECS::Map *map)
 {
     // TODO: consolidate similar code in Zone::Manager::update
-    this->placing_zone = false;
+    this->state = IDLE;
     Rect *camera = Window::get_camera();
     V2 *mouse_position = Window::get_mouse_position();
     V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};

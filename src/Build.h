@@ -6,6 +6,11 @@
 
 namespace Build
 {
+enum State
+{
+    IDLE,
+    WAITING_TO_PLACE_STRUCTURE
+};
 struct Manager
 {
     Manager();
@@ -15,7 +20,7 @@ struct Manager
     void quit_structure_placement();
 
     V2 build_dimensions;
-    bool placing_structure;
+    State state;
 };
 }; // namespace Build
 
