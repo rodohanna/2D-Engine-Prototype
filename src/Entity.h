@@ -24,10 +24,23 @@ struct Cell
 
 struct Map
 {
-    std::vector<std::vector<ECS::Cell>> grid;
+    Map();
+    void update(double);
+    V2 get_mouse_grid_position();
+    V2 get_mouse_world_position();
+    Rect get_hovered_grid_cell();
+    Rect hovered_grid_cell;
     V2 dimensions;
     V2 pixel_dimensions;
+    V2 mouse_grid_position;
+    V2 mouse_world_position;
+    std::vector<std::vector<ECS::Cell>> grid;
     int cell_size;
+    bool mouse_data_cached;
+    bool hovered_cell_cached;
+
+private:
+    void recalculate_mouse_positions();
 };
 
 enum Type

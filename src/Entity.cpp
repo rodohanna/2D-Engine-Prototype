@@ -6,6 +6,61 @@
 #include "Assets.h"
 #include <stdio.h>
 
+ECS::Map::Map() : mouse_data_cached(false), hovered_cell_cached(false){};
+
+void ECS::Map::update(double ts)
+{
+    this->mouse_data_cached = false;
+    this->hovered_cell_cached = false;
+}
+
+void ECS::Map::recalculate_mouse_positions()
+{
+    Rect *camera = Window::get_camera();
+    V2 *mouse_position = Window::get_mouse_position();
+    this->mouse_world_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
+    this->mouse_grid_position = {
+        this->mouse_world_position.x / this->cell_size,
+        this->mouse_world_position.y / this->cell_size};
+    this->mouse_data_cached = true;
+}
+
+Rect ECS::Map::get_hovered_grid_cell()
+{
+    if (!this->hovered_cell_cached)
+    {
+        if (!this->mouse_data_cached)
+        {
+            this->recalculate_mouse_positions();
+        }
+        Rect *camera = Window::get_camera();
+        this->hovered_grid_cell = {
+            (static_cast<int>(this->mouse_grid_position.x) * this->cell_size) - camera->x,
+            (static_cast<int>(this->mouse_grid_position.y) * this->cell_size) - camera->y,
+            this->cell_size,
+            this->cell_size};
+        this->hovered_cell_cached = true;
+    }
+    return this->hovered_grid_cell;
+}
+
+V2 ECS::Map::get_mouse_grid_position()
+{
+    if (!this->mouse_data_cached)
+    {
+        this->recalculate_mouse_positions();
+    }
+    return this->mouse_grid_position;
+};
+V2 ECS::Map::get_mouse_world_position()
+{
+    if (!this->mouse_data_cached)
+    {
+        this->recalculate_mouse_positions();
+    }
+    return this->mouse_world_position;
+};
+
 // Systems
 
 void ECS::render_system(Entity *e)
@@ -161,6 +216,7 @@ void ECS::Manager::update_player(double ts)
 
 void ECS::Manager::update(double ts)
 {
+    this->map.update(ts);
     for (Entity &e : this->entities)
     {
         ECS::render_system(&e);

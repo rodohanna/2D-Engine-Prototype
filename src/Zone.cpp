@@ -17,16 +17,12 @@ void Zone::Manager::update(ECS::Map *map, double ts)
             this->save_zone_placement(map);
             return;
         }
-        Rect *camera = Window::get_camera();
-        V2 *mouse_position = Window::get_mouse_position();
-        V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
-        V2 current_mouse_grid_position = {
-            world_mouse_position.x / map->cell_size,
-            world_mouse_position.y / map->cell_size};
+        V2 current_mouse_grid_position = map->get_mouse_grid_position();
         unsigned int start_x = std::min(this->start_zone_grid_position.x, current_mouse_grid_position.x);
         unsigned int end_x = std::max(this->start_zone_grid_position.x, current_mouse_grid_position.x);
         unsigned int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);
         unsigned int end_y = std::max(this->start_zone_grid_position.y, current_mouse_grid_position.y);
+        Rect *camera = Window::get_camera();
         if (start_x >= 0 && end_x < map->grid.size() && start_y >= 0 && end_y < map->grid.size())
         {
             for (unsigned int i = start_x; i <= end_x; ++i)
@@ -54,23 +50,12 @@ void Zone::Manager::update(ECS::Map *map, double ts)
             this->quit_zone_placement();
             return;
         }
-        Rect *camera = Window::get_camera();
-        V2 *mouse_position = Window::get_mouse_position();
-        V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
-        V2 mouse_grid_position = {
-            world_mouse_position.x / map->cell_size,
-            world_mouse_position.y / map->cell_size};
-        Rect cell_to_render = {
-            (static_cast<int>(mouse_grid_position.x) * map->cell_size) - camera->x,
-            (static_cast<int>(mouse_grid_position.y) * map->cell_size) - camera->y,
-            map->cell_size,
-            map->cell_size};
         Color color = {0xFF, 0xFF, 0xFF, 0x0F};
-        Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 3);
+        Render::render_rectangle(Render::Layer::WORLD_LAYER, map->get_hovered_grid_cell(), color, true, 3);
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {
             this->state = Zone::PLACING_ZONE;
-            this->start_zone_grid_position = mouse_grid_position;
+            this->start_zone_grid_position = map->get_mouse_grid_position();
         }
     }
 };
@@ -78,17 +63,12 @@ void Zone::Manager::wait_for_zone_placement(ECS::Map *map)
 {
     this->state = Zone::WAITING_TO_PLACE_ZONE;
 }
-void Zone::Manager::quit_zone_placement() { this->state = IDLE; }
+void Zone::Manager::quit_zone_placement() { this->state = Zone::IDLE; }
 void Zone::Manager::save_zone_placement(ECS::Map *map)
 {
     // TODO: consolidate similar code in Zone::Manager::update
     this->state = Zone::WAITING_TO_PLACE_ZONE;
-    Rect *camera = Window::get_camera();
-    V2 *mouse_position = Window::get_mouse_position();
-    V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
-    V2 current_mouse_grid_position = {
-        world_mouse_position.x / map->cell_size,
-        world_mouse_position.y / map->cell_size};
+    V2 current_mouse_grid_position = map->get_mouse_grid_position();
     unsigned int start_x = std::min(this->start_zone_grid_position.x, current_mouse_grid_position.x);
     unsigned int end_x = std::max(this->start_zone_grid_position.x, current_mouse_grid_position.x);
     unsigned int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);

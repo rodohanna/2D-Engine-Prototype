@@ -20,12 +20,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
             return;
         }
         Rect *camera = Window::get_camera();
-        V2 *mouse_position = Window::get_mouse_position();
-        int cell_size = map->cell_size;
-        V2 world_mouse_position = {mouse_position->x + camera->x, mouse_position->y + camera->y};
-        V2 grid_position = {
-            world_mouse_position.x / cell_size,
-            world_mouse_position.y / cell_size};
+        V2 grid_position = map->get_mouse_grid_position();
 
         for (int i = grid_position.x; i < grid_position.x + this->build_dimensions.x; ++i)
         {
