@@ -96,6 +96,7 @@ double get_seconds_elapsed(int64_t old_counter, int64_t current_counter)
 EngineContext engine_init()
 {
     EngineContext context;
+    context.initialized = true;
     setbuf(stdout, NULL); // DEBUG
 #ifdef _WIN32
     if (timeBeginPeriod(1) == TIMERR_NOCANDO)

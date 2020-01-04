@@ -76,7 +76,7 @@ void ECS::render_system(Entity *e)
             render_component.clip = {};
         }
         Rect *camera = Window::get_camera();
-        Rect entity_rect = {position_component.position.x, position_component.position.y, 16, 16};
+        Rect entity_rect = {position_component.position.x, position_component.position.y, render_component.clip.w, render_component.clip.h};
         if (Physics::check_collision(camera, &entity_rect))
         {
             V2 render_position = {position_component.position.x - camera->x, position_component.position.y - camera->y};

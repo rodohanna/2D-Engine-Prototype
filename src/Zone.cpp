@@ -36,7 +36,7 @@ void Zone::Manager::update(ECS::Map *map, double ts)
                             (static_cast<int>(j) * map->cell_size) - camera->y,
                             map->cell_size,
                             map->cell_size};
-                        Color color = {0xFF, 0xFF, 0xFF, 0x0F};
+                        Color color = {0xFF, 0xFF, 0xFF, 0x6F};
                         Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 2);
                     }
                 }
@@ -50,7 +50,7 @@ void Zone::Manager::update(ECS::Map *map, double ts)
             this->quit_zone_placement();
             return;
         }
-        Color color = {0xFF, 0xFF, 0xFF, 0x0F};
+        Color color = {0xFF, 0xFF, 0xFF, 0x4F};
         Render::render_rectangle(Render::Layer::WORLD_LAYER, map->get_hovered_grid_cell(), color, true, 3);
         if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
         {

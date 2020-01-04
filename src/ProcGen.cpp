@@ -18,7 +18,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     }
     // We are only placing trees right now:
     int num_trees = rand() % rules->tree_weight;
-    int num_ground = rand() % rules->ground_weight;
+    num_trees = 200;
 
     // Instantiate
     std::vector<int> trees;
@@ -29,8 +29,37 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
         ECS::Entity tree_entity;
         ECS::Component render_component;
         render_component.type = ECS::Type::RENDER;
+        Rect clip = {};
+        if (rand() % 5 == 0)
+        {
+            clip = {128, 80, 16, 32}; // tree
+        }
+        else if (rand() % 2 == 0)
+        {
+            clip = {144, 96, 16, 16};
+        }
+        else if (rand() % 2 == 0)
+        {
+            clip = {144, 80, 16, 16};
+        }
+        else if (rand() % 2 == 0)
+        {
+            clip = {160, 96, 16, 16};
+        }
+        else if (rand() % 2 == 0)
+        {
+            clip = {160, 80, 16, 16};
+        }
+        else if (rand() % 2 == 0)
+        {
+            clip = {160, 112, 16, 16};
+        }
+        else
+        {
+            clip = {144, 80, 16, 16};
+        }
         render_component.data.r = {
-            {0, 17, 16, 16},
+            clip,
             Render::Layer::WORLD_LAYER,
             texture_index,
             1,
@@ -39,22 +68,6 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
         tree_entity.components[render_component.type] = render_component;
         entity_manager.entities.push_back(tree_entity);
         trees.push_back(entity_manager.entities.size() - 1);
-    }
-    for (int i = 0; i < num_ground; ++i)
-    {
-        ECS::Entity ground_entity;
-        ECS::Component render_component;
-        render_component.type = ECS::Type::RENDER;
-        render_component.data.r = {
-            {17, 0, 16, 16},
-            Render::Layer::WORLD_LAYER,
-            texture_index,
-            1,
-            1,
-            true};
-        ground_entity.components[render_component.type] = render_component;
-        entity_manager.entities.push_back(ground_entity);
-        ground.push_back(entity_manager.entities.size() - 1);
     }
 
     // Placement
@@ -65,33 +78,14 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
         {
             int x = rand() % dimensions->x;
             int y = rand() % dimensions->y;
-            if (map.grid[x][y].entity_id == -1)
+            if (map.grid[x][y].entity_id == -1 && y > 1 && map.grid[x][y - 1].entity_id == -1)
             {
                 ECS::Entity *entity = &entity_manager.entities[trees[i]];
                 ECS::Component position;
                 position.type = ECS::Type::POSITION;
-                position.data.p.position = {x * 16, y * 16};
+                position.data.p.position = {x * 16, (y * 16) - (entity->components[ECS::RENDER].data.r.clip.h - 16)};
                 entity->components[position.type] = position;
                 map.grid[x][y].entity_id = trees[i];
-                placed = true;
-            }
-        }
-    }
-    for (unsigned int i = 0; i < ground.size(); ++i)
-    {
-        bool placed = false;
-        while (!placed)
-        {
-            int x = rand() % dimensions->x;
-            int y = rand() % dimensions->y;
-            if (map.grid[x][y].entity_id == -1)
-            {
-                ECS::Entity *entity = &entity_manager.entities[ground[i]];
-                ECS::Component position;
-                position.type = ECS::Type::POSITION;
-                position.data.p.position = {x * 16, y * 16};
-                entity->components[position.type] = position;
-                map.grid[x][y].entity_id = ground[i];
                 placed = true;
             }
         }
@@ -116,7 +110,25 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             ECS::Tile t;
             t.texture_index = Assets::get_texture_index("tilesheet-colored");
             t.position = {i * map.cell_size, j * map.cell_size};
-            t.clip = {0, 0, 16, 16};
+            if (rand() % 25 == 0)
+            {
+                if (rand() % 2 == 0)
+                {
+                    t.clip = {128, 0, 16, 16};
+                }
+                else if (rand() % 2 == 0)
+                {
+                    t.clip = {128, 16, 16, 16};
+                }
+                else
+                {
+                    t.clip = {112, 0, 16, 16};
+                }
+            }
+            else
+            {
+                t.clip = {85, 34, 16, 16};
+            }
             map.grid[i][j].tile = t;
         }
     }
