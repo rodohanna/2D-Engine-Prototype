@@ -33,7 +33,7 @@ void GUI::GUI::update(double ts)
     if (this->build_menu_shown)
     {
         Rect *camera = Window::get_gui_camera();
-        this->build_menu.panel.rect.x = 0;
+        this->build_menu.panel.rect.x = 5;
         this->build_menu.panel.rect.y = camera->h - this->bottom_bar.build_button.button.rect.h - this->build_menu.panel.rect.h - 5;
         this->build_menu.update(ts);
     }

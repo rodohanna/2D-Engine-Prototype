@@ -93,7 +93,7 @@ struct Entity
 };
 
 void input_system(ECS::Map *, Entity *, double ts);
-void render_system(Entity *);
+bool render_system(Entity *);
 void camera_system(Entity *);
 
 void render_map(ECS::Map *, double ts);

@@ -63,7 +63,7 @@ V2 ECS::Map::get_mouse_world_position()
 
 // Systems
 
-void ECS::render_system(Entity *e)
+bool ECS::render_system(Entity *e)
 {
     auto render_it = e->components.find(ECS::Type::RENDER);
     auto position_it = e->components.find(ECS::Type::POSITION);
@@ -88,8 +88,10 @@ void ECS::render_system(Entity *e)
                 nullptr,
                 render_component.scale,
                 render_component.z_index);
+            return true;
         }
     }
+    return false;
 }
 
 void ECS::camera_system(Entity *e)
@@ -105,7 +107,7 @@ void ECS::camera_system(Entity *e)
 
 void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 {
-    double speed = 200;
+    double speed = 500;
     auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
     auto position_it = e->components.find(ECS::Type::POSITION);
     if (player_input_it != e->components.end() && position_it != e->components.end())
@@ -164,6 +166,7 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 
 void ECS::render_map(ECS::Map *m, double ts)
 {
+    int tiles_rendered = 0;
     Rect *camera = Window::get_camera();
     for (unsigned int i = 0; i < m->grid.size(); ++i)
     {
@@ -182,8 +185,16 @@ void ECS::render_map(ECS::Map *m, double ts)
                     nullptr,
                     1,
                     0);
+                ++tiles_rendered;
             }
         }
+    }
+    {
+        // DEBUG
+        MBus::Message debug;
+        debug.type = MBus::TILES_RENDERED;
+        debug.data.er.num = tiles_rendered;
+        MBus::send_debug_message(&debug);
     }
 }
 
@@ -216,10 +227,25 @@ void ECS::Manager::update_player(double ts)
 
 void ECS::Manager::update(double ts)
 {
+    int entities_rendered = 0;
     this->map.update(ts);
     for (Entity &e : this->entities)
     {
-        ECS::render_system(&e);
+        if (ECS::render_system(&e))
+        {
+            ++entities_rendered;
+        }
+    }
+    {
+        // DEBUG
+        MBus::Message debug;
+        debug.type = MBus::ENTITIES_RENDERED;
+        debug.data.er.num = entities_rendered;
+        MBus::send_debug_message(&debug);
+
+        debug.type = MBus::ENTITIES_PROCESSED;
+        debug.data.er.num = this->entities.size();
+        MBus::send_debug_message(&debug);
     }
 };
 

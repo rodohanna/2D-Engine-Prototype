@@ -2,6 +2,7 @@
 #include "Assets.h"
 #include "Window.h"
 #include "SDLWrapper.h"
+#include "MessageBus.h"
 #include <stdio.h>
 #include <algorithm>
 
@@ -129,6 +130,13 @@ void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events,
 
 void Render::perform_render()
 {
+    {
+        // DEBUG
+        MBus::Message debug;
+        debug.type = MBus::MESSAGES_IN_RENDER_QUEUE;
+        debug.data.mirq.num = render_queue_length;
+        MBus::send_debug_message(&debug);
+    }
     double world_render_scale = Window::get_world_render_scale();
     double gui_render_scale = Window::get_gui_render_scale();
     int world_buffer_length = 0;

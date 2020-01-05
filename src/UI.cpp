@@ -4,11 +4,12 @@
 #include "Input.h"
 #include "SDLWrapper.h"
 #include "Assets.h"
+#include <assert.h>
 
 void UI::Panel::update(double ts)
 {
     Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->rect_color, true, this->z_index);
-    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->outline_color, false, this->z_index);
+    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->outline_color, false, this->z_index + 1);
 }
 
 void UI::Button::update(double ts)
@@ -27,7 +28,7 @@ void UI::Button::update(double ts)
         }
     }
     Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, current_color, true, this->z_index);
-    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->outline_color, false, this->z_index);
+    Render::render_rectangle(Render::Layer::GUI_LAYER, this->rect, this->outline_color, false, this->z_index + 1);
 }
 
 void UI::Text::set_text(std::string text)
@@ -40,6 +41,7 @@ void UI::Text::set_text(std::string text)
     }
     if (this->text != text)
     {
+        assert(this->texture_key != "");
         auto info = Assets::create_texture_from_text(
             SDL::get_renderer(),
             this->font_index,

@@ -7,6 +7,7 @@
 #include "GameTypes.h"
 #include "Order.h"
 #include "GUI.h"
+#include "Debug.h"
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -37,8 +38,9 @@ int main(int argc, char *argv[])
     int64_t last_counter = SDL_GetPerformanceCounter();
 
     // debug
+    Debug debugger;
     ProcGen::Rules rules = {100, 100};
-    V2 dimensions = {100, 100};
+    V2 dimensions = {300, 100};
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();
     GUI::GUI gui;
@@ -62,6 +64,10 @@ int main(int argc, char *argv[])
         order_manager.update(&r.entity_manager.map, context.time_step);
 
         ECS::render_map(&r.entity_manager.map, context.time_step);
+
+        debugger.process_messages();
+        MBus::clear_debug_messages();
+        debugger.update(context.time_step);
 
         if (get_seconds_elapsed(last_counter, SDL_GetPerformanceCounter()) < context.time_step)
         {
