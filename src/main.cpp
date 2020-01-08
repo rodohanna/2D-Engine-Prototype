@@ -7,6 +7,7 @@
 #include "GameTypes.h"
 #include "Order.h"
 #include "GUI.h"
+#include "Serialize.h"
 #include "Debug.h"
 #include <stdio.h>
 
@@ -68,6 +69,14 @@ int main(int argc, char *argv[])
         debugger.process_messages();
         MBus::clear_debug_messages();
         debugger.update(context.time_step);
+
+        {
+            // DEBUG - SERIALIZATION
+            if (Input::is_input_active(Input::Q_KEY_DOWN))
+            {
+                Serialize::save_map(&r.entity_manager.map);
+            }
+        }
 
         if (get_seconds_elapsed(last_counter, SDL_GetPerformanceCounter()) < context.time_step)
         {
