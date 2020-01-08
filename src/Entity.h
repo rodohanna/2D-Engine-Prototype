@@ -14,6 +14,7 @@ struct Tile
     Rect clip;
     V2 position;
     int texture_index;
+    bool empty;
 };
 
 struct Cell

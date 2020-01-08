@@ -2,12 +2,12 @@
     {
         "texture_key": "tilesheet-colored",
         "type": "sprite",
-        "path": "resources/assets/spritesheets/higher-res.png"
+        "path": "resources/assets/spritesheets/space-station.png"
     },
     {
         "texture_key": "tilesheet-transparent",
         "type": "sprite",
-        "path": "resources/assets/spritesheets/higher-res.png"
+        "path": "resources/assets/spritesheets/space-station.png"
     },
     {
         "texture_key": "standard-font",

@@ -161,16 +161,19 @@ void Render::perform_render()
     SDL_RenderClear(renderer);
 
     SDL_RenderSetScale(renderer, world_render_scale, world_render_scale);
-    // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x0F);
-    Rect *camera = Window::get_camera();
-    for (int i = 0; i <= 100; ++i)
     {
-        SDL_RenderDrawLine(renderer, (i * 16) - camera->x, 0 - camera->y, (i * 16) - camera->x, (16 * 100) - camera->y);
-    }
-    for (int i = 0; i <= 100; ++i)
-    {
-        SDL_RenderDrawLine(renderer, 0 - camera->x, (i * 16) - camera->y, (16 * 100) - camera->x, (i * 16) - camera->y);
+        // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
+        // DEBUG
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x0F);
+        Rect *camera = Window::get_camera();
+        for (int i = 0; i <= 100; ++i)
+        {
+            SDL_RenderDrawLine(renderer, (i * 32) - camera->x, 0 - camera->y, (i * 32) - camera->x, (32 * 100) - camera->y);
+        }
+        for (int i = 0; i <= 100; ++i)
+        {
+            SDL_RenderDrawLine(renderer, 0 - camera->x, (i * 32) - camera->y, (32 * 100) - camera->x, (i * 32) - camera->y);
+        }
     }
     _perform_render(renderer, world_layer_buffer, world_buffer_length);
 

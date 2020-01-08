@@ -11,18 +11,18 @@ BuildMenu::BuildMenu()
     this->panel.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
     this->panel.z_index = 1;
 
-    UI::TextButton farmhand_house;
-    farmhand_house.button.rect = {0, 0, 100, 75};
-    farmhand_house.button.idle_color = {0x11, 0x11, 0x11, 0xF0};
-    farmhand_house.button.hover_color = {0x1F, 0x1F, 0x1F, 0xF0};
-    farmhand_house.button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
-    farmhand_house.button.z_index = 1;
-    farmhand_house.text.font_index = 1;
-    farmhand_house.text.has_overflow_clip = false;
-    farmhand_house.text.render_layer = Render::GUI_LAYER;
-    farmhand_house.text.texture_key = "farmhand_house_button";
-    farmhand_house.text.set_text("Farmhand House");
-    this->buttons.push_back(farmhand_house);
+    UI::TextButton floor;
+    floor.button.rect = {0, 0, 100, 75};
+    floor.button.idle_color = {0x11, 0x11, 0x11, 0xF0};
+    floor.button.hover_color = {0x1F, 0x1F, 0x1F, 0xF0};
+    floor.button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
+    floor.button.z_index = 1;
+    floor.text.font_index = 0;
+    floor.text.has_overflow_clip = false;
+    floor.text.render_layer = Render::GUI_LAYER;
+    floor.text.texture_key = "floor_button";
+    floor.text.set_text("Floor");
+    this->buttons.push_back(floor);
 }
 
 void BuildMenu::update(double ts)
@@ -42,12 +42,11 @@ void BuildMenu::update(double ts)
             curr_x = this->panel.rect.x + 37;
         }
     }
-    if (this->buttons[0].button.mouse_clicked) // build farm hand house
+    if (this->buttons[0].button.mouse_clicked) // build floor
     {
-        printf("Build Farmhand House\n");
+        printf("Build Floor\n");
         MBus::Message message;
-        message.type = MBus::Type::BEGIN_STRUCTURE_PLACEMENT;
-        message.data.bsp.dimensions = {3, 2};
+        message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
         MBus::send_order_message(&message);
     }
     if (Physics::check_point_in_rect(Window::get_gui_mouse_position(), &this->panel.rect))

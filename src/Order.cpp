@@ -38,7 +38,17 @@ void Order::Manager::process_messages(ECS::Map *map)
         case MBus::Type::BEGIN_STRUCTURE_PLACEMENT:
         {
             printf("Handling structure placement\n");
-            this->build_manager.begin_structure_placement(&m.data.bsp.dimensions);
+            this->build_manager.begin_structure_placement();
+            if (this->zone_manager.state != Zone::IDLE)
+            {
+                this->zone_manager.quit_zone_placement();
+            }
+            break;
+        }
+        case MBus::Type::BEGIN_FLOOR_PLACEMENT:
+        {
+            printf("Handling floor placement\n");
+            this->build_manager.begin_floor_placement();
             if (this->zone_manager.state != Zone::IDLE)
             {
                 this->zone_manager.quit_zone_placement();

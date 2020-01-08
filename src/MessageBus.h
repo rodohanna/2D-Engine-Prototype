@@ -15,8 +15,10 @@ enum Type
     BEGIN_ZONE_PLACEMENT,
     END_ZONE_PLACEMENT,
     BEGIN_STRUCTURE_PLACEMENT,
+    BEGIN_FLOOR_PLACEMENT,
     // ECS
     CREATE_PLANT_ENTITY,
+    CREATE_TILE,
     // GUI
     TOGGLE_BUILD_MENU,
     CLOSE_BUILD_MENU,
@@ -47,6 +49,10 @@ struct CreatePlantEntity
 {
     V2 grid_position;
 };
+struct CreateTile
+{
+    V2 grid_position;
+};
 struct BeginStructurePlacement
 {
     // preview texture????
@@ -62,6 +68,7 @@ struct Message
         MessagesInRenderQueue mirq;
         TilesRendered tr;
         EntitiesProcessed ep;
+        CreateTile ct;
     } data;
 };
 enum QueueType

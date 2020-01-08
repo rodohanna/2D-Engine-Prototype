@@ -4,6 +4,7 @@
 #include "Physics.h"
 #include "MessageBus.h"
 #include "Assets.h"
+#include <assert.h>
 #include <stdio.h>
 
 ECS::Map::Map() : mouse_data_cached(false), hovered_cell_cached(false){};
@@ -173,19 +174,22 @@ void ECS::render_map(ECS::Map *m, double ts)
         for (unsigned int j = 0; j < m->grid[i].size(); ++j)
         {
             Tile t = m->grid[i][j].tile;
-            V2 render_position = {t.position.x - camera->x, t.position.y - camera->y};
-            Rect r = {t.position.x, t.position.y, 16, 16};
-            if (Physics::check_collision(camera, &r))
+            if (!t.empty)
             {
-                Render::render_texture(
-                    Render::Layer::WORLD_LAYER,
-                    t.texture_index,
-                    t.clip,
-                    render_position,
-                    nullptr,
-                    1,
-                    0);
-                ++tiles_rendered;
+                V2 render_position = {t.position.x - camera->x, t.position.y - camera->y};
+                Rect r = {t.position.x, t.position.y, 32, 32};
+                if (Physics::check_collision(camera, &r))
+                {
+                    Render::render_texture(
+                        Render::Layer::WORLD_LAYER,
+                        t.texture_index,
+                        t.clip,
+                        render_position,
+                        nullptr,
+                        1,
+                        0);
+                    ++tiles_rendered;
+                }
             }
         }
     }
@@ -261,7 +265,7 @@ void ECS::Manager::process_messages()
             Component render_component;
             render_component.type = RENDER;
             render_component.data.r = {
-                {0, 17, 16, 16},
+                {32, 0, 32, 32},
                 Render::Layer::WORLD_LAYER,
                 Assets::get_texture_index("tilesheet-transparent"),
                 1,
@@ -269,11 +273,22 @@ void ECS::Manager::process_messages()
                 true};
             Component position_component;
             position_component.type = POSITION;
-            position_component.data.p = {message.data.cpe.grid_position.x * 16, message.data.cpe.grid_position.y * 16};
+            position_component.data.p = {message.data.cpe.grid_position.x * 32, message.data.cpe.grid_position.y * 32};
             e.components[position_component.type] = position_component;
             e.components[render_component.type] = render_component;
             this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].entity_id = this->entities.size();
             this->entities.push_back(e);
+        }
+        else if (message.type == MBus::CREATE_TILE)
+        {
+            V2 grid_position = message.data.ct.grid_position;
+            assert(grid_position.x >= 0 &&
+                   grid_position.x < static_cast<int>(this->map.grid.size()) &&
+                   grid_position.y > 0 &&
+                   grid_position.y < static_cast<int>(this->map.grid[0].size()));
+            this->map.grid[grid_position.x][grid_position.y].tile.empty = false;
+            this->map.grid[grid_position.x][grid_position.y].tile.texture_index = Assets::get_texture_index("tilesheet-transparent");
+            this->map.grid[grid_position.x][grid_position.y].tile.clip = {0, 0, 32, 32};
         }
     }
 }
