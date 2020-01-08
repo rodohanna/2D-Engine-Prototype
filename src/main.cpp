@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
         {
             // DEBUG - SERIALIZATION
-            if (Input::is_input_active(Input::Q_KEY_DOWN))
+            if (Input::is_input_active(Input::Q_KEY_DOWN) && Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
             {
                 Serialize::save_map(&r.entity_manager.map);
             }
