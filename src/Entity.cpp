@@ -176,8 +176,8 @@ void ECS::render_map(ECS::Map *m, double ts)
             Tile t = m->grid[i][j].tile;
             if (!t.empty)
             {
-                V2 render_position = {t.position.x - camera->x, t.position.y - camera->y};
-                Rect r = {t.position.x, t.position.y, 32, 32};
+                V2 render_position = {t.world_position.x - camera->x, t.world_position.y - camera->y};
+                Rect r = {t.world_position.x, t.world_position.y, 32, 32};
                 if (Physics::check_collision(camera, &r))
                 {
                     Render::render_texture(
@@ -284,11 +284,12 @@ void ECS::Manager::process_messages()
             V2 grid_position = message.data.ct.grid_position;
             assert(grid_position.x >= 0 &&
                    grid_position.x < static_cast<int>(this->map.grid.size()) &&
-                   grid_position.y > 0 &&
+                   grid_position.y >= 0 &&
                    grid_position.y < static_cast<int>(this->map.grid[0].size()));
             this->map.grid[grid_position.x][grid_position.y].tile.empty = false;
             this->map.grid[grid_position.x][grid_position.y].tile.texture_index = Assets::get_texture_index("tilesheet-transparent");
             this->map.grid[grid_position.x][grid_position.y].tile.clip = {0, 0, 32, 32};
+            this->map.grid[grid_position.x][grid_position.y].tile.texture_key = "tilesheet-transparent";
         }
     }
 }

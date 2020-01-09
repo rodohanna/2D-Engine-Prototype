@@ -5,7 +5,13 @@
 
 namespace Serialize
 {
-void save_map(ECS::Map *);
+struct LoadMapResult
+{
+    ECS::Map map;
+    bool success;
+};
+bool save_map(ECS::Map *, std::string file);
+LoadMapResult load_map(std::string file);
 } // namespace Serialize
 
 #endif

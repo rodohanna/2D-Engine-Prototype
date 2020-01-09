@@ -28,13 +28,17 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     map.dimensions = *dimensions;
     map.cell_size = 32;
     map.pixel_dimensions = {map.dimensions.x * map.cell_size, map.dimensions.y * map.cell_size};
+    int texture_index = Assets::get_texture_index("tilesheet-colored");
     for (int i = 0; i < dimensions->x; ++i)
     {
         for (int j = 0; j < dimensions->y; ++j)
         {
             ECS::Tile t;
             t.empty = true;
-            t.position = {i * map.cell_size, j * map.cell_size};
+            t.world_position = {i * map.cell_size, j * map.cell_size};
+            t.grid_position = {i, j};
+            t.texture_key = "tilesheet-colored";
+            t.texture_index = texture_index;
             map.grid[i][j].tile = t;
         }
     }

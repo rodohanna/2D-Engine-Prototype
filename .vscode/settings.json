@@ -91,6 +91,7 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "unordered_set": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "xtree": "cpp"
     }
 }

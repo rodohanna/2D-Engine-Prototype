@@ -12,8 +12,10 @@ namespace ECS
 struct Tile
 {
     Rect clip;
-    V2 position;
+    V2 world_position;
+    V2 grid_position;
     int texture_index;
+    std::string texture_key;
     bool empty;
 };
 
