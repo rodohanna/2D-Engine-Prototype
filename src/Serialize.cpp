@@ -79,20 +79,47 @@ Serialize::LoadMapResult Serialize::load_map(std::string file)
     }
 
     picojson::value tiles_value = save_object.get<picojson::object>()["tiles"];
+    picojson::value dimensions_value = save_object.get<picojson::object>()["dimensions"];
     if (!tiles_value.is<picojson::array>())
     {
         printf("Load JSON Err: Tiles field is not array\n");
         return result;
     }
-
+    if (!dimensions_value.is<picojson::object>())
+    {
+        printf("Load JSON Err: Dimensions field is not object\n");
+        return result;
+    }
     picojson::value::array tiles_array = tiles_value.get<picojson::array>();
+    picojson::object dimensions_object = dimensions_value.get<picojson::object>();
+    V2 dimensions = {};
+    if (dimensions_object.find("x") != dimensions_object.end() && dimensions_object.find("y") != dimensions_object.end())
+    {
+        if (!dimensions_object["x"].is<double>())
+        {
+            printf("JSON Load Err: Dimensions 'x' value is not double\n");
+            return result;
+        }
+        if (!dimensions_object["y"].is<double>())
+        {
+            printf("JSON Load Err: Dimensions 'y' value is not double\n");
+            return result;
+        }
+        dimensions.x = dimensions_object["x"].get<double>();
+        dimensions.y = dimensions_object["y"].get<double>();
+    }
+    else
+    {
+        printf("Load JSON Err: Dimensions field is not object\n");
+        return result;
+    }
 
     // TODO, USE DIMENSIONS THAT ARE BEING SAVED.
     int cell_size = 32;
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < dimensions.x; ++i)
     {
         std::vector<ECS::Cell> column;
-        for (int j = 0; j < 100; ++j)
+        for (int j = 0; j < dimensions.y; ++j)
         {
             column.push_back({-1});
             column[j].tile.empty = true;
@@ -101,7 +128,7 @@ Serialize::LoadMapResult Serialize::load_map(std::string file)
         }
         result.map.grid.push_back(column);
     }
-    result.map.dimensions = {100, 100};
+    result.map.dimensions = dimensions;
     result.map.cell_size = cell_size;
     result.map.pixel_dimensions = {100 * cell_size, 100 * cell_size};
 
