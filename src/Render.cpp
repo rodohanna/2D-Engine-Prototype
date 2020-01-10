@@ -10,6 +10,7 @@ Render::Event render_queue[RENDER_QUEUE_SIZE];
 Render::Event world_layer_buffer[RENDER_QUEUE_SIZE];
 Render::Event gui_layer_buffer[RENDER_QUEUE_SIZE];
 int render_queue_length = 0;
+BlankTexture *blank_texture = nullptr;
 
 void Render::render_texture(Render::Layer layer, int texture_index, V2 &position, Rect *overflow_clip, int scale, int z_index)
 {
@@ -157,10 +158,27 @@ void Render::perform_render()
     }
     render_queue_length = 0;
     auto renderer = SDL::get_renderer();
+    Rect *camera = Window::get_camera();
+    if (blank_texture == nullptr)
+    {
+        V2 dimensions = {
+            camera->w,
+            camera->h};
+        blank_texture = new BlankTexture(renderer, dimensions, SDL_TEXTUREACCESS_TARGET);
+    }
+    else if (blank_texture->dimensions.x != camera->w || blank_texture->dimensions.y != camera->h)
+    {
+        delete blank_texture;
+        V2 dimensions = {
+            camera->w,
+            camera->h};
+        blank_texture = new BlankTexture(renderer, dimensions, SDL_TEXTUREACCESS_TARGET);
+    }
+    SDL_SetRenderTarget(renderer, blank_texture->texture);
+    SDL_RenderSetScale(renderer, 1.0, 1.0);
     SDL_SetRenderDrawColor(renderer, 0x11, 0x11, 0x11, 0xFF);
     SDL_RenderClear(renderer);
 
-    SDL_RenderSetScale(renderer, world_render_scale, world_render_scale);
     {
         // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
         // DEBUG
@@ -176,6 +194,8 @@ void Render::perform_render()
         }
     }
     _perform_render(renderer, world_layer_buffer, world_buffer_length);
+    SDL_SetRenderTarget(renderer, nullptr);
+    blank_texture->render(renderer, {0, 0}, world_render_scale);
 
     SDL_RenderSetScale(renderer, gui_render_scale, gui_render_scale);
     _perform_render(renderer, gui_layer_buffer, gui_buffer_length);

@@ -183,6 +183,42 @@ std::vector<std::unique_ptr<Texture>> *Assets::get_texture_table()
     return &texture_table;
 }
 
+// Blank Texture
+
+BlankTexture::BlankTexture(SDL_Renderer *renderer, const V2 &init_dimensions, SDL_TextureAccess texture_access)
+{
+    this->dimensions = {};
+    this->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, texture_access, init_dimensions.x, init_dimensions.y);
+    if (this->texture == NULL)
+    {
+        printf("Unable to create blank texture! SDL Error: %s\n", SDL_GetError());
+    }
+    else
+    {
+        this->dimensions = init_dimensions;
+    }
+};
+
+BlankTexture::~BlankTexture()
+{
+    if (this->texture != nullptr)
+    {
+        SDL_DestroyTexture(this->texture);
+        this->texture = nullptr;
+    }
+}
+
+void BlankTexture::render(SDL_Renderer *renderer, const V2 &position, double scale, double angle, SDL_Point *center, SDL_RendererFlip flip)
+{
+    if (this->texture == nullptr)
+    {
+        printf("Warning! A null blank texture render was attempted.\n");
+        return;
+    }
+    SDL_Rect render_quad = {position.x, position.y, static_cast<int>(this->dimensions.x * scale), static_cast<int>(this->dimensions.y * scale)};
+    SDL_RenderCopyEx(renderer, this->texture, nullptr, &render_quad, angle, center, flip);
+};
+
 // Texture
 
 Texture::Texture(SDL_Texture *texture, const V2 &dimensions, int index) : texture(texture), dimensions(dimensions), index(index) {}

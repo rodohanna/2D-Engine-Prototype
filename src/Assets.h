@@ -25,6 +25,15 @@ struct Texture
     int index;
 };
 
+struct BlankTexture
+{
+    BlankTexture(SDL_Renderer *, const V2 &dimensions, SDL_TextureAccess texture_access);
+    ~BlankTexture();
+    void render(SDL_Renderer *renderer, const V2 &position, double scale = 1.0, double angle = 0.0, SDL_Point *center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    V2 dimensions;
+    SDL_Texture *texture;
+};
+
 struct TextTextureInfo
 {
     int texture_index;

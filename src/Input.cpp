@@ -62,6 +62,19 @@ void Input::collect_input_events()
                 case SDLK_q:
                 {
                     register_input(Input::Q_KEY_DOWN);
+                    if (Window::get_world_render_scale() > 1)
+                    {
+                        Window::set_world_render_scale(Window::get_world_render_scale() - .25);
+                    }
+
+                    break;
+                }
+                case SDLK_e:
+                {
+                    if (Window::get_world_render_scale() < 4)
+                    {
+                        Window::set_world_render_scale(Window::get_world_render_scale() + .25);
+                    }
                     break;
                 }
                 }
