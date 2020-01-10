@@ -6,24 +6,23 @@
 #include <vector>
 #include <fstream>
 
-bool Serialize::save_map(ECS::Map *map, std::string file)
+bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
 {
-    picojson::value save_object = picojson::value(picojson::object());
-    picojson::value tiles = picojson::value(std::vector<picojson::value>());
+    ECS::Map *map = &entity_manager->map;
+    picojson::object save_object;
+    picojson::array tiles;
     picojson::value::object dimensions_object;
-    dimensions_object["x"] = picojson::value((double)map->dimensions.x);
-    dimensions_object["y"] = picojson::value((double)map->dimensions.y);
-    save_object.get<picojson::object>()["dimensions"] = picojson::value(dimensions_object);
-    save_object.get<picojson::object>()["tiles"] = tiles;
+    picojson::value::array entity_array;
 
+    // Serialize Map
     for (unsigned int i = 0; i < map->grid.size(); ++i)
     {
         for (unsigned int j = 0; j < map->grid[i].size(); ++j)
         {
             ECS::Tile tile = map->grid[i][j].tile;
+            picojson::object tile_object;
             if (!tile.empty)
             {
-                picojson::object tile_object;
                 picojson::object clip;
                 tile_object["grid_x"] = picojson::value((double)tile.grid_position.x);
                 tile_object["grid_y"] = picojson::value((double)tile.grid_position.y);
@@ -35,15 +34,49 @@ bool Serialize::save_map(ECS::Map *map, std::string file)
                 clip["w"] = picojson::value((double)tile.clip.w);
                 clip["h"] = picojson::value((double)tile.clip.h);
                 tile_object["clip"] = picojson::value(clip);
-                save_object.get<picojson::object>()["tiles"].get<picojson::array>().push_back(picojson::value(tile_object));
+            }
+            if (map->grid[i][j].has_entity)
+            {
+                tile_object["entity_id"] = picojson::value((double)map->grid[i][j].entity_id);
+            }
+
+            if (!tile.empty || map->grid[i][j].has_entity)
+            {
+                tiles.push_back(picojson::value(tile_object));
             }
         }
     }
-    printf("%s\n", save_object.serialize().c_str());
+
+    // Serialize Entities
+    for (unsigned int i = 0; i < entity_manager->entities.size(); ++i)
+    {
+        ECS::Entity *entity = &entity_manager->entities[i];
+        picojson::object entity_object;
+        picojson::array components_array;
+        entity_object["id"] = picojson::value((double)i);
+
+        for (auto component_it = entity->components.begin(); component_it != entity->components.end(); ++component_it)
+        {
+            printf("Looking at component: %d\n", component_it->first);
+            picojson::object compoment_object = ECS::jsonize_component(component_it->first, &component_it->second);
+            components_array.push_back(picojson::value(compoment_object));
+        }
+        entity_object["components"] = picojson::value(components_array);
+        entity_array.push_back(picojson::value(entity_object));
+    }
+
+    dimensions_object["x"] = picojson::value((double)map->dimensions.x);
+    dimensions_object["y"] = picojson::value((double)map->dimensions.y);
+    save_object["dimensions"] = picojson::value(dimensions_object);
+    save_object["tiles"] = picojson::value(tiles);
+    save_object["entities"] = picojson::value(entity_array);
+    picojson::value save_value = picojson::value(save_object);
+
+    printf("%s\n", save_value.serialize().c_str());
     std::ofstream save_file(file);
     if (save_file.is_open())
     {
-        save_file << save_object.serialize();
+        save_file << save_value.serialize();
         save_file.close();
         return true;
     }
@@ -54,7 +87,7 @@ bool Serialize::save_map(ECS::Map *map, std::string file)
     }
 };
 
-Serialize::LoadMapResult Serialize::load_map(std::string file)
+Serialize::LoadMapResult Serialize::load_game(std::string file)
 {
     Serialize::LoadMapResult result;
     result.success = false;
@@ -126,11 +159,11 @@ Serialize::LoadMapResult Serialize::load_map(std::string file)
             column[j].tile.world_position = {i * cell_size, j * cell_size};
             column[j].tile.grid_position = {i, j};
         }
-        result.map.grid.push_back(column);
+        result.entity_manager.map.grid.push_back(column);
     }
-    result.map.dimensions = dimensions;
-    result.map.cell_size = cell_size;
-    result.map.pixel_dimensions = {100 * cell_size, 100 * cell_size};
+    result.entity_manager.map.dimensions = dimensions;
+    result.entity_manager.map.cell_size = cell_size;
+    result.entity_manager.map.pixel_dimensions = {dimensions.x * cell_size, dimensions.y * cell_size};
 
     for (picojson::value::array::const_iterator obj_it = tiles_array.begin(); obj_it != tiles_array.end(); ++obj_it)
     {
@@ -213,14 +246,15 @@ Serialize::LoadMapResult Serialize::load_map(std::string file)
                 int clip_w = static_cast<int>(clip["w"].get<double>());
                 int clip_h = static_cast<int>(clip["h"].get<double>());
 
-                if (grid_x >= 0 && grid_x < result.map.dimensions.x && grid_y >= 0 && grid_y < result.map.dimensions.y)
+                if (grid_x >= 0 && grid_x < result.entity_manager.map.dimensions.x &&
+                    grid_y >= 0 && grid_y < result.entity_manager.map.dimensions.y)
                 {
-                    result.map.grid[grid_x][grid_y].tile.grid_position = {grid_x, grid_y};
-                    result.map.grid[grid_x][grid_y].tile.world_position = {world_x, world_y};
-                    result.map.grid[grid_x][grid_y].tile.clip = {clip_x, clip_y, clip_w, clip_h};
-                    result.map.grid[grid_x][grid_y].tile.texture_key = texture_key;
-                    result.map.grid[grid_x][grid_y].tile.texture_index = Assets::get_texture_index(texture_key);
-                    result.map.grid[grid_x][grid_y].tile.empty = false;
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.grid_position = {grid_x, grid_y};
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.world_position = {world_x, world_y};
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.clip = {clip_x, clip_y, clip_w, clip_h};
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.texture_key = texture_key;
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.texture_index = Assets::get_texture_index(texture_key);
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.empty = false;
                     // printf("Successfully loaded tile at: %d %d with texture key: %s and clip vals: %d %d %d %d\n",
                     //        grid_x, grid_y, texture_key.c_str(), clip_x, clip_y, clip_w, clip_h);
                 }

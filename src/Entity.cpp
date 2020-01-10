@@ -276,6 +276,7 @@ void ECS::Manager::process_messages()
             position_component.data.p = {message.data.cpe.grid_position.x * 32, message.data.cpe.grid_position.y * 32};
             e.components[position_component.type] = position_component;
             e.components[render_component.type] = render_component;
+            this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].has_entity = true;
             this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].entity_id = this->entities.size();
             this->entities.push_back(e);
         }
@@ -292,4 +293,55 @@ void ECS::Manager::process_messages()
             this->map.grid[grid_position.x][grid_position.y].tile.texture_key = "tilesheet-transparent";
         }
     }
+}
+
+picojson::object ECS::jsonize_component(Type type, Component *component)
+{
+    picojson::object component_object;
+    switch (type)
+    {
+    case ECS::Type::PLAYER_INPUT:
+    {
+        component_object["type"] = picojson::value("PLAYER_INPUT");
+        break;
+    }
+    case ECS::Type::POSITION:
+    {
+        component_object["type"] = picojson::value("POSITION");
+        component_object["x"] = picojson::value((double)component->data.p.position.x);
+        component_object["y"] = picojson::value((double)component->data.p.position.x);
+        break;
+    }
+    case ECS::Type::CAMERA:
+    {
+        component_object["type"] = picojson::value("CAMERA");
+        break;
+    }
+    case ECS::Type::DUMB_AI_COMPONENT:
+    {
+        component_object["type"] = picojson::value("DUMB_AI_COMPONENT");
+        break;
+    }
+    case ECS::Type::POSITION_ANIMATE:
+    {
+        component_object["type"] = picojson::value("POSITION_ANIMATE");
+        break;
+    }
+    case ECS::Type::RENDER:
+    {
+        component_object["type"] = picojson::value("RENDER");
+        component_object["has_clip"] = picojson::value(component->data.r.has_clip);
+        component_object["layer"] = picojson::value((double)component->data.r.layer);
+        component_object["scale"] = picojson::value((double)component->data.r.scale);
+        component_object["texture_index"] = picojson::value((double)component->data.r.texture_index);
+        picojson::object clip;
+        clip["x"] = picojson::value((double)component->data.r.clip.x);
+        clip["y"] = picojson::value((double)component->data.r.clip.y);
+        clip["w"] = picojson::value((double)component->data.r.clip.w);
+        clip["h"] = picojson::value((double)component->data.r.clip.h);
+        component_object["clip"] = picojson::value(clip);
+        break;
+    }
+    }
+    return component_object;
 }

@@ -7,11 +7,11 @@ namespace Serialize
 {
 struct LoadMapResult
 {
-    ECS::Map map;
+    ECS::Manager entity_manager;
     bool success;
 };
-bool save_map(ECS::Map *, std::string file);
-LoadMapResult load_map(std::string file);
+bool save_game(ECS::Manager *, std::string file);
+LoadMapResult load_game(std::string file);
 } // namespace Serialize
 
 #endif

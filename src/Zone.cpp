@@ -29,7 +29,7 @@ void Zone::Manager::update(ECS::Map *map, double ts)
             {
                 for (unsigned int j = start_y; j <= end_y; ++j)
                 {
-                    if (map->grid[i][j].entity_id == -1)
+                    if (!map->grid[i][j].has_entity)
                     {
                         Rect cell_to_render = {
                             (static_cast<int>(i) * map->cell_size) - camera->x,
@@ -79,7 +79,7 @@ void Zone::Manager::save_zone_placement(ECS::Map *map)
         {
             for (unsigned int j = start_y; j <= end_y; ++j)
             {
-                if (map->grid[i][j].entity_id == -1)
+                if (!map->grid[i][j].has_entity)
                 {
                     MBus::Message message;
                     message.type = MBus::CREATE_PLANT_ENTITY;

@@ -3,6 +3,7 @@
 
 #include "GameTypes.h"
 #include "Render.h"
+#include "json/picojson.h"
 #include <vector>
 #include <unordered_map>
 
@@ -21,8 +22,9 @@ struct Tile
 
 struct Cell
 {
-    int entity_id;
     Tile tile;
+    int entity_id;
+    bool has_entity;
 };
 
 struct Map
@@ -99,6 +101,7 @@ void input_system(ECS::Map *, Entity *, double ts);
 bool render_system(Entity *);
 void camera_system(Entity *);
 
+picojson::object jsonize_component(Type, Component *);
 void render_map(ECS::Map *, double ts);
 
 struct Manager

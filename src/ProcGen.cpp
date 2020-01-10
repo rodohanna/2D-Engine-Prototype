@@ -40,6 +40,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             t.texture_key = "tilesheet-colored";
             t.texture_index = texture_index;
             map.grid[i][j].tile = t;
+            map.grid[i][j].has_entity = false;
         }
     }
     entity_manager.map = map;

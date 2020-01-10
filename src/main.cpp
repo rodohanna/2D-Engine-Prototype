@@ -46,10 +46,11 @@ int main(int argc, char *argv[])
     Order::Manager order_manager = Order::Manager();
     GUI::GUI gui;
 
-    Serialize::LoadMapResult load_map_result = Serialize::load_map("resources/data/save.json");
-    if (load_map_result.success)
+    Serialize::LoadMapResult load_game_result = Serialize::load_game("resources/data/save.json");
+    if (load_game_result.success)
     {
-        r.entity_manager.map = load_map_result.map;
+        // TODO: We need to save/load the player
+        r.entity_manager = load_game_result.entity_manager;
     }
     else
     {
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
             // DEBUG - SERIALIZATION
             if (Input::is_input_active(Input::Q_KEY_DOWN) && Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
             {
-                Serialize::save_map(&r.entity_manager.map, "resources/data/save.json");
+                Serialize::save_game(&r.entity_manager, "resources/data/save.json");
             }
         }
 
