@@ -1,6 +1,7 @@
 #include "Input.h"
 #include "SDLWrapper.h"
 #include "Window.h"
+#include "MessageBus.h"
 #include <stdio.h>
 
 const int EVENTS_SIZE = 100;
@@ -65,6 +66,8 @@ void Input::collect_input_events()
                     if (Window::get_world_render_scale() > 1)
                     {
                         Window::set_world_render_scale(Window::get_world_render_scale() - .25);
+                        V2 *window = Window::get_window();
+                        update_cameras(window->x, window->y);
                     }
 
                     break;
@@ -74,6 +77,8 @@ void Input::collect_input_events()
                     if (Window::get_world_render_scale() < 4)
                     {
                         Window::set_world_render_scale(Window::get_world_render_scale() + .25);
+                        V2 *window = Window::get_window();
+                        update_cameras(window->x, window->y);
                     }
                     break;
                 }
@@ -249,12 +254,22 @@ void update_mouse_positions()
 
 void update_cameras(double w, double h)
 {
+    Window::set_window({static_cast<int>(w), static_cast<int>(h)});
     double world_render_scale = Window::get_world_render_scale();
     double gui_render_scale = Window::get_gui_render_scale();
     Rect *camera = Window::get_camera();
     Rect *gui_camera = Window::get_gui_camera();
+    V2 camera_dimensions_before = {camera->w, camera->h};
     camera->w = w / world_render_scale;
     camera->h = h / world_render_scale;
+    V2 camera_dimensions_after = {
+        camera->w,
+        camera->h};
     gui_camera->w = w / gui_render_scale;
     gui_camera->h = h / gui_render_scale;
+    MBus::Message message;
+    message.type = MBus::HANDLE_WINDOW_RESIZE_FOR_PLAYER;
+    message.data.hwrfp.old_camera_dimensions = {camera_dimensions_before.x, camera_dimensions_before.y};
+    message.data.hwrfp.new_camera_dimensions = {camera_dimensions_after.x, camera_dimensions_after.y};
+    MBus::send_ecs_message(&message);
 }

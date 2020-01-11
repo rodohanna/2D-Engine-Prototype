@@ -158,20 +158,20 @@ void Render::perform_render()
     }
     render_queue_length = 0;
     auto renderer = SDL::get_renderer();
-    Rect *camera = Window::get_camera();
+    V2 *window = Window::get_window();
     if (blank_texture == nullptr)
     {
         V2 dimensions = {
-            camera->w,
-            camera->h};
+            window->x,
+            window->y};
         blank_texture = new BlankTexture(renderer, dimensions, SDL_TEXTUREACCESS_TARGET);
     }
-    else if (blank_texture->dimensions.x != camera->w || blank_texture->dimensions.y != camera->h)
+    else if (blank_texture->dimensions.x != window->x || blank_texture->dimensions.y != window->y)
     {
         delete blank_texture;
         V2 dimensions = {
-            camera->w,
-            camera->h};
+            window->x,
+            window->y};
         blank_texture = new BlankTexture(renderer, dimensions, SDL_TEXTUREACCESS_TARGET);
     }
     SDL_SetRenderTarget(renderer, blank_texture->texture);

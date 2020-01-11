@@ -5,8 +5,11 @@
 
 namespace Window
 {
+V2 *get_window();
 Rect *get_camera();
 Rect *get_gui_camera();
+void set_window(V2);
+void set_window(V2 *);
 void set_camera(Rect);
 void set_camera(Rect *);
 void set_camera_position(V2);

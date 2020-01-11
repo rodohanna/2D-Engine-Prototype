@@ -76,7 +76,7 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
     std::ofstream save_file(file);
     if (save_file.is_open())
     {
-        save_file << save_value.serialize();
+        save_file << save_value.serialize(true); // DEBUG
         save_file.close();
         return true;
     }

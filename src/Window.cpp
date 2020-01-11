@@ -1,5 +1,6 @@
 #include "Window.h"
 
+V2 _window;
 Rect camera;
 Rect gui_camera;
 V2 mouse_position;
@@ -7,6 +8,18 @@ V2 gui_mouse_position;
 float world_render_scale = 1.0;
 float gui_render_scale = 1.0;
 
+void Window::set_window(V2 dimensions)
+{
+    _window = dimensions;
+};
+void Window::set_window(V2 *dimensions)
+{
+    _window = *dimensions;
+};
+V2 *Window::get_window()
+{
+    return &_window;
+}
 Rect *Window::get_camera()
 {
     return &camera;

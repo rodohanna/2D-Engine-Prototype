@@ -136,31 +136,35 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
             position->x += vel;
         }
 
-        auto camera = Window::get_camera();
+        V2 *window = Window::get_window();
+        Rect *camera = Window::get_camera();
+        V2 window_dimensions_with_camera_zoom = {
+            window->x - (window->x - camera->w),
+            window->y - (window->y - camera->h)};
 
         if (position->x < 0)
         {
             position->x = 0;
         }
-        if (position->x + camera->w > map->pixel_dimensions.x)
+        if (position->x + window_dimensions_with_camera_zoom.x > map->pixel_dimensions.x)
         {
-            position->x = map->pixel_dimensions.x - camera->w;
+            position->x = map->pixel_dimensions.x - window_dimensions_with_camera_zoom.x;
         }
         if (position->y < 0)
         {
             position->y = 0;
         }
-        if (position->y + camera->h > map->pixel_dimensions.y)
+        if (position->y + window_dimensions_with_camera_zoom.y > map->pixel_dimensions.y)
         {
-            position->y = map->pixel_dimensions.y - camera->h;
+            position->y = map->pixel_dimensions.y - window_dimensions_with_camera_zoom.y;
         }
-        if (camera->w > map->pixel_dimensions.x)
+        if (window_dimensions_with_camera_zoom.x > map->pixel_dimensions.x)
         {
-            position->x = -((camera->w - map->pixel_dimensions.x) / 2);
+            position->x = -((window_dimensions_with_camera_zoom.x - map->pixel_dimensions.x) / 2);
         }
-        if (camera->h > map->pixel_dimensions.y)
+        if (window_dimensions_with_camera_zoom.y > map->pixel_dimensions.y)
         {
-            position->y = -((camera->h - map->pixel_dimensions.y) / 2);
+            position->y = -((window_dimensions_with_camera_zoom.y - map->pixel_dimensions.y) / 2);
         }
     }
 }
@@ -291,6 +295,23 @@ void ECS::Manager::process_messages()
             this->map.grid[grid_position.x][grid_position.y].tile.texture_index = Assets::get_texture_index("tilesheet-transparent");
             this->map.grid[grid_position.x][grid_position.y].tile.clip = {0, 0, 32, 32};
             this->map.grid[grid_position.x][grid_position.y].tile.texture_key = "tilesheet-transparent";
+        }
+        else if (message.type == MBus::HANDLE_WINDOW_RESIZE_FOR_PLAYER)
+        {
+            if (this->player_entity_index != -1)
+            {
+                Entity *player = &this->entities[this->player_entity_index];
+                auto player_position_it = player->components.find(ECS::Type::POSITION);
+                if (player_position_it != player->components.end())
+                {
+                    V2 old_camera_dimensions = message.data.hwrfp.old_camera_dimensions;
+                    V2 new_camera_dimensions = message.data.hwrfp.new_camera_dimensions;
+                    V2 *current_player_position = &player_position_it->second.data.p.position;
+                    *current_player_position = {
+                        current_player_position->x + (old_camera_dimensions.x - new_camera_dimensions.x) / 2,
+                        current_player_position->y + (old_camera_dimensions.y - new_camera_dimensions.y) / 2};
+                }
+            }
         }
     }
 }
