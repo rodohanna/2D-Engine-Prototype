@@ -12,7 +12,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
         std::vector<ECS::Cell> column;
         for (int j = 0; j < dimensions->y; ++j)
         {
-            column.push_back({-1});
+            column.push_back({{}, -1});
         }
         map.grid.push_back(column);
     }

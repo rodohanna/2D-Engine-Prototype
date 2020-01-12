@@ -268,10 +268,12 @@ void ECS::Manager::process_messages()
             Entity e;
             Component render_component;
             render_component.type = RENDER;
+            render_component.strings.push_back("tilesheet-transparent");
             render_component.data.r = {
                 {32, 0, 32, 32},
                 Render::Layer::WORLD_LAYER,
                 Assets::get_texture_index("tilesheet-transparent"),
+                static_cast<int>(render_component.strings.size() - 1),
                 1,
                 1,
                 true};
@@ -316,6 +318,43 @@ void ECS::Manager::process_messages()
     }
 }
 
+void jsonize_component_strings(picojson::object *object, ECS::Component *component)
+{
+    assert(component != nullptr);
+    assert(object != nullptr);
+    if (component->strings.size() > 0)
+    {
+        picojson::array strings_array;
+        for (std::string &s : component->strings)
+        {
+            strings_array.push_back(picojson::value(s));
+        }
+        (*object)["strings"] = picojson::value(strings_array);
+    }
+}
+
+std::vector<std::string> componentize_json_strings(picojson::object *object)
+{
+    assert(object != nullptr);
+    std::vector<std::string> strings;
+    if ((*object)["strings"].is<picojson::array>())
+    {
+        picojson::array strings_array = (*object)["strings"].get<picojson::array>();
+        for (picojson::value::array::const_iterator obj_it = strings_array.begin(); obj_it != strings_array.end(); ++obj_it)
+        {
+            if (obj_it->is<std::string>())
+            {
+                strings.push_back(obj_it->get<std::string>());
+            }
+            else
+            {
+                printf("ERROR: componentize_json_strings 'strings' array contains non-string item\n");
+            }
+        }
+    }
+    return strings;
+}
+
 picojson::object ECS::jsonize_component(Type type, Component *component)
 {
     picojson::object component_object;
@@ -330,7 +369,7 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     {
         component_object["type"] = picojson::value("POSITION");
         component_object["x"] = picojson::value((double)component->data.p.position.x);
-        component_object["y"] = picojson::value((double)component->data.p.position.x);
+        component_object["y"] = picojson::value((double)component->data.p.position.y);
         break;
     }
     case ECS::Type::CAMERA:
@@ -354,7 +393,8 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
         component_object["has_clip"] = picojson::value(component->data.r.has_clip);
         component_object["layer"] = picojson::value((double)component->data.r.layer);
         component_object["scale"] = picojson::value((double)component->data.r.scale);
-        component_object["texture_index"] = picojson::value((double)component->data.r.texture_index);
+        component_object["texture_key_strings_index"] = picojson::value((double)component->data.r.texture_key_strings_index);
+        component_object["z_index"] = picojson::value((double)component->data.r.z_index);
         picojson::object clip;
         clip["x"] = picojson::value((double)component->data.r.clip.x);
         clip["y"] = picojson::value((double)component->data.r.clip.y);
@@ -364,5 +404,104 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
         break;
     }
     }
+    jsonize_component_strings(&component_object, component);
     return component_object;
+}
+
+ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
+{
+    assert(object != nullptr);
+    ECS::ComponentizeJsonResult result;
+    result.success = false;
+    if (!(*object)["type"].is<std::string>())
+    {
+        printf("JSON serialize error: 'type' field not set\n");
+        return result;
+    }
+    std::string type = (*object)["type"].get<std::string>();
+    if (type == "PLAYER_INPUT")
+    {
+        result.component.type = ECS::PLAYER_INPUT;
+        result.success = true;
+    }
+    else if (type == "POSITION")
+    {
+        result.component.type = ECS::POSITION;
+        if ((*object)["x"].is<double>() && (*object)["y"].is<double>())
+        {
+            result.component.data.p.position = {
+                static_cast<int>((*object)["x"].get<double>()),
+                static_cast<int>((*object)["y"].get<double>())};
+            result.success = true;
+        }
+        else
+        {
+            printf("JSON serialize error: position is missing 'x' or 'y' field on POSITION\n");
+        }
+    }
+    else if (type == "CAMERA")
+    {
+        result.component.type = ECS::CAMERA;
+        result.success = true;
+    }
+    else if (type == "DUMB_AI_COMPONENT")
+    {
+        result.component.type = ECS::DUMB_AI_COMPONENT;
+        result.success = true;
+    }
+    else if (type == "POSITION_ANIMATE")
+    {
+        result.component.type = ECS::POSITION_ANIMATE;
+        assert(false && "POSITION_ANIMATE componentization not implemented!");
+    }
+    else if (type == "RENDER")
+    {
+        result.component.type = ECS::RENDER;
+        picojson::object render_comp_obj = *object;
+        if (render_comp_obj["clip"].is<picojson::object>() && render_comp_obj["layer"].is<double>() &&
+            render_comp_obj["texture_key_strings_index"].is<double>() &&
+            render_comp_obj["scale"].is<double>() && render_comp_obj["z_index"].is<double>() &&
+            render_comp_obj["has_clip"].is<bool>())
+        {
+            picojson::object clip = render_comp_obj["clip"].get<picojson::object>();
+            if (clip["x"].is<double>() &&
+                clip["y"].is<double>() &&
+                clip["w"].is<double>() &&
+                clip["h"].is<double>())
+            {
+                Render::Layer layer = (Render::Layer)render_comp_obj["layer"].get<double>();
+                int texture_key_strings_index = static_cast<int>(render_comp_obj["texture_key_strings_index"].get<double>());
+                int scale = static_cast<int>(render_comp_obj["scale"].get<double>());
+                int z_index = static_cast<int>(render_comp_obj["z_index"].get<double>());
+                int has_clip = static_cast<int>(render_comp_obj["has_clip"].get<bool>());
+                Rect _clip = {
+                    static_cast<int>(clip["x"].get<double>()),
+                    static_cast<int>(clip["y"].get<double>()),
+                    static_cast<int>(clip["w"].get<double>()),
+                    static_cast<int>(clip["h"].get<double>())};
+                result.component.strings = componentize_json_strings(&render_comp_obj);
+                result.component.data.r.clip = _clip;
+                result.component.data.r.has_clip = has_clip;
+                result.component.data.r.layer = layer;
+                result.component.data.r.scale = scale;
+                result.component.data.r.texture_key_strings_index = texture_key_strings_index;
+                result.component.data.r.texture_index = Assets::get_texture_index(result.component.strings[texture_key_strings_index]);
+                result.component.data.r.z_index = z_index;
+                result.success = true;
+            }
+            else
+            {
+                printf("JSON serialize error: RENDER component has malformed 'clip' field\n");
+            }
+        }
+        else
+        {
+            printf("JSON serialize error: RENDER component missing field\n");
+        }
+    }
+    else
+    {
+        printf("JSON serialize error: Unrecognized type %s\n", type.c_str());
+    }
+    return result;
 }

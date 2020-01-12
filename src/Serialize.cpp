@@ -58,8 +58,8 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
         for (auto component_it = entity->components.begin(); component_it != entity->components.end(); ++component_it)
         {
             printf("Looking at component: %d\n", component_it->first);
-            picojson::object compoment_object = ECS::jsonize_component(component_it->first, &component_it->second);
-            components_array.push_back(picojson::value(compoment_object));
+            picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
+            components_array.push_back(picojson::value(component_object));
         }
         entity_object["components"] = picojson::value(components_array);
         entity_array.push_back(picojson::value(entity_object));
@@ -112,10 +112,16 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
     }
 
     picojson::value tiles_value = save_object.get<picojson::object>()["tiles"];
+    picojson::value entities_value = save_object.get<picojson::object>()["entities"];
     picojson::value dimensions_value = save_object.get<picojson::object>()["dimensions"];
     if (!tiles_value.is<picojson::array>())
     {
         printf("Load JSON Err: Tiles field is not array\n");
+        return result;
+    }
+    if (!entities_value.is<picojson::array>())
+    {
+        printf("Load JSON Err: Entities field is not array\n");
         return result;
     }
     if (!dimensions_value.is<picojson::object>())
@@ -123,8 +129,11 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         printf("Load JSON Err: Dimensions field is not object\n");
         return result;
     }
-    picojson::value::array tiles_array = tiles_value.get<picojson::array>();
+    picojson::array tiles_array = tiles_value.get<picojson::array>();
+    picojson::array entities_array = entities_value.get<picojson::array>();
     picojson::object dimensions_object = dimensions_value.get<picojson::object>();
+
+    // ************* DIMENSIONS *****************
     V2 dimensions = {};
     if (dimensions_object.find("x") != dimensions_object.end() && dimensions_object.find("y") != dimensions_object.end())
     {
@@ -147,14 +156,13 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         return result;
     }
 
-    // TODO, USE DIMENSIONS THAT ARE BEING SAVED.
     int cell_size = 32;
     for (int i = 0; i < dimensions.x; ++i)
     {
         std::vector<ECS::Cell> column;
         for (int j = 0; j < dimensions.y; ++j)
         {
-            column.push_back({-1});
+            column.push_back({{}, -1});
             column[j].tile.empty = true;
             column[j].tile.world_position = {i * cell_size, j * cell_size};
             column[j].tile.grid_position = {i, j};
@@ -164,12 +172,15 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
     result.entity_manager.map.dimensions = dimensions;
     result.entity_manager.map.cell_size = cell_size;
     result.entity_manager.map.pixel_dimensions = {dimensions.x * cell_size, dimensions.y * cell_size};
+    // ******************************************
 
+    // ************* TILES *****************
     for (picojson::value::array::const_iterator obj_it = tiles_array.begin(); obj_it != tiles_array.end(); ++obj_it)
     {
         if (obj_it->is<picojson::object>())
         {
             picojson::object tile_object = obj_it->get<picojson::object>();
+            // TODO: HANDLE TILES THAT ONLY HAVE AN ENTITY
             if (tile_object.find("grid_x") != tile_object.end() && tile_object.find("grid_y") != tile_object.end() &&
                 tile_object.find("world_x") != tile_object.end() && tile_object.find("world_y") != tile_object.end() &&
                 tile_object.find("texture_key") != tile_object.end() && tile_object.find("clip") != tile_object.end())
@@ -273,6 +284,65 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
             printf("Load JSON Err: Tiles should be an array of objects\n");
         }
     }
+    // ******************************************
+
+    std::vector<ECS::Entity> entities_array_return(entities_array.size());
+    // ************** ENTITIES ******************
+    for (picojson::value::array::const_iterator obj_it = entities_array.begin(); obj_it != entities_array.end(); ++obj_it)
+    {
+        if (obj_it->is<picojson::object>())
+        {
+            ECS::Entity entity;
+            picojson::object entity_object = obj_it->get<picojson::object>();
+            if (entity_object.find("id") != entity_object.end() && entity_object.find("components") != entity_object.end())
+            {
+                // ***************** VALIDATION *****************
+                if (!entity_object["id"].is<double>())
+                {
+                    printf("JSON Load Err: Entity 'id' value is not double\n");
+                    continue;
+                }
+                if (!entity_object["components"].is<picojson::array>())
+                {
+                    printf("JSON Load Err: Entity 'components' value is not array\n");
+                    continue;
+                }
+                picojson::array component_array = entity_object["components"].get<picojson::array>();
+                for (picojson::value::array::const_iterator component_it = component_array.begin(); component_it != component_array.end(); ++component_it)
+                {
+                    if (component_it->is<picojson::object>())
+                    {
+                        picojson::object component_object = component_it->get<picojson::object>();
+                        ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
+                        if (cjr.success)
+                        {
+                            entity.components[cjr.component.type] = cjr.component;
+                        }
+                        else
+                        {
+                            printf("JSON Load Err: componentize_json failed\n");
+                        }
+                    }
+                    else
+                    {
+                        printf("JSON Load Err: Entity 'components' array contains non-object value\n");
+                    }
+                }
+                int id = static_cast<int>(entity_object["id"].get<double>());
+                entities_array_return[id] = entity;
+            }
+            else
+            {
+                printf("JSON Load Err: Entity is missing required fields\n");
+            }
+        }
+        else
+        {
+            printf("Load JSON Err: Entities should be an array of objects\n");
+        }
+    }
+    result.entity_manager.entities = entities_array_return;
+    // ******************************************
     result.success = true;
     return result;
 }

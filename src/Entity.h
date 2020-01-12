@@ -68,6 +68,9 @@ struct RenderComponent
     Rect clip;
     Render::Layer layer;
     int texture_index;
+    // ** For Serialization **
+    int texture_key_strings_index;
+    // **
     int scale;
     int z_index;
     bool has_clip;
@@ -84,6 +87,10 @@ struct PositionAnimateComponent
 struct Component
 {
     ECS::Type type;
+    // Can't store strings in unions so each
+    // component has a strings array that a component
+    // can stuff string in and keep an index to each one.
+    std::vector<std::string> strings;
     union {
         PositionComponent p;
         RenderComponent r;
@@ -102,6 +109,12 @@ bool render_system(Entity *);
 void camera_system(Entity *);
 
 picojson::object jsonize_component(Type, Component *);
+struct ComponentizeJsonResult
+{
+    Component component;
+    bool success;
+};
+ComponentizeJsonResult componentize_json(picojson::object *);
 void render_map(ECS::Map *, double ts);
 
 struct Manager
