@@ -268,8 +268,8 @@ void update_cameras(double w, double h)
     gui_camera->w = w / gui_render_scale;
     gui_camera->h = h / gui_render_scale;
     MBus::Message message;
-    message.type = MBus::HANDLE_WINDOW_RESIZE_FOR_PLAYER;
-    message.data.hwrfp.old_camera_dimensions = {camera_dimensions_before.x, camera_dimensions_before.y};
-    message.data.hwrfp.new_camera_dimensions = {camera_dimensions_after.x, camera_dimensions_after.y};
+    message.type = MBus::HANDLE_CAMERA_RESIZE_FOR_PLAYER;
+    message.data.hcrfp.old_camera_dimensions = {camera_dimensions_before.x, camera_dimensions_before.y};
+    message.data.hcrfp.new_camera_dimensions = {camera_dimensions_after.x, camera_dimensions_after.y};
     MBus::send_ecs_message(&message);
 }

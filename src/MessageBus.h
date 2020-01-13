@@ -19,7 +19,7 @@ enum Type
     // ECS
     CREATE_PLANT_ENTITY,
     CREATE_TILE,
-    HANDLE_WINDOW_RESIZE_FOR_PLAYER,
+    HANDLE_CAMERA_RESIZE_FOR_PLAYER,
     // GUI
     TOGGLE_BUILD_MENU,
     CLOSE_BUILD_MENU,
@@ -30,7 +30,7 @@ enum Type
     ENTITIES_PROCESSED,
     TILES_RENDERED
 };
-struct HandleWindowResizeForPlayer
+struct HandleCameraResizeForPlayer
 {
     V2 old_camera_dimensions;
     V2 new_camera_dimensions;
@@ -75,7 +75,7 @@ struct Message
         TilesRendered tr;
         EntitiesProcessed ep;
         CreateTile ct;
-        HandleWindowResizeForPlayer hwrfp;
+        HandleCameraResizeForPlayer hcrfp;
     } data;
 };
 enum QueueType

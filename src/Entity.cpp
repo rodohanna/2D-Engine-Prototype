@@ -298,7 +298,7 @@ void ECS::Manager::process_messages()
             this->map.grid[grid_position.x][grid_position.y].tile.clip = {0, 0, 32, 32};
             this->map.grid[grid_position.x][grid_position.y].tile.texture_key = "tilesheet-transparent";
         }
-        else if (message.type == MBus::HANDLE_WINDOW_RESIZE_FOR_PLAYER)
+        else if (message.type == MBus::HANDLE_CAMERA_RESIZE_FOR_PLAYER)
         {
             if (this->player_entity_index != -1)
             {
@@ -306,8 +306,8 @@ void ECS::Manager::process_messages()
                 auto player_position_it = player->components.find(ECS::Type::POSITION);
                 if (player_position_it != player->components.end())
                 {
-                    V2 old_camera_dimensions = message.data.hwrfp.old_camera_dimensions;
-                    V2 new_camera_dimensions = message.data.hwrfp.new_camera_dimensions;
+                    V2 old_camera_dimensions = message.data.hcrfp.old_camera_dimensions;
+                    V2 new_camera_dimensions = message.data.hcrfp.new_camera_dimensions;
                     V2 *current_player_position = &player_position_it->second.data.p.position;
                     *current_player_position = {
                         current_player_position->x + (old_camera_dimensions.x - new_camera_dimensions.x) / 2,
