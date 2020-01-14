@@ -34,14 +34,10 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
                 clip["w"] = picojson::value((double)tile.clip.w);
                 clip["h"] = picojson::value((double)tile.clip.h);
                 tile_object["clip"] = picojson::value(clip);
-            }
-            if (map->grid[i][j].has_entity)
-            {
-                tile_object["entity_id"] = picojson::value((double)map->grid[i][j].entity_id);
-            }
-
-            if (!tile.empty || map->grid[i][j].has_entity)
-            {
+                if (map->grid[i][j].has_entity)
+                {
+                    tile_object["entity_id"] = picojson::value((double)map->grid[i][j].entity_id);
+                }
                 tiles.push_back(picojson::value(tile_object));
             }
         }
@@ -57,7 +53,6 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
 
         for (auto component_it = entity->components.begin(); component_it != entity->components.end(); ++component_it)
         {
-            printf("Looking at component: %d\n", component_it->first);
             picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
             components_array.push_back(picojson::value(component_object));
         }
@@ -180,7 +175,6 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         if (obj_it->is<picojson::object>())
         {
             picojson::object tile_object = obj_it->get<picojson::object>();
-            // TODO: HANDLE TILES THAT ONLY HAVE AN ENTITY
             if (tile_object.find("grid_x") != tile_object.end() && tile_object.find("grid_y") != tile_object.end() &&
                 tile_object.find("world_x") != tile_object.end() && tile_object.find("world_y") != tile_object.end() &&
                 tile_object.find("texture_key") != tile_object.end() && tile_object.find("clip") != tile_object.end())
@@ -266,6 +260,11 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                     result.entity_manager.map.grid[grid_x][grid_y].tile.texture_key = texture_key;
                     result.entity_manager.map.grid[grid_x][grid_y].tile.texture_index = Assets::get_texture_index(texture_key);
                     result.entity_manager.map.grid[grid_x][grid_y].tile.empty = false;
+                    if (tile_object["entity_id"].is<double>())
+                    {
+                        result.entity_manager.map.grid[grid_x][grid_y].has_entity = true;
+                        result.entity_manager.map.grid[grid_x][grid_y].entity_id = static_cast<int>(tile_object["entity_id"].get<double>());
+                    }
                     // printf("Successfully loaded tile at: %d %d with texture key: %s and clip vals: %d %d %d %d\n",
                     //        grid_x, grid_y, texture_key.c_str(), clip_x, clip_y, clip_w, clip_h);
                 }
