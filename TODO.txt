@@ -1,3 +1,5 @@
- - Add a UI bar at the bottom of the screen
- - Clicking on button opens new UI menu
- - From new UI menu you can build / place zone
+BLUEPRINTS
+ - Load in blueprints recursively from /things directory
+ - Put them into lists by type
+ - Allow them to be retrieved in bulk by type or by a blueprint key
+ - Populate the build menu with a single blueprint
