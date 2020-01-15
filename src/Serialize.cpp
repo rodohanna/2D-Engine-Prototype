@@ -15,9 +15,9 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
     picojson::value::array entity_array;
 
     // Serialize Map
-    for (unsigned int i = 0; i < map->dimensions.x; ++i)
+    for (int i = 0; i < map->dimensions.x; ++i)
     {
-        for (unsigned int j = 0; j < map->dimensions.y; ++j)
+        for (int j = 0; j < map->dimensions.y; ++j)
         {
             ECS::Tile tile = map->grid[i][j].tile;
             picojson::object tile_object;

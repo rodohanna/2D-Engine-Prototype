@@ -66,16 +66,16 @@ void Build::Manager::update(ECS::Map *map, double ts)
             return;
         }
         V2 current_mouse_grid_position = map->get_mouse_grid_position();
-        unsigned int start_x = std::min(this->start_floor_grid_position.x, current_mouse_grid_position.x);
-        unsigned int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
-        unsigned int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
-        unsigned int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
+        int start_x = std::min(this->start_floor_grid_position.x, current_mouse_grid_position.x);
+        int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
+        int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
+        int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
         Rect *camera = Window::get_camera();
         if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
         {
-            for (unsigned int i = start_x; i <= end_x; ++i)
+            for (int i = start_x; i <= end_x; ++i)
             {
-                for (unsigned int j = start_y; j <= end_y; ++j)
+                for (int j = start_y; j <= end_y; ++j)
                 {
                     if (map->grid[i][j].tile.empty)
                     {
@@ -109,15 +109,15 @@ void Build::Manager::save_floor_placement(ECS::Map *map)
     // TODO: consolidate similar code in Build::Manager::update
     this->state = Build::WAITING_TO_BUILD_FLOOR;
     V2 current_mouse_grid_position = map->get_mouse_grid_position();
-    unsigned int start_x = std::min(this->start_floor_grid_position.x, current_mouse_grid_position.x);
-    unsigned int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
-    unsigned int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
-    unsigned int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
+    int start_x = std::min(this->start_floor_grid_position.x, current_mouse_grid_position.x);
+    int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
+    int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
+    int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
     if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
     {
-        for (unsigned int i = start_x; i <= end_x; ++i)
+        for (int i = start_x; i <= end_x; ++i)
         {
-            for (unsigned int j = start_y; j <= end_y; ++j)
+            for (int j = start_y; j <= end_y; ++j)
             {
                 if (map->grid[i][j].tile.empty)
                 {
