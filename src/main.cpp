@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
     {
         // TODO: We need to save/load the player
         r.entity_manager = load_game_result.entity_manager;
+        printf("Loaded game successfully.\n");
     }
     else
     {

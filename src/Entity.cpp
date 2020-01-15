@@ -174,13 +174,14 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 void ECS::process_map(ECS::Map *m, double ts)
 {
     int tiles_rendered = 0;
-    for (auto &row : m->grid)
+    for (int i = 0; i < m->dimensions.x; ++i)
     {
-        for (auto &cell : row)
+        for (int j = 0; j < m->dimensions.y; ++j)
         {
-            if (!cell.tile.empty)
+            ECS::Cell *cell = &m->grid[i][j];
+            if (!cell->tile.empty)
             {
-                if (ECS::render_system(&cell.tile.tile_entity))
+                if (ECS::render_system(&cell->tile.tile_entity))
                 {
                     ++tiles_rendered;
                 }
@@ -282,9 +283,9 @@ void ECS::Manager::process_messages()
         {
             V2 grid_position = message.data.ct.grid_position;
             assert(grid_position.x >= 0 &&
-                   grid_position.x < static_cast<int>(this->map.grid.size()) &&
+                   grid_position.x < static_cast<int>(this->map.dimensions.x) &&
                    grid_position.y >= 0 &&
-                   grid_position.y < static_cast<int>(this->map.grid[0].size()));
+                   grid_position.y < static_cast<int>(this->map.dimensions.y));
             Entity tile_entity;
             tile_entity.component_flags |= ECS::RENDER;
             tile_entity.component_flags |= ECS::POSITION;

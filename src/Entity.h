@@ -92,7 +92,7 @@ struct Map
     V2 pixel_dimensions;
     V2 mouse_grid_position;
     V2 mouse_world_position;
-    std::vector<std::vector<ECS::Cell>> grid;
+    ECS::Cell **grid;
     int cell_size;
     bool mouse_data_cached;
     bool hovered_cell_cached;

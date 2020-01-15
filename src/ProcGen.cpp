@@ -7,14 +7,18 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     ECS::Manager entity_manager = ECS::Manager();
     ECS::Map map;
     // Initialize map.
+    map.grid = new ECS::Cell *[dimensions->x];
     for (int i = 0; i < dimensions->x; ++i)
     {
-        std::vector<ECS::Cell> column;
+        map.grid[i] = new ECS::Cell[dimensions->y];
+    }
+    for (int i = 0; i < dimensions->x; ++i)
+    {
         for (int j = 0; j < dimensions->y; ++j)
         {
-            column.push_back({{}, -1});
+            map.grid[i][j].has_entity = false;
+            map.grid[i][j].tile.empty = true;
         }
-        map.grid.push_back(column);
     }
     ECS::Entity player;
     ECS::Component position;

@@ -32,7 +32,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
                 Color green = {0x00, 0xFF, 0x00, 0x5F};
                 Color red = {0xBB, 0x0A, 0x1E, 0x5F};
                 Rect rect = {(i * map->cell_size) - camera->x, (j * map->cell_size) - camera->y, map->cell_size, map->cell_size};
-                if (map->grid[i][j].entity_id != -1)
+                if (!map->grid[i][j].has_entity)
                 {
                     Render::render_rectangle(Render::Layer::WORLD_LAYER, rect, red, true, 2);
                 }
@@ -71,7 +71,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
         unsigned int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
         unsigned int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
         Rect *camera = Window::get_camera();
-        if (start_x >= 0 && end_x < map->grid.size() && start_y >= 0 && end_y < map->grid.size())
+        if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
         {
             for (unsigned int i = start_x; i <= end_x; ++i)
             {
@@ -113,7 +113,7 @@ void Build::Manager::save_floor_placement(ECS::Map *map)
     unsigned int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
     unsigned int start_y = std::min(this->start_floor_grid_position.y, current_mouse_grid_position.y);
     unsigned int end_y = std::max(this->start_floor_grid_position.y, current_mouse_grid_position.y);
-    if (start_x >= 0 && end_x < map->grid.size() && start_y >= 0 && end_y < map->grid.size())
+    if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
     {
         for (unsigned int i = start_x; i <= end_x; ++i)
         {

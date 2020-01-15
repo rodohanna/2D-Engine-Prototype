@@ -23,7 +23,7 @@ void Zone::Manager::update(ECS::Map *map, double ts)
         unsigned int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);
         unsigned int end_y = std::max(this->start_zone_grid_position.y, current_mouse_grid_position.y);
         Rect *camera = Window::get_camera();
-        if (start_x >= 0 && end_x < map->grid.size() && start_y >= 0 && end_y < map->grid.size())
+        if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
         {
             for (unsigned int i = start_x; i <= end_x; ++i)
             {
@@ -73,7 +73,7 @@ void Zone::Manager::save_zone_placement(ECS::Map *map)
     unsigned int end_x = std::max(this->start_zone_grid_position.x, current_mouse_grid_position.x);
     unsigned int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);
     unsigned int end_y = std::max(this->start_zone_grid_position.y, current_mouse_grid_position.y);
-    if (start_x >= 0 && end_x < map->grid.size() && start_y >= 0 && end_y < map->grid.size())
+    if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
     {
         for (unsigned int i = start_x; i <= end_x; ++i)
         {

@@ -15,9 +15,9 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
     picojson::value::array entity_array;
 
     // Serialize Map
-    for (unsigned int i = 0; i < map->grid.size(); ++i)
+    for (unsigned int i = 0; i < map->dimensions.x; ++i)
     {
-        for (unsigned int j = 0; j < map->grid[i].size(); ++j)
+        for (unsigned int j = 0; j < map->dimensions.y; ++j)
         {
             ECS::Tile tile = map->grid[i][j].tile;
             picojson::object tile_object;
@@ -154,15 +154,18 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
     }
 
     int cell_size = 32;
+    result.entity_manager.map.grid = new ECS::Cell *[dimensions.x];
     for (int i = 0; i < dimensions.x; ++i)
     {
-        std::vector<ECS::Cell> column;
+        result.entity_manager.map.grid[i] = new ECS::Cell[dimensions.y];
+    }
+    for (int i = 0; i < dimensions.x; ++i)
+    {
         for (int j = 0; j < dimensions.y; ++j)
         {
-            column.push_back({{}, -1});
-            column[j].tile.empty = true;
+            result.entity_manager.map.grid[i][j].has_entity = false;
+            result.entity_manager.map.grid[i][j].tile.empty = true;
         }
-        result.entity_manager.map.grid.push_back(column);
     }
     result.entity_manager.map.dimensions = dimensions;
     result.entity_manager.map.cell_size = cell_size;
