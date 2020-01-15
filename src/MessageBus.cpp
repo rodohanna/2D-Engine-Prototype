@@ -1,14 +1,14 @@
 #include "MessageBus.h"
 #include <stdio.h>
 
-MBus::Message order_message_queue[MBus::ORDER_MESSAGE_QUEUE_SIZE];
-MBus::Message ecs_message_queue[MBus::ECS_MESSAGE_QUEUE_SIZE];
-MBus::Message gui_message_queue[MBus::GUI_MESSAGE_QUEUE_SIZE];
-MBus::Message debug_message_queue[MBus::DEBUG_MESSAGE_QUEUE_SIZE];
-int order_message_queue_length = 0;
-int ecs_message_queue_length = 0;
-int gui_message_queue_length = 0;
-int debug_message_queue_length = 0;
+static MBus::Message order_message_queue[MBus::ORDER_MESSAGE_QUEUE_SIZE];
+static MBus::Message ecs_message_queue[MBus::ECS_MESSAGE_QUEUE_SIZE];
+static MBus::Message gui_message_queue[MBus::GUI_MESSAGE_QUEUE_SIZE];
+static MBus::Message debug_message_queue[MBus::DEBUG_MESSAGE_QUEUE_SIZE];
+static int order_message_queue_length = 0;
+static int ecs_message_queue_length = 0;
+static int gui_message_queue_length = 0;
+static int debug_message_queue_length = 0;
 
 void MBus::send_order_message(MBus::Message *m)
 {

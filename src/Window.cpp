@@ -1,24 +1,24 @@
 #include "Window.h"
 
-V2 _window;
-Rect camera;
-Rect gui_camera;
-V2 mouse_position;
-V2 gui_mouse_position;
-float world_render_scale = 1.0;
-float gui_render_scale = 1.0;
+static V2 window;
+static Rect camera;
+static Rect gui_camera;
+static V2 mouse_position;
+static V2 gui_mouse_position;
+static float world_render_scale = 1.0;
+static float gui_render_scale = 1.0;
 
 void Window::set_window(V2 dimensions)
 {
-    _window = dimensions;
+    window = dimensions;
 };
 void Window::set_window(V2 *dimensions)
 {
-    _window = *dimensions;
+    window = *dimensions;
 };
 V2 *Window::get_window()
 {
-    return &_window;
+    return &window;
 }
 Rect *Window::get_camera()
 {

@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <algorithm>
 
-Render::Event render_queue[RENDER_QUEUE_SIZE];
-Render::Event world_layer_buffer[RENDER_QUEUE_SIZE];
-Render::Event gui_layer_buffer[RENDER_QUEUE_SIZE];
-int render_queue_length = 0;
-BlankTexture *blank_texture = nullptr;
+static Render::Event render_queue[RENDER_QUEUE_SIZE];
+static Render::Event world_layer_buffer[RENDER_QUEUE_SIZE];
+static Render::Event gui_layer_buffer[RENDER_QUEUE_SIZE];
+static int render_queue_length = 0;
+static BlankTexture *blank_texture = nullptr;
 
 void Render::render_texture(Render::Layer layer, int texture_index, V2 &position, Rect *overflow_clip, int scale, int z_index)
 {

@@ -1,9 +1,9 @@
 #include "SDLWrapper.h"
 #include <stdio.h>
 
-SDL_Window *window;
-SDL_Renderer *renderer;
-bool vsync;
+static SDL_Window *window;
+static SDL_Renderer *renderer;
+static bool vsync;
 
 bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool _vsync)
 {

@@ -4,10 +4,10 @@
 #include "MessageBus.h"
 #include <stdio.h>
 
-const int EVENTS_SIZE = 100;
-int event_queue_length = 0;
-Input::Event event_queue[EVENTS_SIZE];
-bool running;
+static const int EVENTS_SIZE = 100;
+static int event_queue_length = 0;
+static Input::Event event_queue[EVENTS_SIZE];
+static bool running;
 
 void update_cameras(double w, double h);
 void update_mouse_positions();

@@ -6,10 +6,10 @@
 #include <assert.h>
 #include "json/picojson.h"
 
-std::unordered_map<std::string, int> texture_index_map;
-std::unordered_map<std::string, int> font_index_map;
-std::vector<std::unique_ptr<Texture>> texture_table;
-std::vector<Font *> font_table;
+static std::unordered_map<std::string, int> texture_index_map;
+static std::unordered_map<std::string, int> font_index_map;
+static std::vector<std::unique_ptr<Texture>> texture_table;
+static std::vector<Font *> font_table;
 std::unique_ptr<Texture> create_texture_from_file(std::string path, SDL_Renderer *renderer, int index);
 
 void Assets::load_assets_from_manifest(SDL_Renderer *renderer, std::string path)
