@@ -85,7 +85,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
                             map->cell_size,
                             map->cell_size};
                         Color color = {0xFF, 0xFF, 0xFF, 0x6F};
-                        Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 2);
+                        Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 1);
                     }
                 }
             }
