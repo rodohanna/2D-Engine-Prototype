@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+static int RENDER_FLAGS = ECS::RENDER | ECS::POSITION;
+
 ECS::Map::Map() : mouse_data_cached(false), hovered_cell_cached(false){};
 
 void ECS::Map::update(double ts)
@@ -66,10 +68,10 @@ V2 ECS::Map::get_mouse_world_position()
 
 bool ECS::render_system(Entity *e)
 {
-    auto render_it = e->components.find(ECS::Type::RENDER);
-    auto position_it = e->components.find(ECS::Type::POSITION);
-    if (render_it != e->components.end() && position_it != e->components.end())
+    if (e->component_flags & RENDER_FLAGS)
     {
+        auto render_it = e->components.find(ECS::Type::RENDER);
+        auto position_it = e->components.find(ECS::Type::POSITION);
         auto render_component = render_it->second.data.r;
         auto position_component = position_it->second.data.p;
         if (!render_component.has_clip)
@@ -172,14 +174,13 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 void ECS::process_map(ECS::Map *m, double ts)
 {
     int tiles_rendered = 0;
-    for (unsigned int i = 0; i < m->grid.size(); ++i)
+    for (auto &row : m->grid)
     {
-        for (unsigned int j = 0; j < m->grid[i].size(); ++j)
+        for (auto &cell : row)
         {
-            Tile t = m->grid[i][j].tile;
-            if (!t.empty)
+            if (!cell.tile.empty)
             {
-                if (ECS::render_system(&t.tile_entity))
+                if (ECS::render_system(&cell.tile.tile_entity))
                 {
                     ++tiles_rendered;
                 }
@@ -255,6 +256,8 @@ void ECS::Manager::process_messages()
         if (message.type == MBus::CREATE_PLANT_ENTITY)
         {
             Entity e;
+            e.component_flags |= ECS::RENDER;
+            e.component_flags |= ECS::POSITION;
             Component render_component;
             render_component.type = RENDER;
             render_component.strings.push_back("tilesheet-transparent");
@@ -283,6 +286,8 @@ void ECS::Manager::process_messages()
                    grid_position.y >= 0 &&
                    grid_position.y < static_cast<int>(this->map.grid[0].size()));
             Entity tile_entity;
+            tile_entity.component_flags |= ECS::RENDER;
+            tile_entity.component_flags |= ECS::POSITION;
             Component render_component;
             render_component.type = ECS::RENDER;
             render_component.strings.push_back("tilesheet-transparent");
@@ -366,6 +371,10 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     picojson::object component_object;
     switch (type)
     {
+    case ECS::Type::NOOP:
+    {
+        break;
+    }
     case ECS::Type::PLAYER_INPUT:
     {
         component_object["type"] = picojson::value("PLAYER_INPUT");

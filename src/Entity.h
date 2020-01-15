@@ -12,6 +12,7 @@ namespace ECS
 
 enum Type
 {
+    NOOP, // I use these enums as bit flags, so I don't want one of them to be '0'
     POSITION,
     RENDER,
     CAMERA,
@@ -62,8 +63,8 @@ struct Component
 
 struct Entity
 {
+    int component_flags;
     std::unordered_map<ECS::Type, Component> components;
-    int energy;
 };
 
 struct Tile

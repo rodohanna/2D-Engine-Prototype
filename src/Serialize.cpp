@@ -34,6 +34,7 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
                 }
                 tile_object["grid_x"] = picojson::value((double)i);
                 tile_object["grid_y"] = picojson::value((double)j);
+                tile_object["component_flags"] = picojson::value((double)tile.tile_entity.component_flags);
                 tile_object["tile_components"] = picojson::value(tile_entity_components_array);
                 if (map->grid[i][j].has_entity)
                 {
@@ -51,7 +52,7 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
         picojson::object entity_object;
         picojson::array components_array;
         entity_object["id"] = picojson::value((double)i);
-
+        entity_object["component_flags"] = picojson::value((double)entity->component_flags);
         for (auto component_it = entity->components.begin(); component_it != entity->components.end(); ++component_it)
         {
             picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
@@ -175,7 +176,7 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         {
             picojson::object tile_object = obj_it->get<picojson::object>();
             if (tile_object.find("grid_x") != tile_object.end() && tile_object.find("grid_y") != tile_object.end() &&
-                tile_object.find("tile_components") != tile_object.end())
+                tile_object.find("tile_components") != tile_object.end() && tile_object.find("component_flags") != tile_object.end())
             {
                 // ***************** VALIDATION *****************
                 if (!tile_object["grid_x"].is<double>())
@@ -193,15 +194,22 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                     printf("JSON Load Err: Tile 'world_x' value is not double\n");
                     continue;
                 }
+                if (!tile_object["component_flags"].is<double>())
+                {
+                    printf("JSON Load Err: Tile 'component_flags' value is not double\n");
+                    continue;
+                }
                 // ************* EVERYTHING IS VALIDATED *************
                 int grid_x = static_cast<int>(tile_object["grid_x"].get<double>());
                 int grid_y = static_cast<int>(tile_object["grid_y"].get<double>());
+                int component_flags = static_cast<int>(tile_object["component_flags"].get<double>());
                 picojson::array tile_components_array = tile_object["tile_components"].get<picojson::array>();
 
                 if (grid_x >= 0 && grid_x < result.entity_manager.map.dimensions.x &&
                     grid_y >= 0 && grid_y < result.entity_manager.map.dimensions.y)
                 {
                     ECS::Entity tile_entity;
+                    tile_entity.component_flags = component_flags;
                     for (picojson::value::array::const_iterator component_obj_it = tile_components_array.begin();
                          component_obj_it != tile_components_array.end();
                          ++component_obj_it)
@@ -259,7 +267,8 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         {
             ECS::Entity entity;
             picojson::object entity_object = obj_it->get<picojson::object>();
-            if (entity_object.find("id") != entity_object.end() && entity_object.find("components") != entity_object.end())
+            if (entity_object.find("id") != entity_object.end() && entity_object.find("components") != entity_object.end() &&
+                entity_object.find("component_flags") != entity_object.end())
             {
                 // ***************** VALIDATION *****************
                 if (!entity_object["id"].is<double>())
@@ -270,6 +279,11 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                 if (!entity_object["components"].is<picojson::array>())
                 {
                     printf("JSON Load Err: Entity 'components' value is not array\n");
+                    continue;
+                }
+                if (!entity_object["component_flags"].is<double>())
+                {
+                    printf("JSON Load Err: Entity 'component_flags' value is not double\n");
                     continue;
                 }
                 picojson::array component_array = entity_object["components"].get<picojson::array>();
@@ -294,6 +308,8 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                     }
                 }
                 int id = static_cast<int>(entity_object["id"].get<double>());
+                int component_flags = static_cast<int>(entity_object["component_flags"].get<double>());
+                entity.component_flags = component_flags;
                 entities_array_return[id] = entity;
             }
             else
