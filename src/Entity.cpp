@@ -169,10 +169,9 @@ void ECS::input_system(ECS::Map *map, Entity *e, double ts)
     }
 }
 
-void ECS::render_map(ECS::Map *m, double ts)
+void ECS::process_map(ECS::Map *m, double ts)
 {
     int tiles_rendered = 0;
-    Rect *camera = Window::get_camera();
     for (unsigned int i = 0; i < m->grid.size(); ++i)
     {
         for (unsigned int j = 0; j < m->grid[i].size(); ++j)
@@ -180,18 +179,8 @@ void ECS::render_map(ECS::Map *m, double ts)
             Tile t = m->grid[i][j].tile;
             if (!t.empty)
             {
-                V2 render_position = {t.world_position.x - camera->x, t.world_position.y - camera->y};
-                Rect r = {t.world_position.x, t.world_position.y, 32, 32};
-                if (Physics::check_collision(camera, &r))
+                if (ECS::render_system(&t.tile_entity))
                 {
-                    Render::render_texture(
-                        Render::Layer::WORLD_LAYER,
-                        t.texture_index,
-                        t.clip,
-                        render_position,
-                        nullptr,
-                        1,
-                        0);
                     ++tiles_rendered;
                 }
             }
@@ -293,10 +282,27 @@ void ECS::Manager::process_messages()
                    grid_position.x < static_cast<int>(this->map.grid.size()) &&
                    grid_position.y >= 0 &&
                    grid_position.y < static_cast<int>(this->map.grid[0].size()));
+            Entity tile_entity;
+            Component render_component;
+            render_component.type = ECS::RENDER;
+            render_component.strings.push_back("tilesheet-transparent");
+            render_component.data.r = {
+                {0, 0, 32, 32},
+                Render::WORLD_LAYER,
+                Assets::get_texture_index("tilesheet-transparent"),
+                static_cast<int>(render_component.strings.size() - 1),
+                1,
+                0,
+                true};
+            Component position_component;
+            position_component.type = ECS::POSITION;
+            position_component.data.p.position = {
+                grid_position.x * this->map.cell_size,
+                grid_position.y * this->map.cell_size};
+            tile_entity.components[render_component.type] = render_component;
+            tile_entity.components[position_component.type] = position_component;
             this->map.grid[grid_position.x][grid_position.y].tile.empty = false;
-            this->map.grid[grid_position.x][grid_position.y].tile.texture_index = Assets::get_texture_index("tilesheet-transparent");
-            this->map.grid[grid_position.x][grid_position.y].tile.clip = {0, 0, 32, 32};
-            this->map.grid[grid_position.x][grid_position.y].tile.texture_key = "tilesheet-transparent";
+            this->map.grid[grid_position.x][grid_position.y].tile.tile_entity = tile_entity;
         }
         else if (message.type == MBus::HANDLE_CAMERA_RESIZE_FOR_PLAYER)
         {

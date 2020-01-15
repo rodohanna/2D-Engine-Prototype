@@ -35,10 +35,26 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
         {
             ECS::Tile t;
             t.empty = true;
-            t.world_position = {i * map.cell_size, j * map.cell_size};
-            t.grid_position = {i, j};
-            t.texture_key = "tilesheet-colored";
-            t.texture_index = texture_index;
+            ECS::Entity tile_entity;
+            ECS::Component render_component;
+            render_component.type = ECS::RENDER;
+            render_component.strings.push_back("tilesheet-transparent");
+            render_component.data.r = {
+                {0, 0, 32, 32},
+                Render::WORLD_LAYER,
+                texture_index,
+                static_cast<int>(render_component.strings.size() - 1),
+                1,
+                1,
+                true};
+            ECS::Component position_component;
+            position_component.type = ECS::POSITION;
+            position_component.data.p = {
+                i * map.cell_size,
+                j * map.cell_size};
+            tile_entity.components[render_component.type] = render_component;
+            tile_entity.components[position_component.type] = position_component;
+            t.tile_entity = tile_entity;
             map.grid[i][j].tile = t;
             map.grid[i][j].has_entity = false;
         }

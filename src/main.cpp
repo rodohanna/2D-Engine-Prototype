@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         MBus::clear_order_messages();
         order_manager.update(&r.entity_manager.map, context.time_step);
 
-        ECS::render_map(&r.entity_manager.map, context.time_step);
+        ECS::process_map(&r.entity_manager.map, context.time_step);
 
         debugger.process_messages();
         MBus::clear_debug_messages();

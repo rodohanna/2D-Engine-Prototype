@@ -24,16 +24,17 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
             if (!tile.empty)
             {
                 picojson::object clip;
-                tile_object["grid_x"] = picojson::value((double)tile.grid_position.x);
-                tile_object["grid_y"] = picojson::value((double)tile.grid_position.y);
-                tile_object["world_x"] = picojson::value((double)tile.world_position.x);
-                tile_object["world_y"] = picojson::value((double)tile.world_position.y);
-                tile_object["texture_key"] = picojson::value(tile.texture_key);
-                clip["x"] = picojson::value((double)tile.clip.x);
-                clip["y"] = picojson::value((double)tile.clip.y);
-                clip["w"] = picojson::value((double)tile.clip.w);
-                clip["h"] = picojson::value((double)tile.clip.h);
-                tile_object["clip"] = picojson::value(clip);
+                picojson::array tile_entity_components_array;
+                for (auto component_it = tile.tile_entity.components.begin();
+                     component_it != tile.tile_entity.components.end();
+                     ++component_it)
+                {
+                    picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
+                    tile_entity_components_array.push_back(picojson::value(component_object));
+                }
+                tile_object["grid_x"] = picojson::value((double)i);
+                tile_object["grid_y"] = picojson::value((double)j);
+                tile_object["tile_components"] = picojson::value(tile_entity_components_array);
                 if (map->grid[i][j].has_entity)
                 {
                     tile_object["entity_id"] = picojson::value((double)map->grid[i][j].entity_id);
@@ -159,8 +160,6 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         {
             column.push_back({{}, -1});
             column[j].tile.empty = true;
-            column[j].tile.world_position = {i * cell_size, j * cell_size};
-            column[j].tile.grid_position = {i, j};
         }
         result.entity_manager.map.grid.push_back(column);
     }
@@ -176,8 +175,7 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
         {
             picojson::object tile_object = obj_it->get<picojson::object>();
             if (tile_object.find("grid_x") != tile_object.end() && tile_object.find("grid_y") != tile_object.end() &&
-                tile_object.find("world_x") != tile_object.end() && tile_object.find("world_y") != tile_object.end() &&
-                tile_object.find("texture_key") != tile_object.end() && tile_object.find("clip") != tile_object.end())
+                tile_object.find("tile_components") != tile_object.end())
             {
                 // ***************** VALIDATION *****************
                 if (!tile_object["grid_x"].is<double>())
@@ -190,75 +188,43 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                     printf("JSON Load Err: Tile 'grid_y' value is not double\n");
                     continue;
                 }
-                if (!tile_object["world_x"].is<double>())
+                if (!tile_object["tile_components"].is<picojson::array>())
                 {
                     printf("JSON Load Err: Tile 'world_x' value is not double\n");
-                    continue;
-                }
-                if (!tile_object["world_y"].is<double>())
-                {
-                    printf("JSON Load Err: Tile 'world_y' value is not double\n");
-                    continue;
-                }
-                if (!tile_object["texture_key"].is<std::string>())
-                {
-                    printf("JSON Load Err: Tile 'texture_key' value is not string\n");
-                    continue;
-                }
-                if (!tile_object["clip"].is<picojson::object>())
-                {
-                    printf("JSON Load Err: Tile 'clip' value is not a picojson::object\n");
-                    continue;
-                }
-                picojson::object clip = tile_object["clip"].get<picojson::object>();
-                if (clip.find("x") != clip.end() && clip.find("y") != clip.end() &&
-                    clip.find("w") != clip.end() && clip.find("h") != clip.end())
-                {
-                    if (!clip["x"].is<double>())
-                    {
-                        printf("JSON Load Err: Tile 'clip.x' value is not a double\n");
-                        continue;
-                    }
-                    if (!clip["y"].is<double>())
-                    {
-                        printf("JSON Load Err: Tile 'clip.y' value is not a double\n");
-                        continue;
-                    }
-                    if (!clip["w"].is<double>())
-                    {
-                        printf("JSON Load Err: Tile 'clip.w' value is not a double\n");
-                        continue;
-                    }
-                    if (!clip["h"].is<double>())
-                    {
-                        printf("JSON Load Err: Tile 'clip.h' value is not a double\n");
-                        continue;
-                    }
-                }
-                else
-                {
-                    printf("JSON Load Err: Tile 'clip' is missing field\n");
                     continue;
                 }
                 // ************* EVERYTHING IS VALIDATED *************
                 int grid_x = static_cast<int>(tile_object["grid_x"].get<double>());
                 int grid_y = static_cast<int>(tile_object["grid_y"].get<double>());
-                int world_x = static_cast<int>(tile_object["world_x"].get<double>());
-                int world_y = static_cast<int>(tile_object["world_y"].get<double>());
-                std::string texture_key = tile_object["texture_key"].get<std::string>();
-                int clip_x = static_cast<int>(clip["x"].get<double>());
-                int clip_y = static_cast<int>(clip["y"].get<double>());
-                int clip_w = static_cast<int>(clip["w"].get<double>());
-                int clip_h = static_cast<int>(clip["h"].get<double>());
+                picojson::array tile_components_array = tile_object["tile_components"].get<picojson::array>();
 
                 if (grid_x >= 0 && grid_x < result.entity_manager.map.dimensions.x &&
                     grid_y >= 0 && grid_y < result.entity_manager.map.dimensions.y)
                 {
-                    result.entity_manager.map.grid[grid_x][grid_y].tile.grid_position = {grid_x, grid_y};
-                    result.entity_manager.map.grid[grid_x][grid_y].tile.world_position = {world_x, world_y};
-                    result.entity_manager.map.grid[grid_x][grid_y].tile.clip = {clip_x, clip_y, clip_w, clip_h};
-                    result.entity_manager.map.grid[grid_x][grid_y].tile.texture_key = texture_key;
-                    result.entity_manager.map.grid[grid_x][grid_y].tile.texture_index = Assets::get_texture_index(texture_key);
+                    ECS::Entity tile_entity;
+                    for (picojson::value::array::const_iterator component_obj_it = tile_components_array.begin();
+                         component_obj_it != tile_components_array.end();
+                         ++component_obj_it)
+                    {
+                        if (component_obj_it->is<picojson::object>())
+                        {
+                            picojson::object component_object = component_obj_it->get<picojson::object>();
+                            ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
+                            if (cjr.success)
+                            {
+                                tile_entity.components[cjr.component.type] = cjr.component;
+                            }
+                            else
+                            {
+                                printf("JSON Load Err: componentize_json failed\n");
+                            }
+                        }
+                        else
+                        {
+                            printf("JSON Load Err: Entity 'components' array contains non-object value\n");
+                        }
+                    }
+                    result.entity_manager.map.grid[grid_x][grid_y].tile.tile_entity = tile_entity;
                     result.entity_manager.map.grid[grid_x][grid_y].tile.empty = false;
                     if (tile_object["entity_id"].is<double>())
                     {

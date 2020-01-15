@@ -10,44 +10,6 @@
 namespace ECS
 {
 
-struct Tile
-{
-    Rect clip;
-    V2 world_position;
-    V2 grid_position;
-    int texture_index;
-    std::string texture_key;
-    bool empty;
-};
-
-struct Cell
-{
-    Tile tile;
-    int entity_id;
-    bool has_entity;
-};
-
-struct Map
-{
-    Map();
-    void update(double);
-    V2 get_mouse_grid_position();
-    V2 get_mouse_world_position();
-    Rect get_hovered_grid_cell();
-    Rect hovered_grid_cell;
-    V2 dimensions;
-    V2 pixel_dimensions;
-    V2 mouse_grid_position;
-    V2 mouse_world_position;
-    std::vector<std::vector<ECS::Cell>> grid;
-    int cell_size;
-    bool mouse_data_cached;
-    bool hovered_cell_cached;
-
-private:
-    void recalculate_mouse_positions();
-};
-
 enum Type
 {
     POSITION,
@@ -104,6 +66,40 @@ struct Entity
     int energy;
 };
 
+struct Tile
+{
+    ECS::Entity tile_entity;
+    bool empty;
+};
+
+struct Cell
+{
+    Tile tile;
+    int entity_id;
+    bool has_entity;
+};
+
+struct Map
+{
+    Map();
+    void update(double);
+    V2 get_mouse_grid_position();
+    V2 get_mouse_world_position();
+    Rect get_hovered_grid_cell();
+    Rect hovered_grid_cell;
+    V2 dimensions;
+    V2 pixel_dimensions;
+    V2 mouse_grid_position;
+    V2 mouse_world_position;
+    std::vector<std::vector<ECS::Cell>> grid;
+    int cell_size;
+    bool mouse_data_cached;
+    bool hovered_cell_cached;
+
+private:
+    void recalculate_mouse_positions();
+};
+
 void input_system(ECS::Map *, Entity *, double ts);
 bool render_system(Entity *);
 void camera_system(Entity *);
@@ -115,7 +111,7 @@ struct ComponentizeJsonResult
     bool success;
 };
 ComponentizeJsonResult componentize_json(picojson::object *);
-void render_map(ECS::Map *, double ts);
+void process_map(ECS::Map *, double ts);
 
 struct Manager
 {
