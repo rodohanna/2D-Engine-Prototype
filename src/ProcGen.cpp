@@ -24,9 +24,13 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     ECS::Component position;
     position.type = ECS::Type::POSITION;
     position.data.p.position = {0, 0};
-    player.components[position.type] = position;
-    player.components[ECS::Type::CAMERA] = {};
-    player.components[ECS::Type::PLAYER_INPUT] = {};
+    ECS::Component camera;
+    camera.type = ECS::CAMERA;
+    ECS::Component player_input;
+    player_input.type = ECS::PLAYER_INPUT;
+    player.add_component(&position);
+    player.add_component(&camera);
+    player.add_component(&player_input);
     entity_manager.entities.push_back(player);
 
     map.dimensions = *dimensions;
@@ -56,8 +60,8 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             position_component.data.p = {
                 i * map.cell_size,
                 j * map.cell_size};
-            tile_entity.components[render_component.type] = render_component;
-            tile_entity.components[position_component.type] = position_component;
+            tile_entity.add_component(&render_component);
+            tile_entity.add_component(&position_component);
             t.tile_entity = tile_entity;
             map.grid[i][j].tile = t;
             map.grid[i][j].has_entity = false;

@@ -7,7 +7,40 @@
 #include <assert.h>
 #include <stdio.h>
 
-static int RENDER_FLAGS = ECS::RENDER | ECS::POSITION;
+static int RENDER_FLAGS = (1 << ECS::RENDER) | (1 << ECS::POSITION);
+
+ECS::Entity::Entity()
+{
+    this->components = new ECS::Component[ECS::NUM_COMPONENT_TYPES];
+    this->component_length = 0;
+    this->component_flags = 0;
+}
+void ECS::Entity::add_component(ECS::Component *c)
+{
+    if (this->component_length >= ECS::NUM_COMPONENT_TYPES - 1)
+    {
+        printf("WARNING: Entity component list is full and should not be full\n");
+        return;
+    }
+    this->components[this->component_length++] = *c;
+    this->component_flags |= (1 << c->type);
+}
+ECS::Entity::~Entity()
+{
+    // Can't free in destructor because entities get copied around a lot.
+    // delete[] this->components;
+}
+ECS::Component *ECS::Entity::get_component(ECS::Type type)
+{
+    for (int i = 0; i < this->component_length; ++i)
+    {
+        if (this->components[i].type == type)
+        {
+            return &this->components[i];
+        }
+    }
+    return nullptr;
+}
 
 ECS::Map::Map() : mouse_data_cached(false), hovered_cell_cached(false){};
 
@@ -68,12 +101,13 @@ V2 ECS::Map::get_mouse_world_position()
 
 bool ECS::render_system(Entity *e)
 {
-    if (e->component_flags & RENDER_FLAGS)
+    if ((e->component_flags & RENDER_FLAGS) == RENDER_FLAGS)
     {
-        auto render_it = e->components.find(ECS::Type::RENDER);
-        auto position_it = e->components.find(ECS::Type::POSITION);
-        auto render_component = render_it->second.data.r;
-        auto position_component = position_it->second.data.p;
+        ECS::Component *render_ptr = e->get_component(ECS::Type::RENDER);
+        ECS::Component *position_ptr = e->get_component(ECS::Type::POSITION);
+        assert(render_ptr != nullptr && position_ptr != nullptr);
+        auto render_component = render_ptr->data.r;
+        auto position_component = position_ptr->data.p;
         if (!render_component.has_clip)
         {
             render_component.clip = {};
@@ -99,11 +133,11 @@ bool ECS::render_system(Entity *e)
 
 void ECS::camera_system(Entity *e)
 {
-    auto camera_it = e->components.find(ECS::Type::CAMERA);
-    auto position_it = e->components.find(ECS::Type::POSITION);
-    if (camera_it != e->components.end() && position_it != e->components.end())
+    auto camera_ptr = e->get_component(ECS::Type::CAMERA);
+    auto position_ptr = e->get_component(ECS::Type::POSITION);
+    if (camera_ptr != nullptr && position_ptr != nullptr)
     {
-        auto position = position_it->second.data.p.position;
+        auto position = position_ptr->data.p.position;
         Window::set_camera_position(position);
     }
 }
@@ -111,15 +145,15 @@ void ECS::camera_system(Entity *e)
 void ECS::input_system(ECS::Map *map, Entity *e, double ts)
 {
     double speed = 500;
-    auto player_input_it = e->components.find(ECS::Type::PLAYER_INPUT);
-    auto position_it = e->components.find(ECS::Type::POSITION);
-    if (player_input_it != e->components.end() && position_it != e->components.end())
+    auto player_input_ptr = e->get_component(ECS::Type::PLAYER_INPUT);
+    auto position_ptr = e->get_component(ECS::Type::POSITION);
+    if (player_input_ptr != nullptr && position_ptr != nullptr)
     {
         auto w_pressed = Input::is_input_active(Input::Event::W_KEY_DOWN);
         auto a_pressed = Input::is_input_active(Input::Event::A_KEY_DOWN);
         auto s_pressed = Input::is_input_active(Input::Event::S_KEY_DOWN);
         auto d_pressed = Input::is_input_active(Input::Event::D_KEY_DOWN);
-        auto position = &position_it->second.data.p.position;
+        auto position = &position_ptr->data.p.position;
         int vel = speed * ts;
         if (w_pressed)
         {
@@ -206,9 +240,9 @@ void ECS::Manager::update_player(double ts)
         for (unsigned int i = 0; i < this->entities.size(); ++i)
         {
             Entity *e = &this->entities[i];
-            auto input_component_it = e->components.find(ECS::Type::PLAYER_INPUT);
-            auto camera_component_it = e->components.find(ECS::Type::CAMERA);
-            if (input_component_it != e->components.end() && camera_component_it != e->components.end())
+            auto input_component_ptr = e->get_component(ECS::Type::PLAYER_INPUT);
+            auto camera_component_ptr = e->get_component(ECS::Type::CAMERA);
+            if (input_component_ptr != nullptr && camera_component_ptr != nullptr)
             {
                 this->player_entity_index = i;
                 break;
@@ -257,8 +291,6 @@ void ECS::Manager::process_messages()
         if (message.type == MBus::CREATE_PLANT_ENTITY)
         {
             Entity e;
-            e.component_flags |= ECS::RENDER;
-            e.component_flags |= ECS::POSITION;
             Component render_component;
             render_component.type = RENDER;
             render_component.strings.push_back("tilesheet-transparent");
@@ -273,8 +305,8 @@ void ECS::Manager::process_messages()
             Component position_component;
             position_component.type = POSITION;
             position_component.data.p = {message.data.cpe.grid_position.x * 32, message.data.cpe.grid_position.y * 32};
-            e.components[position_component.type] = position_component;
-            e.components[render_component.type] = render_component;
+            e.add_component(&position_component);
+            e.add_component(&render_component);
             this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].has_entity = true;
             this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].entity_id = this->entities.size();
             this->entities.push_back(e);
@@ -287,8 +319,6 @@ void ECS::Manager::process_messages()
                    grid_position.y >= 0 &&
                    grid_position.y < static_cast<int>(this->map.dimensions.y));
             Entity tile_entity;
-            tile_entity.component_flags |= ECS::RENDER;
-            tile_entity.component_flags |= ECS::POSITION;
             Component render_component;
             render_component.type = ECS::RENDER;
             render_component.strings.push_back("tilesheet-transparent");
@@ -305,8 +335,8 @@ void ECS::Manager::process_messages()
             position_component.data.p.position = {
                 grid_position.x * this->map.cell_size,
                 grid_position.y * this->map.cell_size};
-            tile_entity.components[render_component.type] = render_component;
-            tile_entity.components[position_component.type] = position_component;
+            tile_entity.add_component(&render_component);
+            tile_entity.add_component(&position_component);
             this->map.grid[grid_position.x][grid_position.y].tile.empty = false;
             this->map.grid[grid_position.x][grid_position.y].tile.tile_entity = tile_entity;
         }
@@ -315,12 +345,12 @@ void ECS::Manager::process_messages()
             if (this->player_entity_index != -1)
             {
                 Entity *player = &this->entities[this->player_entity_index];
-                auto player_position_it = player->components.find(ECS::Type::POSITION);
-                if (player_position_it != player->components.end())
+                auto player_position_ptr = player->get_component(ECS::Type::POSITION);
+                if (player_position_ptr != nullptr)
                 {
                     V2 old_camera_dimensions = message.data.hcrfp.old_camera_dimensions;
                     V2 new_camera_dimensions = message.data.hcrfp.new_camera_dimensions;
-                    V2 *current_player_position = &player_position_it->second.data.p.position;
+                    V2 *current_player_position = &player_position_ptr->data.p.position;
                     *current_player_position = {
                         current_player_position->x + (old_camera_dimensions.x - new_camera_dimensions.x) / 2,
                         current_player_position->y + (old_camera_dimensions.y - new_camera_dimensions.y) / 2};
@@ -372,7 +402,7 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     picojson::object component_object;
     switch (type)
     {
-    case ECS::Type::NOOP:
+    case ECS::NUM_COMPONENT_TYPES:
     {
         break;
     }

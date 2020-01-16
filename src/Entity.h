@@ -12,13 +12,13 @@ namespace ECS
 
 enum Type
 {
-    NOOP, // I use these enums as bit flags, so I don't want one of them to be '0'
     POSITION,
     RENDER,
     CAMERA,
     PLAYER_INPUT,
     POSITION_ANIMATE,
-    DUMB_AI_COMPONENT
+    DUMB_AI_COMPONENT,
+    NUM_COMPONENT_TYPES
 };
 
 struct PositionComponent
@@ -63,8 +63,13 @@ struct Component
 
 struct Entity
 {
+    Entity();
+    ~Entity();
+    void add_component(ECS::Component *);
+    ECS::Component *get_component(ECS::Type);
+    ECS::Component *components;
     int component_flags;
-    std::unordered_map<ECS::Type, Component> components;
+    int component_length;
 };
 
 struct Tile

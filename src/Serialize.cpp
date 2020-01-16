@@ -25,11 +25,11 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
             {
                 picojson::object clip;
                 picojson::array tile_entity_components_array;
-                for (auto component_it = tile.tile_entity.components.begin();
-                     component_it != tile.tile_entity.components.end();
-                     ++component_it)
+                for (int i = 0; i < tile.tile_entity.component_length; ++i)
                 {
-                    picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
+                    picojson::object component_object = ECS::jsonize_component(
+                        tile.tile_entity.components[i].type,
+                        &tile.tile_entity.components[i]);
                     tile_entity_components_array.push_back(picojson::value(component_object));
                 }
                 tile_object["grid_x"] = picojson::value((double)i);
@@ -53,9 +53,9 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
         picojson::array components_array;
         entity_object["id"] = picojson::value((double)i);
         entity_object["component_flags"] = picojson::value((double)entity->component_flags);
-        for (auto component_it = entity->components.begin(); component_it != entity->components.end(); ++component_it)
+        for (int i = 0; i < entity->component_length; ++i)
         {
-            picojson::object component_object = ECS::jsonize_component(component_it->first, &component_it->second);
+            picojson::object component_object = ECS::jsonize_component(entity->components[i].type, &entity->components[i]);
             components_array.push_back(picojson::value(component_object));
         }
         entity_object["components"] = picojson::value(components_array);
@@ -223,7 +223,7 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                             ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
                             if (cjr.success)
                             {
-                                tile_entity.components[cjr.component.type] = cjr.component;
+                                tile_entity.add_component(&cjr.component);
                             }
                             else
                             {
@@ -298,7 +298,7 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                         ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
                         if (cjr.success)
                         {
-                            entity.components[cjr.component.type] = cjr.component;
+                            entity.add_component(&cjr.component);
                         }
                         else
                         {
