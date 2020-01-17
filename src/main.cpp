@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     Order::Manager order_manager = Order::Manager();
     GUI::GUI gui;
 
+    Serialize::load_things("resources/data/things");
     Serialize::LoadMapResult load_game_result = Serialize::load_game("resources/data/save.json");
     if (load_game_result.success)
     {

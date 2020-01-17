@@ -1,0 +1,26 @@
+{
+    "type": "buildable",
+    "build_category": "Floor",
+    "components": [
+        {
+            "type": "RENDER",
+            "clip": {
+                "h": 32,
+                "w": 32,
+                "x": 32,
+                "y": 0
+            },
+            "scale": 1,
+            "texture_key": "tilesheet-transparent"
+        },
+        {
+            "type": "BUILD_COST",
+            "amount": 200
+        },
+        {
+            "type": "INFO",
+            "name": "Steel Floor",
+            "description": "A floor made out of steel."
+        }
+    ]
+}

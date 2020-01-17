@@ -5,6 +5,8 @@
 #include "Assets.h"
 #include <vector>
 #include <fstream>
+#include <dirent.h>
+#include <sstream>
 
 bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
 {
@@ -329,4 +331,34 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
     // ******************************************
     result.success = true;
     return result;
+}
+
+std::vector<ECS::Entity> Serialize::load_things(std::string directory)
+{
+    printf("TRAVERSING DIRECTORY %s \n", directory.c_str());
+    std::stringstream ss;
+    struct dirent *entry = nullptr;
+    DIR *dp = opendir(directory.c_str());
+    if (dp != nullptr)
+    {
+        while ((entry = readdir(dp)))
+        {
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            {
+                continue;
+            }
+            ss.str("");
+            ss << directory << "/" << entry->d_name;
+            if (strstr(entry->d_name, ".json") != nullptr)
+            {
+                // is json. Load it up bois
+                printf("Found json: %s\n", ss.str().c_str());
+            }
+            else
+            {
+                Serialize::load_things(ss.str()); // Traverse
+            }
+        }
+    }
+    return std::vector<ECS::Entity>();
 }
