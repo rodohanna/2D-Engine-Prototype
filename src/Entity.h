@@ -18,6 +18,8 @@ enum Type
     PLAYER_INPUT,
     POSITION_ANIMATE,
     DUMB_AI_COMPONENT,
+    BUILD_COST,
+    INFO,
     NUM_COMPONENT_TYPES
 };
 
@@ -47,6 +49,17 @@ struct PositionAnimateComponent
     double duration;
 };
 
+struct BuildCostComponent
+{
+    int amount;
+};
+
+struct InfoComponent
+{
+    int name_string_index;
+    int description_string_index;
+};
+
 struct Component
 {
     ECS::Type type;
@@ -58,6 +71,8 @@ struct Component
         PositionComponent p;
         RenderComponent r;
         PositionAnimateComponent p_a;
+        BuildCostComponent bc;
+        InfoComponent i;
     } data;
 };
 

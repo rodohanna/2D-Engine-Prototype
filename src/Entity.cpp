@@ -437,7 +437,14 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     {
         component_object["type"] = picojson::value("RENDER");
         component_object["has_clip"] = picojson::value(component->data.r.has_clip);
-        component_object["layer"] = picojson::value((double)component->data.r.layer);
+        if (component->data.r.layer == Render::GUI_LAYER)
+        {
+            component_object["layer"] = picojson::value("GUI_LAYER");
+        }
+        else
+        {
+            component_object["layer"] = picojson::value("WORLD_LAYER");
+        }
         component_object["scale"] = picojson::value((double)component->data.r.scale);
         component_object["texture_key_strings_index"] = picojson::value((double)component->data.r.texture_key_strings_index);
         component_object["z_index"] = picojson::value((double)component->data.r.z_index);
@@ -447,6 +454,19 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
         clip["w"] = picojson::value((double)component->data.r.clip.w);
         clip["h"] = picojson::value((double)component->data.r.clip.h);
         component_object["clip"] = picojson::value(clip);
+        break;
+    }
+    case ECS::Type::BUILD_COST:
+    {
+        component_object["type"] = picojson::value("BUILD_COST");
+        component_object["amount"] = picojson::value((double)component->data.bc.amount);
+        break;
+    }
+    case ECS::Type::INFO:
+    {
+        component_object["type"] = picojson::value("INFO");
+        component_object["name_string_index"] = picojson::value((double)component->data.i.name_string_index);
+        component_object["description_string_index"] = picojson::value((double)component->data.i.description_string_index);
         break;
     }
     }
@@ -504,45 +524,92 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
     {
         result.component.type = ECS::RENDER;
         picojson::object render_comp_obj = *object;
-        if (render_comp_obj["clip"].is<picojson::object>() && render_comp_obj["layer"].is<double>() &&
+        if (render_comp_obj["layer"].is<std::string>() &&
             render_comp_obj["texture_key_strings_index"].is<double>() &&
-            render_comp_obj["scale"].is<double>() && render_comp_obj["z_index"].is<double>() &&
-            render_comp_obj["has_clip"].is<bool>())
+            render_comp_obj["scale"].is<double>() &&
+            render_comp_obj["z_index"].is<double>())
         {
-            picojson::object clip = render_comp_obj["clip"].get<picojson::object>();
-            if (clip["x"].is<double>() &&
-                clip["y"].is<double>() &&
-                clip["w"].is<double>() &&
-                clip["h"].is<double>())
+            if (render_comp_obj["clip"].is<picojson::object>())
             {
-                Render::Layer layer = (Render::Layer)render_comp_obj["layer"].get<double>();
-                int texture_key_strings_index = static_cast<int>(render_comp_obj["texture_key_strings_index"].get<double>());
-                int scale = static_cast<int>(render_comp_obj["scale"].get<double>());
-                int z_index = static_cast<int>(render_comp_obj["z_index"].get<double>());
-                int has_clip = static_cast<int>(render_comp_obj["has_clip"].get<bool>());
-                Rect _clip = {
-                    static_cast<int>(clip["x"].get<double>()),
-                    static_cast<int>(clip["y"].get<double>()),
-                    static_cast<int>(clip["w"].get<double>()),
-                    static_cast<int>(clip["h"].get<double>())};
-                result.component.strings = componentize_json_strings(&render_comp_obj);
-                result.component.data.r.clip = _clip;
-                result.component.data.r.has_clip = has_clip;
-                result.component.data.r.layer = layer;
-                result.component.data.r.scale = scale;
-                result.component.data.r.texture_key_strings_index = texture_key_strings_index;
-                result.component.data.r.texture_index = Assets::get_texture_index(result.component.strings[texture_key_strings_index]);
-                result.component.data.r.z_index = z_index;
-                result.success = true;
+                picojson::object clip = render_comp_obj["clip"].get<picojson::object>();
+                if (clip["x"].is<double>() &&
+                    clip["y"].is<double>() &&
+                    clip["w"].is<double>() &&
+                    clip["h"].is<double>())
+                {
+                    Rect _clip = {
+                        static_cast<int>(clip["x"].get<double>()),
+                        static_cast<int>(clip["y"].get<double>()),
+                        static_cast<int>(clip["w"].get<double>()),
+                        static_cast<int>(clip["h"].get<double>())};
+                    result.component.data.r.clip = _clip;
+                    result.component.data.r.has_clip = true;
+                }
+                else
+                {
+                    printf("JSON serialize error: RENDER component has malformed 'clip' field\n");
+                }
             }
             else
             {
-                printf("JSON serialize error: RENDER component has malformed 'clip' field\n");
+                result.component.data.r.has_clip = false;
             }
+            std::string layer_string = render_comp_obj["layer"].get<std::string>();
+            int texture_key_strings_index = static_cast<int>(render_comp_obj["texture_key_strings_index"].get<double>());
+            int scale = static_cast<int>(render_comp_obj["scale"].get<double>());
+            int z_index = static_cast<int>(render_comp_obj["z_index"].get<double>());
+            result.component.strings = componentize_json_strings(&render_comp_obj);
+            if (layer_string == "WORLD_LAYER")
+            {
+
+                result.component.data.r.layer = Render::WORLD_LAYER;
+            }
+            else
+            {
+                result.component.data.r.layer = Render::GUI_LAYER;
+            }
+            result.component.data.r.scale = scale;
+            result.component.data.r.texture_key_strings_index = texture_key_strings_index;
+            result.component.data.r.texture_index = Assets::get_texture_index(result.component.strings[texture_key_strings_index]);
+            result.component.data.r.z_index = z_index;
+            result.success = true;
         }
         else
         {
             printf("JSON serialize error: RENDER component missing field\n");
+        }
+    }
+    else if (type == "INFO")
+    {
+        result.component.type = ECS::INFO;
+        picojson::object info_comp_obj = *object;
+        if (info_comp_obj["name_string_index"].is<double>() && info_comp_obj["description_string_index"].is<double>())
+        {
+            int name_string_index = static_cast<int>(info_comp_obj["name_string_index"].get<double>());
+            int description_string_index = static_cast<int>(info_comp_obj["description_string_index"].get<double>());
+            result.component.data.i.name_string_index = name_string_index;
+            result.component.data.i.description_string_index = description_string_index;
+            result.component.strings = componentize_json_strings(&info_comp_obj);
+            result.success = true;
+        }
+        else
+        {
+            printf("JSON serialize error: INFO component missing field\n");
+        }
+    }
+    else if (type == "BUILD_COST")
+    {
+        result.component.type = ECS::BUILD_COST;
+        picojson::object build_cost_comp_obj = *object;
+        if (build_cost_comp_obj["amount"].is<double>())
+        {
+            int amount = static_cast<int>(build_cost_comp_obj["amount"].get<double>());
+            result.component.data.bc.amount = amount;
+            result.success = true;
+        }
+        else
+        {
+            printf("JSON serialize error: BUILD_COST component missing field\n");
         }
     }
     else

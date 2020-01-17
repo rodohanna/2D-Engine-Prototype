@@ -8,6 +8,9 @@
 #include <dirent.h>
 #include <sstream>
 
+void load_things_recurse(std::string directory, Serialize::LoadThingsResult *things);
+void process_thing_file(std::string file, Serialize::LoadThingsResult *things);
+
 bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
 {
     ECS::Map *map = &entity_manager->map;
@@ -85,6 +88,30 @@ bool Serialize::save_game(ECS::Manager *entity_manager, std::string file)
         return false;
     }
 };
+
+void process_json_component_array(ECS::Entity *entity, picojson::array *component_array)
+{
+    for (picojson::value::array::const_iterator component_it = component_array->begin(); component_it != component_array->end(); ++component_it)
+    {
+        if (component_it->is<picojson::object>())
+        {
+            picojson::object component_object = component_it->get<picojson::object>();
+            ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
+            if (cjr.success)
+            {
+                entity->add_component(&cjr.component);
+            }
+            else
+            {
+                printf("JSON Load Err: componentize_json failed\n");
+            }
+        }
+        else
+        {
+            printf("JSON Load Err: Entity 'components' array contains non-object value\n");
+        }
+    }
+}
 
 Serialize::LoadMapResult Serialize::load_game(std::string file)
 {
@@ -292,26 +319,7 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
                     continue;
                 }
                 picojson::array component_array = entity_object["components"].get<picojson::array>();
-                for (picojson::value::array::const_iterator component_it = component_array.begin(); component_it != component_array.end(); ++component_it)
-                {
-                    if (component_it->is<picojson::object>())
-                    {
-                        picojson::object component_object = component_it->get<picojson::object>();
-                        ECS::ComponentizeJsonResult cjr = ECS::componentize_json(&component_object);
-                        if (cjr.success)
-                        {
-                            entity.add_component(&cjr.component);
-                        }
-                        else
-                        {
-                            printf("JSON Load Err: componentize_json failed\n");
-                        }
-                    }
-                    else
-                    {
-                        printf("JSON Load Err: Entity 'components' array contains non-object value\n");
-                    }
-                }
+                process_json_component_array(&entity, &component_array);
                 int id = static_cast<int>(entity_object["id"].get<double>());
                 int component_flags = static_cast<int>(entity_object["component_flags"].get<double>());
                 entity.component_flags = component_flags;
@@ -333,7 +341,77 @@ Serialize::LoadMapResult Serialize::load_game(std::string file)
     return result;
 }
 
-std::vector<ECS::Entity> Serialize::load_things(std::string directory)
+void process_thing_file(std::string file, Serialize::LoadThingsResult *things)
+{
+    std::ifstream thing_file(file);
+    if (!thing_file.is_open())
+    {
+        return;
+    }
+    picojson::value thing_objects;
+    thing_file >> thing_objects;
+    std::string err = picojson::get_last_error();
+    if (err.size() > 0)
+    {
+        printf("Error: could not load thing at %s: %s\n", file.c_str(), err.c_str());
+        return;
+    }
+    if (!thing_objects.is<picojson::array>())
+    {
+        printf("Error: Thing file did not contain array at %s: %s\n", file.c_str(), err.c_str());
+        return;
+    }
+    picojson::array things_array = thing_objects.get<picojson::array>();
+    for (picojson::value::array::const_iterator obj_it = things_array.begin(); obj_it != things_array.end(); ++obj_it)
+    {
+        if (obj_it->is<picojson::object>())
+        {
+            picojson::object thing_object = obj_it->get<picojson::object>();
+            if (thing_object["type"].is<std::string>())
+            {
+                std::string type = thing_object["type"].get<std::string>();
+                if (type == "buildable")
+                {
+                    if (thing_object["build_category"].is<std::string>())
+                    {
+                        std::string build_category = thing_object["build_category"].get<std::string>();
+                        if (thing_object["components"].is<picojson::array>())
+                        {
+                            picojson::array component_array = thing_object["components"].get<picojson::array>();
+                            Build::Buildable buildable;
+                            ECS::Entity entity;
+                            buildable.build_category = build_category;
+                            process_json_component_array(&entity, &component_array);
+                            things->buildables.push_back(buildable);
+                        }
+                        else
+                        {
+                            printf("Load JSON Err: Buildable Thing in category %s has no components array\n", build_category.c_str());
+                        }
+                    }
+                    else
+                    {
+                        printf("Load JSON Err: Buildable Thing object has no build_category\n");
+                    }
+                }
+                else
+                {
+                    printf("Load JSON Err: Thing object had unrecognized type: %s\n", type.c_str());
+                }
+            }
+            else
+            {
+                printf("Load JSON Err: Things object had no type\n");
+            }
+        }
+        else
+        {
+            printf("Load JSON Err: Things should be an array of objects\n");
+        }
+    }
+}
+
+void load_things_recurse(std::string directory, Serialize::LoadThingsResult *things)
 {
     printf("TRAVERSING DIRECTORY %s \n", directory.c_str());
     std::stringstream ss;
@@ -353,12 +431,19 @@ std::vector<ECS::Entity> Serialize::load_things(std::string directory)
             {
                 // is json. Load it up bois
                 printf("Found json: %s\n", ss.str().c_str());
+                process_thing_file(ss.str(), things);
             }
             else
             {
-                Serialize::load_things(ss.str()); // Traverse
+                load_things_recurse(ss.str(), things); // Traverse
             }
         }
     }
-    return std::vector<ECS::Entity>();
+}
+
+Serialize::LoadThingsResult Serialize::load_things(std::string directory)
+{
+    Serialize::LoadThingsResult things;
+    load_things_recurse(directory, &things);
+    return things;
 }

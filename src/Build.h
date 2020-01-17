@@ -6,6 +6,11 @@
 
 namespace Build
 {
+struct Buildable
+{
+    std::string build_category;
+    ECS::Entity entity;
+};
 enum State
 {
     IDLE,

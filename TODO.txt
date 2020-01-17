@@ -3,3 +3,8 @@ BLUEPRINTS
  - Put them into lists by type
  - Allow them to be retrieved in bulk by type or by a blueprint key
  - Populate the build menu with a single blueprint
+
+ BIG TODO:
+  - Redo the way I am serializing strings. Just because the engine has to handle string indexes
+    and such doesn't mean the serialized format needs to think of them that way. This will allow 
+    easier modding, easier blueprints, and easier mental models.

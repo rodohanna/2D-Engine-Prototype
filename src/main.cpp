@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     GUI::GUI gui;
 
     Serialize::load_things("resources/data/things");
+    printf("Loading game\n");
     Serialize::LoadMapResult load_game_result = Serialize::load_game("resources/data/save.json");
     if (load_game_result.success)
     {
