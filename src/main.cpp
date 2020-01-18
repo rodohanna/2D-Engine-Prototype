@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 
     int64_t last_counter = SDL_GetPerformanceCounter();
 
+    printf("Loading things\n");
+    Serialize::LoadThingsResult load_things_result = Serialize::load_things("resources/data/things");
     // debug
     Debug debugger;
     ProcGen::Rules rules = {100, 100};
@@ -45,8 +47,8 @@ int main(int argc, char *argv[])
     ProcGen::Return r = ProcGen::generate_map(&rules, &dimensions);
     Order::Manager order_manager = Order::Manager();
     GUI::GUI gui;
+    gui.build_menu.set_buildables(&load_things_result.buildables);
 
-    Serialize::load_things("resources/data/things");
     printf("Loading game\n");
     Serialize::LoadMapResult load_game_result = Serialize::load_game("resources/data/save.json");
     if (load_game_result.success)

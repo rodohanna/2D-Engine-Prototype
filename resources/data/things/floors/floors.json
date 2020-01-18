@@ -13,8 +13,8 @@
                 },
                 "scale": 1,
                 "texture_key": "tilesheet-transparent",
-                "layer": "WORLD_LAYER",
-                "z_index": 1
+                "draw_layer": "WORLD_LAYER",
+                "z_index": "TILE_BASE_LAYER"
             },
             {
                 "type": "BUILD_COST",

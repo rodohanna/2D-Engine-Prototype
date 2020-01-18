@@ -92,6 +92,7 @@
         "xutility": "cpp",
         "unordered_set": "cpp",
         "iostream": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "set": "cpp"
     }
 }

@@ -25,9 +25,68 @@ BuildMenu::BuildMenu()
     this->buttons.push_back(floor);
 }
 
-void BuildMenu::update(double ts)
+void BuildMenu::set_buildables(std::vector<Build::Buildable> *buildables)
 {
-    this->panel.update(ts);
+    // set up menu.
+    for (Build::Buildable &buildable : *buildables)
+    {
+        if (this->build_category_to_buildables.find(buildable.build_category) == this->build_category_to_buildables.end())
+        {
+            this->build_category_to_buildables[buildable.build_category] = std::vector<Build::Buildable>();
+        }
+        this->build_category_to_buildables[buildable.build_category].push_back(buildable);
+    }
+    for (auto build_category_pair : this->build_category_to_buildables)
+    {
+        UI::TextButton build_category_button;
+        build_category_button.text.font_index = 0;
+        build_category_button.text.has_overflow_clip = false;
+        build_category_button.text.render_layer = Render::GUI_LAYER;
+        build_category_button.text.texture_key = build_category_pair.first + "_build_menu_button";
+        build_category_button.text.set_text(build_category_pair.first);
+        build_category_button.button.rect = {
+            0,
+            0,
+            125,
+            40};
+        build_category_button.button.idle_color = {0x11, 0x11, 0x11, 0xF0};
+        build_category_button.button.hover_color = {0x1F, 0x1F, 0x1F, 0xF0};
+        build_category_button.button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
+        build_category_button.button.z_index = 1;
+        this->build_category_buttons.push_back(build_category_button);
+    }
+}
+
+void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this menu can consider the bottom is
+{
+    int start_x = 0;
+    int start_y = bottom_y;
+    this->panel.rect.y = bottom_y - 40 - this->panel.rect.h - 4;
+    for (UI::TextButton &build_category_button : this->build_category_buttons)
+    {
+        build_category_button.button.rect.x = start_x;
+        build_category_button.button.rect.y = start_y - build_category_button.button.rect.h - 2;
+        start_x += build_category_button.button.rect.w + 2;
+        build_category_button.update(ts);
+        if (build_category_button.button.mouse_clicked)
+        {
+            if (this->active_build_category == build_category_button.text.text)
+            {
+                // toggle
+                this->active_build_category = "";
+            }
+            else
+            {
+                this->active_build_category = build_category_button.text.text;
+            }
+        }
+    }
+    if (this->build_category_to_buildables.find(this->active_build_category) != this->build_category_to_buildables.end())
+    {
+        this->panel.update(ts);
+        // TODO: RENDER BUILDABLE BUTTONS IN HERE
+    }
+    return;
     int curr_x = this->panel.rect.x + 5;
     int curr_y = this->panel.rect.y + 5;
     for (unsigned int i = 0; i < this->buttons.size(); ++i)
