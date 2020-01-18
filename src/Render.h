@@ -7,6 +7,15 @@ const static int RENDER_QUEUE_SIZE = 16384;
 
 namespace Render
 {
+namespace Z_Index
+{
+enum World
+{
+    TILE_BASE_LAYER,
+    FLOOR_LAYER,
+    ENTITY_LAYER
+};
+};
 enum Layer
 {
     GUI_LAYER,

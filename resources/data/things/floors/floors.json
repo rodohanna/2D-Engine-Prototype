@@ -12,10 +12,7 @@
                     "y": 0
                 },
                 "scale": 1,
-                "texture_key_strings_index": 0,
-                "strings": [
-                    "tilesheet-transparent"
-                ],
+                "texture_key": "tilesheet-transparent",
                 "layer": "WORLD_LAYER",
                 "z_index": 1
             },
@@ -25,12 +22,8 @@
             },
             {
                 "type": "INFO",
-                "name_string_index": 0,
-                "description_string_index": 1,
-                "strings": [
-                    "Steel Floor",
-                    "A floor made out of steel."
-                ]
+                "name": "Steel Floor",
+                "description": "A floor made out of steel."
             }
         ]
     }

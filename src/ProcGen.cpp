@@ -53,7 +53,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
                 texture_index,
                 static_cast<int>(render_component.strings.size() - 1),
                 1,
-                1,
+                Render::Z_Index::TILE_BASE_LAYER,
                 true};
             ECS::Component position_component;
             position_component.type = ECS::POSITION;

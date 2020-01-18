@@ -300,7 +300,7 @@ void ECS::Manager::process_messages()
                 Assets::get_texture_index("tilesheet-transparent"),
                 static_cast<int>(render_component.strings.size() - 1),
                 1,
-                1,
+                Render::Z_Index::ENTITY_LAYER,
                 true};
             Component position_component;
             position_component.type = POSITION;
@@ -328,7 +328,7 @@ void ECS::Manager::process_messages()
                 Assets::get_texture_index("tilesheet-transparent"),
                 static_cast<int>(render_component.strings.size() - 1),
                 1,
-                0,
+                Render::Z_Index::TILE_BASE_LAYER,
                 true};
             Component position_component;
             position_component.type = ECS::POSITION;
@@ -358,43 +358,6 @@ void ECS::Manager::process_messages()
             }
         }
     }
-}
-
-void jsonize_component_strings(picojson::object *object, ECS::Component *component)
-{
-    assert(component != nullptr);
-    assert(object != nullptr);
-    if (component->strings.size() > 0)
-    {
-        picojson::array strings_array;
-        for (std::string &s : component->strings)
-        {
-            strings_array.push_back(picojson::value(s));
-        }
-        (*object)["strings"] = picojson::value(strings_array);
-    }
-}
-
-std::vector<std::string> componentize_json_strings(picojson::object *object)
-{
-    assert(object != nullptr);
-    std::vector<std::string> strings;
-    if ((*object)["strings"].is<picojson::array>())
-    {
-        picojson::array strings_array = (*object)["strings"].get<picojson::array>();
-        for (picojson::value::array::const_iterator obj_it = strings_array.begin(); obj_it != strings_array.end(); ++obj_it)
-        {
-            if (obj_it->is<std::string>())
-            {
-                strings.push_back(obj_it->get<std::string>());
-            }
-            else
-            {
-                printf("ERROR: componentize_json_strings 'strings' array contains non-string item\n");
-            }
-        }
-    }
-    return strings;
 }
 
 picojson::object ECS::jsonize_component(Type type, Component *component)
@@ -436,18 +399,28 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     case ECS::Type::RENDER:
     {
         component_object["type"] = picojson::value("RENDER");
-        component_object["has_clip"] = picojson::value(component->data.r.has_clip);
         if (component->data.r.layer == Render::GUI_LAYER)
         {
-            component_object["layer"] = picojson::value("GUI_LAYER");
+            component_object["draw_layer"] = picojson::value("GUI_LAYER");
         }
         else
         {
-            component_object["layer"] = picojson::value("WORLD_LAYER");
+            component_object["draw_layer"] = picojson::value("WORLD_LAYER");
         }
         component_object["scale"] = picojson::value((double)component->data.r.scale);
-        component_object["texture_key_strings_index"] = picojson::value((double)component->data.r.texture_key_strings_index);
-        component_object["z_index"] = picojson::value((double)component->data.r.z_index);
+        component_object["texture_key"] = picojson::value(component->strings[component->data.r.texture_key_strings_index]);
+        if (component->data.r.z_index == Render::Z_Index::TILE_BASE_LAYER)
+        {
+            component_object["z_index"] = picojson::value("TILE_BASE_LAYER");
+        }
+        else if (component->data.r.z_index == Render::Z_Index::FLOOR_LAYER)
+        {
+            component_object["z_index"] = picojson::value("FLOOR_LAYER");
+        }
+        else if (component->data.r.z_index == Render::Z_Index::ENTITY_LAYER)
+        {
+            component_object["z_index"] = picojson::value("ENTITY_LAYER");
+        }
         picojson::object clip;
         clip["x"] = picojson::value((double)component->data.r.clip.x);
         clip["y"] = picojson::value((double)component->data.r.clip.y);
@@ -465,12 +438,11 @@ picojson::object ECS::jsonize_component(Type type, Component *component)
     case ECS::Type::INFO:
     {
         component_object["type"] = picojson::value("INFO");
-        component_object["name_string_index"] = picojson::value((double)component->data.i.name_string_index);
-        component_object["description_string_index"] = picojson::value((double)component->data.i.description_string_index);
+        component_object["name"] = picojson::value(component->strings[component->data.i.name_string_index]);
+        component_object["description"] = picojson::value(component->strings[component->data.i.description_string_index]);
         break;
     }
     }
-    jsonize_component_strings(&component_object, component);
     return component_object;
 }
 
@@ -524,10 +496,10 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
     {
         result.component.type = ECS::RENDER;
         picojson::object render_comp_obj = *object;
-        if (render_comp_obj["layer"].is<std::string>() &&
-            render_comp_obj["texture_key_strings_index"].is<double>() &&
+        if (render_comp_obj["draw_layer"].is<std::string>() &&
+            render_comp_obj["texture_key"].is<std::string>() &&
             render_comp_obj["scale"].is<double>() &&
-            render_comp_obj["z_index"].is<double>())
+            render_comp_obj["z_index"].is<std::string>())
         {
             if (render_comp_obj["clip"].is<picojson::object>())
             {
@@ -554,11 +526,10 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
             {
                 result.component.data.r.has_clip = false;
             }
-            std::string layer_string = render_comp_obj["layer"].get<std::string>();
-            int texture_key_strings_index = static_cast<int>(render_comp_obj["texture_key_strings_index"].get<double>());
+            std::string layer_string = render_comp_obj["draw_layer"].get<std::string>();
+            std::string texture_key = render_comp_obj["texture_key"].get<std::string>();
+            std::string z_index = render_comp_obj["z_index"].get<std::string>();
             int scale = static_cast<int>(render_comp_obj["scale"].get<double>());
-            int z_index = static_cast<int>(render_comp_obj["z_index"].get<double>());
-            result.component.strings = componentize_json_strings(&render_comp_obj);
             if (layer_string == "WORLD_LAYER")
             {
 
@@ -568,10 +539,22 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
             {
                 result.component.data.r.layer = Render::GUI_LAYER;
             }
+            if (z_index == "TILE_BASE_LAYER")
+            {
+                result.component.data.r.z_index = Render::Z_Index::TILE_BASE_LAYER;
+            }
+            else if (z_index == "FLOOR_LAYER")
+            {
+                result.component.data.r.z_index = Render::Z_Index::FLOOR_LAYER;
+            }
+            else if (z_index == "ENTITY_LAYER")
+            {
+                result.component.data.r.z_index = Render::Z_Index::ENTITY_LAYER;
+            }
             result.component.data.r.scale = scale;
-            result.component.data.r.texture_key_strings_index = texture_key_strings_index;
-            result.component.data.r.texture_index = Assets::get_texture_index(result.component.strings[texture_key_strings_index]);
-            result.component.data.r.z_index = z_index;
+            result.component.strings.push_back(texture_key);
+            result.component.data.r.texture_key_strings_index = result.component.strings.size() - 1;
+            result.component.data.r.texture_index = Assets::get_texture_index(texture_key);
             result.success = true;
         }
         else
@@ -583,13 +566,14 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
     {
         result.component.type = ECS::INFO;
         picojson::object info_comp_obj = *object;
-        if (info_comp_obj["name_string_index"].is<double>() && info_comp_obj["description_string_index"].is<double>())
+        if (info_comp_obj["name"].is<std::string>() && info_comp_obj["description"].is<std::string>())
         {
-            int name_string_index = static_cast<int>(info_comp_obj["name_string_index"].get<double>());
-            int description_string_index = static_cast<int>(info_comp_obj["description_string_index"].get<double>());
-            result.component.data.i.name_string_index = name_string_index;
-            result.component.data.i.description_string_index = description_string_index;
-            result.component.strings = componentize_json_strings(&info_comp_obj);
+            std::string name_string = info_comp_obj["name"].get<std::string>();
+            std::string description_string = info_comp_obj["description"].get<std::string>();
+            result.component.strings.push_back(name_string);
+            result.component.data.i.name_string_index = result.component.strings.size() - 1;
+            result.component.strings.push_back(description_string);
+            result.component.data.i.description_string_index = result.component.strings.size() - 1;
             result.success = true;
         }
         else
