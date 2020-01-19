@@ -23,6 +23,10 @@ enum Type
     NUM_COMPONENT_TYPES
 };
 
+const static int RENDER_FLAG = 1 << ECS::RENDER;
+const static int POSITION_FLAG = 1 << ECS::POSITION;
+const static int RENDER_SYSTEM_FLAGS = RENDER_FLAG | POSITION_FLAG;
+
 struct PositionComponent
 {
     V2 position;

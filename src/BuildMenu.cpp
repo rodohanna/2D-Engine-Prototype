@@ -3,6 +3,7 @@
 #include "Physics.h"
 #include "Window.h"
 #include "MessageBus.h"
+#include <assert.h>
 
 BuildMenu::BuildMenu()
 {
@@ -49,6 +50,10 @@ void BuildMenu::set_buildables(std::vector<Build::Buildable> *buildables)
             0,
             125,
             40};
+        if (build_category_button.text.dimensions.x > build_category_button.button.rect.w)
+        {
+            build_category_button.button.rect.w = build_category_button.text.dimensions.x + 10;
+        }
         build_category_button.button.idle_color = {0x11, 0x11, 0x11, 0xF0};
         build_category_button.button.hover_color = {0x1F, 0x1F, 0x1F, 0xF0};
         build_category_button.button.outline_color = {0xFF, 0xFF, 0xFF, 0xF0};
@@ -79,40 +84,52 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
             {
                 this->active_build_category = build_category_button.text.text;
             }
+            // TODO: Do this in the build panel instead.
+            {
+                MBus::Message message;
+                message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
+                MBus::send_order_message(&message);
+            }
         }
     }
     if (this->build_category_to_buildables.find(this->active_build_category) != this->build_category_to_buildables.end())
     {
         this->panel.update(ts);
-        // TODO: RENDER BUILDABLE BUTTONS IN HERE
-    }
-    return;
-    int curr_x = this->panel.rect.x + 5;
-    int curr_y = this->panel.rect.y + 5;
-    for (unsigned int i = 0; i < this->buttons.size(); ++i)
-    {
-        UI::TextButton *tb = &this->buttons[i];
-        tb->button.rect.x = curr_x;
-        tb->button.rect.y = curr_y;
-        tb->update(ts);
-        if (i % 3 == 0) // 3 per row
+        std::vector<Build::Buildable> *selected_buildables = &this->build_category_to_buildables[this->active_build_category];
+        int curr_x = this->panel.rect.x + 5;
+        int curr_y = this->panel.rect.y + 5;
+        int i = 1;
+        for (Build::Buildable &buildable : *selected_buildables)
         {
-            curr_y += tb->button.rect.h + 5;
-            curr_x = this->panel.rect.x + 37;
+            if (buildable.entity.component_flags & ECS::RENDER_FLAG)
+            {
+                ECS::Component *render_component = buildable.entity.get_component(ECS::RENDER);
+                assert(render_component != nullptr);
+                ECS::RenderComponent render_data = render_component->data.r;
+                V2 render_position = {curr_x, curr_y};
+                Render::render_texture(
+                    Render::GUI_LAYER,
+                    render_data.texture_index,
+                    render_data.clip,
+                    render_position,
+                    nullptr,
+                    2,
+                    this->panel.z_index + 1);
+                curr_x += (render_data.clip.w * 2) + 5;
+                if (i % 3 == 0) // 3 per row
+                {
+                    curr_y += render_data.clip.h + 5;
+                    curr_x = this->panel.rect.x + 5;
+                }
+                ++i;
+            }
         }
-    }
-    if (this->buttons[0].button.mouse_clicked) // build floor
-    {
-        printf("Build Floor\n");
-        MBus::Message message;
-        message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
-        MBus::send_order_message(&message);
-    }
-    if (Physics::check_point_in_rect(Window::get_gui_mouse_position(), &this->panel.rect))
-    {
-        if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+        if (Physics::check_point_in_rect(Window::get_gui_mouse_position(), &this->panel.rect))
         {
-            Input::clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
+            if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+            {
+                Input::clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
+            }
         }
     }
 }

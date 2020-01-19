@@ -379,9 +379,8 @@ void process_thing_file(std::string file, Serialize::LoadThingsResult *things)
                         {
                             picojson::array component_array = thing_object["components"].get<picojson::array>();
                             Build::Buildable buildable;
-                            ECS::Entity entity;
                             buildable.build_category = build_category;
-                            process_json_component_array(&entity, &component_array);
+                            process_json_component_array(&buildable.entity, &component_array);
                             things->buildables.push_back(buildable);
                         }
                         else

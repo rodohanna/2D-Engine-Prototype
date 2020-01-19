@@ -26,5 +26,89 @@
                 "description": "A floor made out of steel."
             }
         ]
+    },
+    {
+        "type": "buildable",
+        "build_category": "Floor",
+        "components": [
+            {
+                "type": "RENDER",
+                "clip": {
+                    "h": 32,
+                    "w": 32,
+                    "x": 0,
+                    "y": 0
+                },
+                "scale": 1,
+                "texture_key": "tilesheet-transparent",
+                "draw_layer": "WORLD_LAYER",
+                "z_index": "TILE_BASE_LAYER"
+            },
+            {
+                "type": "BUILD_COST",
+                "amount": 200
+            },
+            {
+                "type": "INFO",
+                "name": "Steel Floor",
+                "description": "A floor made out of steel."
+            }
+        ]
+    },
+    {
+        "type": "buildable",
+        "build_category": "Power",
+        "components": [
+            {
+                "type": "RENDER",
+                "clip": {
+                    "h": 32,
+                    "w": 32,
+                    "x": 32,
+                    "y": 32
+                },
+                "scale": 1,
+                "texture_key": "tilesheet-transparent",
+                "draw_layer": "WORLD_LAYER",
+                "z_index": "TILE_BASE_LAYER"
+            },
+            {
+                "type": "BUILD_COST",
+                "amount": 200
+            },
+            {
+                "type": "INFO",
+                "name": "Steel Floor",
+                "description": "A floor made out of steel."
+            }
+        ]
+    },
+    {
+        "type": "buildable",
+        "build_category": "Power",
+        "components": [
+            {
+                "type": "RENDER",
+                "clip": {
+                    "h": 32,
+                    "w": 32,
+                    "x": 64,
+                    "y": 32
+                },
+                "scale": 1,
+                "texture_key": "tilesheet-transparent",
+                "draw_layer": "WORLD_LAYER",
+                "z_index": "TILE_BASE_LAYER"
+            },
+            {
+                "type": "BUILD_COST",
+                "amount": 200
+            },
+            {
+                "type": "INFO",
+                "name": "Steel Floor",
+                "description": "A floor made out of steel."
+            }
+        ]
     }
 ]

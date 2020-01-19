@@ -7,8 +7,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-static int RENDER_FLAGS = (1 << ECS::RENDER) | (1 << ECS::POSITION);
-
 ECS::Entity::Entity()
 {
     this->components = new ECS::Component[ECS::NUM_COMPONENT_TYPES];
@@ -101,7 +99,7 @@ V2 ECS::Map::get_mouse_world_position()
 
 bool ECS::render_system(Entity *e)
 {
-    if ((e->component_flags & RENDER_FLAGS) == RENDER_FLAGS)
+    if ((e->component_flags & ECS::RENDER_SYSTEM_FLAGS) == ECS::RENDER_SYSTEM_FLAGS)
     {
         ECS::Component *render_ptr = e->get_component(ECS::Type::RENDER);
         ECS::Component *position_ptr = e->get_component(ECS::Type::POSITION);
@@ -532,7 +530,6 @@ ECS::ComponentizeJsonResult ECS::componentize_json(picojson::object *object)
             int scale = static_cast<int>(render_comp_obj["scale"].get<double>());
             if (layer_string == "WORLD_LAYER")
             {
-
                 result.component.data.r.layer = Render::WORLD_LAYER;
             }
             else
