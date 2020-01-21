@@ -40,6 +40,19 @@ ECS::Component *ECS::Entity::get_component(ECS::Type type)
     return nullptr;
 }
 
+ECS::Entity ECS::Entity::make_deep_copy() const
+{
+    ECS::Entity copy;
+    copy.component_flags = this->component_flags;
+    copy.component_length = this->component_length;
+    copy.components = new ECS::Component[ECS::NUM_COMPONENT_TYPES];
+    for (int i = 0; i < this->component_length; ++i)
+    {
+        copy.components[i] = this->components[i];
+    }
+    return copy;
+}
+
 ECS::Map::Map() : mouse_data_cached(false), hovered_cell_cached(false){};
 
 void ECS::Map::update(double ts)
@@ -316,24 +329,13 @@ void ECS::Manager::process_messages()
                    grid_position.x < static_cast<int>(this->map.dimensions.x) &&
                    grid_position.y >= 0 &&
                    grid_position.y < static_cast<int>(this->map.dimensions.y));
-            Entity tile_entity;
-            Component render_component;
-            render_component.type = ECS::RENDER;
-            render_component.strings.push_back("tilesheet-transparent");
-            render_component.data.r = {
-                {0, 0, 32, 32},
-                Render::WORLD_LAYER,
-                Assets::get_texture_index("tilesheet-transparent"),
-                static_cast<int>(render_component.strings.size() - 1),
-                1,
-                Render::Z_Index::TILE_BASE_LAYER,
-                true};
+            assert(message.data.ct.blueprint != nullptr);
+            Entity tile_entity = message.data.ct.blueprint->make_deep_copy();
             Component position_component;
             position_component.type = ECS::POSITION;
             position_component.data.p.position = {
                 grid_position.x * this->map.cell_size,
                 grid_position.y * this->map.cell_size};
-            tile_entity.add_component(&render_component);
             tile_entity.add_component(&position_component);
             this->map.grid[grid_position.x][grid_position.y].tile.empty = false;
             this->map.grid[grid_position.x][grid_position.y].tile.tile_entity = tile_entity;

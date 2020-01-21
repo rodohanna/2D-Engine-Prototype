@@ -23,7 +23,7 @@ struct Manager
     Manager();
     void update(ECS::Map *, double);
     void begin_structure_placement();
-    void begin_floor_placement();
+    void begin_floor_placement(const ECS::Entity *);
     void save_structure_placement(ECS::Map *);
     void save_floor_placement(ECS::Map *);
     void quit_structure_placement();
@@ -31,6 +31,7 @@ struct Manager
 
     V2 start_floor_grid_position;
     State state;
+    const ECS::Entity *blueprint;
 };
 }; // namespace Build
 

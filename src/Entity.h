@@ -85,6 +85,7 @@ struct Entity
     Entity();
     ~Entity();
     void add_component(ECS::Component *);
+    ECS::Entity make_deep_copy() const;
     ECS::Component *get_component(ECS::Type);
     ECS::Component *components;
     int component_flags;

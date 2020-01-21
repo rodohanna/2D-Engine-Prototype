@@ -1,6 +1,7 @@
 #include "Order.h"
 #include "Input.h"
 #include "MessageBus.h"
+#include <assert.h>
 
 Order::Manager::Manager(){};
 void Order::Manager::update(ECS::Map *map, double ts)
@@ -48,7 +49,8 @@ void Order::Manager::process_messages(ECS::Map *map)
         case MBus::Type::BEGIN_FLOOR_PLACEMENT:
         {
             printf("Handling floor placement\n");
-            this->build_manager.begin_floor_placement();
+            assert(m.data.bfp.entity != nullptr);
+            this->build_manager.begin_floor_placement(m.data.bfp.entity);
             if (this->zone_manager.state != Zone::IDLE)
             {
                 this->zone_manager.quit_zone_placement();

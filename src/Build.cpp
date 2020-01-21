@@ -5,7 +5,7 @@
 #include "MessageBus.h"
 #include <algorithm>
 
-Build::Manager::Manager() : state(Build::IDLE){};
+Build::Manager::Manager() : state(Build::IDLE), blueprint(nullptr){};
 
 void Build::Manager::update(ECS::Map *map, double ts)
 {
@@ -96,9 +96,10 @@ void Build::Manager::begin_structure_placement()
 {
     this->state = Build::WAITING_TO_PLACE_STRUCTURE;
 };
-void Build::Manager::begin_floor_placement()
+void Build::Manager::begin_floor_placement(const ECS::Entity *blueprint)
 {
     this->state = Build::WAITING_TO_BUILD_FLOOR;
+    this->blueprint = blueprint;
 }
 void Build::Manager::save_structure_placement(ECS::Map *)
 {
@@ -124,6 +125,7 @@ void Build::Manager::save_floor_placement(ECS::Map *map)
                     MBus::Message message;
                     message.type = MBus::CREATE_TILE;
                     message.data.ct.grid_position = {static_cast<int>(i), static_cast<int>(j)};
+                    message.data.ct.blueprint = this->blueprint;
                     MBus::send_ecs_message(&message);
                 }
             }
@@ -137,4 +139,5 @@ void Build::Manager::quit_structure_placement()
 void Build::Manager::quit_floor_placement()
 {
     this->state = Build::IDLE;
+    this->blueprint = nullptr;
 };

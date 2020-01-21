@@ -2,6 +2,7 @@
 #define MESSAGEBUS_h_
 
 #include "GameTypes.h"
+#include "Entity.h"
 
 namespace MBus
 {
@@ -58,11 +59,16 @@ struct CreatePlantEntity
 struct CreateTile
 {
     V2 grid_position;
+    const ECS::Entity *blueprint;
 };
 struct BeginStructurePlacement
 {
     // preview texture????
     V2 dimensions;
+};
+struct BeginFloorPlacement
+{
+    const ECS::Entity *entity;
 };
 struct Message
 {
@@ -76,6 +82,7 @@ struct Message
         EntitiesProcessed ep;
         CreateTile ct;
         HandleCameraResizeForPlayer hcrfp;
+        BeginFloorPlacement bfp;
     } data;
 };
 enum QueueType

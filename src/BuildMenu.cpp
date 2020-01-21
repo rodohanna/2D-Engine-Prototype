@@ -84,14 +84,9 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
             {
                 this->active_build_category = build_category_button.text.text;
             }
-            // TODO: Do this in the build panel instead.
-            {
-                MBus::Message message;
-                message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
-                MBus::send_order_message(&message);
-            }
         }
     }
+    V2 *mouse_position = Window::get_gui_mouse_position();
     if (this->build_category_to_buildables.find(this->active_build_category) != this->build_category_to_buildables.end())
     {
         this->panel.update(ts);
@@ -122,6 +117,33 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
                     curr_x = this->panel.rect.x + 5;
                 }
                 ++i;
+
+                // handle hover
+                Rect render_rect = {
+                    render_position.x,
+                    render_position.y,
+                    render_data.clip.w * 2,
+                    render_data.clip.h * 2};
+                if (Physics::check_point_in_rect(mouse_position, &render_rect))
+                {
+                    Color hover_color = {0x2E, 0xCC, 0x40, 0xFF};
+                    Render::render_rectangle(
+                        Render::GUI_LAYER,
+                        render_rect,
+                        hover_color,
+                        false,
+                        this->panel.z_index + 2);
+                    if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+                    {
+                        Input::clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
+                        {
+                            MBus::Message message;
+                            message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
+                            message.data.bfp.entity = &buildable.entity;
+                            MBus::send_order_message(&message);
+                        }
+                    }
+                }
             }
         }
         if (Physics::check_point_in_rect(Window::get_gui_mouse_position(), &this->panel.rect))
