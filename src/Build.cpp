@@ -9,45 +9,42 @@ Build::Manager::Manager() : state(Build::IDLE), blueprint(nullptr){};
 
 void Build::Manager::update(ECS::Map *map, double ts)
 {
-    if (this->state == Build::WAITING_TO_PLACE_STRUCTURE)
+    if (this->state == Build::WAITING_TO_BUILD_ENTITY)
     {
-        V2 build_dimensions = {2, 2};
-        if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
+
+        if (Input::is_input_active(Input::RIGHT_MOUSE_JUST_PRESSED) || Input::is_input_active(Input::Q_KEY_DOWN))
         {
-            this->save_structure_placement(map);
-            return;
-        }
-        else if (Input::is_input_active(Input::RIGHT_MOUSE_JUST_PRESSED) || Input::is_input_active(Input::Q_KEY_DOWN))
-        {
-            this->quit_structure_placement();
+            this->quit_entity_placement();
             return;
         }
         Rect *camera = Window::get_camera();
         V2 grid_position = map->get_mouse_grid_position();
 
-        for (int i = grid_position.x; i < grid_position.x + build_dimensions.x; ++i)
+        Color green = {0x00, 0xFF, 0x00, 0x5F};
+        Color red = {0xBB, 0x0A, 0x1E, 0x5F};
+        Rect placeholder_rect = {(grid_position.x * map->cell_size) - camera->x, (grid_position.y * map->cell_size) - camera->y, map->cell_size, map->cell_size};
+        if (!map->grid[grid_position.x][grid_position.y].has_entity && !map->grid[grid_position.x][grid_position.y].tile.empty)
         {
-            for (int j = grid_position.y; j < grid_position.y + build_dimensions.y; ++j)
+            if (Input::is_input_active(Input::LEFT_MOUSE_JUST_PRESSED))
             {
-                Color green = {0x00, 0xFF, 0x00, 0x5F};
-                Color red = {0xBB, 0x0A, 0x1E, 0x5F};
-                Rect rect = {(i * map->cell_size) - camera->x, (j * map->cell_size) - camera->y, map->cell_size, map->cell_size};
-                if (!map->grid[i][j].has_entity)
-                {
-                    Render::render_rectangle(Render::Layer::WORLD_LAYER, rect, red, true, 2);
-                }
-                else
-                {
-                    Render::render_rectangle(Render::Layer::WORLD_LAYER, rect, green, true, 2);
-                }
+                this->save_entity_placement(map);
+                return;
+            }
+            else
+            {
+                Render::render_rectangle(Render::Layer::WORLD_LAYER, placeholder_rect, green, true, 2);
             }
         }
+        else
+        {
+            Render::render_rectangle(Render::Layer::WORLD_LAYER, placeholder_rect, red, true, 2);
+        }
     }
-    else if (this->state == Build::WAITING_TO_BUILD_FLOOR)
+    else if (this->state == Build::WAITING_TO_BUILD_TILE)
     {
         if (Input::is_input_active(Input::RIGHT_MOUSE_JUST_PRESSED) || Input::is_input_active(Input::Q_KEY_DOWN))
         {
-            this->quit_floor_placement();
+            this->quit_tile_placement();
             return;
         }
         Color color = {0xFF, 0xFF, 0xFF, 0x4F};
@@ -62,7 +59,7 @@ void Build::Manager::update(ECS::Map *map, double ts)
     {
         if (!Input::is_input_active(Input::LEFT_MOUSE_PRESSED))
         {
-            this->save_floor_placement(map);
+            this->save_tile_placement(map);
             return;
         }
         V2 current_mouse_grid_position = map->get_mouse_grid_position();
@@ -92,23 +89,29 @@ void Build::Manager::update(ECS::Map *map, double ts)
         }
     }
 };
-void Build::Manager::begin_structure_placement()
+void Build::Manager::begin_entity_placement(const ECS::Entity *blueprint)
 {
-    this->state = Build::WAITING_TO_PLACE_STRUCTURE;
+    this->state = Build::WAITING_TO_BUILD_ENTITY;
+    this->blueprint = blueprint;
 };
-void Build::Manager::begin_floor_placement(const ECS::Entity *blueprint)
+void Build::Manager::begin_tile_placement(const ECS::Entity *blueprint)
 {
-    this->state = Build::WAITING_TO_BUILD_FLOOR;
+    this->state = Build::WAITING_TO_BUILD_TILE;
     this->blueprint = blueprint;
 }
-void Build::Manager::save_structure_placement(ECS::Map *)
+void Build::Manager::save_entity_placement(ECS::Map *map)
 {
-    this->state = Build::WAITING_TO_PLACE_STRUCTURE;
+    this->state = Build::WAITING_TO_BUILD_ENTITY;
+    MBus::Message message;
+    message.type = MBus::CREATE_ENTITY;
+    message.data.ct.grid_position = map->get_mouse_grid_position();
+    message.data.ct.blueprint = this->blueprint;
+    MBus::send_ecs_message(&message);
 };
-void Build::Manager::save_floor_placement(ECS::Map *map)
+void Build::Manager::save_tile_placement(ECS::Map *map)
 {
     // TODO: consolidate similar code in Build::Manager::update
-    this->state = Build::WAITING_TO_BUILD_FLOOR;
+    this->state = Build::WAITING_TO_BUILD_TILE;
     V2 current_mouse_grid_position = map->get_mouse_grid_position();
     int start_x = std::min(this->start_floor_grid_position.x, current_mouse_grid_position.x);
     int end_x = std::max(this->start_floor_grid_position.x, current_mouse_grid_position.x);
@@ -132,11 +135,12 @@ void Build::Manager::save_floor_placement(ECS::Map *map)
         }
     }
 };
-void Build::Manager::quit_structure_placement()
+void Build::Manager::quit_entity_placement()
 {
     this->state = Build::IDLE;
+    this->blueprint = nullptr;
 };
-void Build::Manager::quit_floor_placement()
+void Build::Manager::quit_tile_placement()
 {
     this->state = Build::IDLE;
     this->blueprint = nullptr;

@@ -3,6 +3,7 @@
 
 #include "GameTypes.h"
 #include "Entity.h"
+#include "Build.h"
 
 namespace MBus
 {
@@ -15,12 +16,11 @@ enum Type
     // ORDER
     BEGIN_ZONE_PLACEMENT,
     END_ZONE_PLACEMENT,
-    BEGIN_STRUCTURE_PLACEMENT,
-    BEGIN_FLOOR_PLACEMENT,
+    BEGIN_BUILDABLE_PLACEMENT,
     // ECS
-    CREATE_PLANT_ENTITY,
     CREATE_TILE,
     HANDLE_CAMERA_RESIZE_FOR_PLAYER,
+    CREATE_ENTITY,
     // GUI
     TOGGLE_BUILD_MENU,
     CLOSE_BUILD_MENU,
@@ -52,37 +52,33 @@ struct EntitiesProcessed
 {
     int num;
 };
-struct CreatePlantEntity
-{
-    V2 grid_position;
-};
 struct CreateTile
 {
     V2 grid_position;
     const ECS::Entity *blueprint;
 };
-struct BeginStructurePlacement
+struct CreateEntity
 {
-    // preview texture????
-    V2 dimensions;
+    V2 grid_position;
+    const ECS::Entity *blueprint;
 };
-struct BeginFloorPlacement
+struct BeginBuildablePlacement
 {
     const ECS::Entity *entity;
+    Build::BuildableType type;
 };
 struct Message
 {
     Type type;
     union {
-        CreatePlantEntity cpe;
-        BeginStructurePlacement bsp;
         EntitiesRendered er;
         MessagesInRenderQueue mirq;
         TilesRendered tr;
         EntitiesProcessed ep;
         CreateTile ct;
         HandleCameraResizeForPlayer hcrfp;
-        BeginFloorPlacement bfp;
+        BeginBuildablePlacement bbp;
+        CreateEntity ce;
     } data;
 };
 enum QueueType

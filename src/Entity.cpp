@@ -299,28 +299,17 @@ void ECS::Manager::process_messages()
     for (int i = 0; i < queue.length; ++i)
     {
         MBus::Message message = queue.queue[i];
-        if (message.type == MBus::CREATE_PLANT_ENTITY)
+        if (message.type == MBus::CREATE_ENTITY)
         {
-            Entity e;
-            Component render_component;
-            render_component.type = RENDER;
-            render_component.strings.push_back("tilesheet-transparent");
-            render_component.data.r = {
-                {32, 0, 32, 32},
-                Render::Layer::WORLD_LAYER,
-                Assets::get_texture_index("tilesheet-transparent"),
-                static_cast<int>(render_component.strings.size() - 1),
-                1,
-                Render::Z_Index::ENTITY_LAYER,
-                true};
+            assert(message.data.ce.blueprint != nullptr);
+            Entity entity = message.data.ce.blueprint->make_deep_copy();
             Component position_component;
             position_component.type = POSITION;
-            position_component.data.p = {message.data.cpe.grid_position.x * 32, message.data.cpe.grid_position.y * 32};
-            e.add_component(&position_component);
-            e.add_component(&render_component);
-            this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].has_entity = true;
-            this->map.grid[message.data.cpe.grid_position.x][message.data.cpe.grid_position.y].entity_id = this->entities.size();
-            this->entities.push_back(e);
+            position_component.data.p = {message.data.ce.grid_position.x * 32, message.data.ce.grid_position.y * 32};
+            entity.add_component(&position_component);
+            this->map.grid[message.data.ce.grid_position.x][message.data.ce.grid_position.y].has_entity = true;
+            this->map.grid[message.data.ce.grid_position.x][message.data.ce.grid_position.y].entity_id = this->entities.size();
+            this->entities.push_back(entity);
         }
         else if (message.type == MBus::CREATE_TILE)
         {

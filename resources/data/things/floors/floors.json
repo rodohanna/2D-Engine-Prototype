@@ -2,6 +2,7 @@
     {
         "type": "buildable",
         "build_category": "Floor",
+        "build_type": "tile_entity",
         "components": [
             {
                 "type": "RENDER",
@@ -30,6 +31,7 @@
     {
         "type": "buildable",
         "build_category": "Floor",
+        "build_type": "tile_entity",
         "components": [
             {
                 "type": "RENDER",
@@ -58,6 +60,7 @@
     {
         "type": "buildable",
         "build_category": "Power",
+        "build_type": "entity",
         "components": [
             {
                 "type": "RENDER",
@@ -70,7 +73,7 @@
                 "scale": 1,
                 "texture_key": "tilesheet-transparent",
                 "draw_layer": "WORLD_LAYER",
-                "z_index": "TILE_BASE_LAYER"
+                "z_index": "ENTITY_LAYER"
             },
             {
                 "type": "BUILD_COST",
@@ -86,6 +89,7 @@
     {
         "type": "buildable",
         "build_category": "Power",
+        "build_type": "entity",
         "components": [
             {
                 "type": "RENDER",
@@ -98,7 +102,7 @@
                 "scale": 1,
                 "texture_key": "tilesheet-transparent",
                 "draw_layer": "WORLD_LAYER",
-                "z_index": "TILE_BASE_LAYER"
+                "z_index": "ENTITY_LAYER"
             },
             {
                 "type": "BUILD_COST",

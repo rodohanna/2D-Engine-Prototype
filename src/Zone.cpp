@@ -68,25 +68,26 @@ void Zone::Manager::save_zone_placement(ECS::Map *map)
 {
     // TODO: consolidate similar code in Zone::Manager::update
     this->state = Zone::WAITING_TO_PLACE_ZONE;
-    V2 current_mouse_grid_position = map->get_mouse_grid_position();
-    int start_x = std::min(this->start_zone_grid_position.x, current_mouse_grid_position.x);
-    int end_x = std::max(this->start_zone_grid_position.x, current_mouse_grid_position.x);
-    int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);
-    int end_y = std::max(this->start_zone_grid_position.y, current_mouse_grid_position.y);
-    if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
-    {
-        for (int i = start_x; i <= end_x; ++i)
-        {
-            for (int j = start_y; j <= end_y; ++j)
-            {
-                if (!map->grid[i][j].tile.empty && !map->grid[i][j].has_entity)
-                {
-                    MBus::Message message;
-                    message.type = MBus::CREATE_PLANT_ENTITY;
-                    message.data.cpe.grid_position = {static_cast<int>(i), static_cast<int>(j)};
-                    MBus::send_ecs_message(&message);
-                }
-            }
-        }
-    }
+    // TODO: handle zoning?
+    // V2 current_mouse_grid_position = map->get_mouse_grid_position();
+    // int start_x = std::min(this->start_zone_grid_position.x, current_mouse_grid_position.x);
+    // int end_x = std::max(this->start_zone_grid_position.x, current_mouse_grid_position.x);
+    // int start_y = std::min(this->start_zone_grid_position.y, current_mouse_grid_position.y);
+    // int end_y = std::max(this->start_zone_grid_position.y, current_mouse_grid_position.y);
+    // if (start_x >= 0 && end_x < map->dimensions.x && start_y >= 0 && end_y < map->dimensions.y)
+    // {
+    //     for (int i = start_x; i <= end_x; ++i)
+    //     {
+    //         for (int j = start_y; j <= end_y; ++j)
+    //         {
+    //             if (!map->grid[i][j].tile.empty && !map->grid[i][j].has_entity)
+    //             {
+    //                 MBus::Message message;
+    //                 message.type = MBus::CREATE_PLANT_ENTITY;
+    //                 message.data.cpe.grid_position = {static_cast<int>(i), static_cast<int>(j)};
+    //                 MBus::send_ecs_message(&message);
+    //             }
+    //         }
+    //     }
+    // }
 }

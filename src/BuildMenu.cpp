@@ -138,8 +138,9 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
                         Input::clear_input(Input::LEFT_MOUSE_JUST_PRESSED);
                         {
                             MBus::Message message;
-                            message.type = MBus::Type::BEGIN_FLOOR_PLACEMENT;
-                            message.data.bfp.entity = &buildable.entity;
+                            message.type = MBus::Type::BEGIN_BUILDABLE_PLACEMENT;
+                            message.data.bbp.entity = &buildable.entity;
+                            message.data.bbp.type = buildable.type;
                             MBus::send_order_message(&message);
                         }
                     }

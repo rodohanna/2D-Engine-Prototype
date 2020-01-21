@@ -375,17 +375,38 @@ void process_thing_file(std::string file, Serialize::LoadThingsResult *things)
                     if (thing_object["build_category"].is<std::string>())
                     {
                         std::string build_category = thing_object["build_category"].get<std::string>();
-                        if (thing_object["components"].is<picojson::array>())
+                        if (thing_object["build_type"].is<std::string>())
                         {
-                            picojson::array component_array = thing_object["components"].get<picojson::array>();
-                            Build::Buildable buildable;
-                            buildable.build_category = build_category;
-                            process_json_component_array(&buildable.entity, &component_array);
-                            things->buildables.push_back(buildable);
+                            std::string build_type = thing_object["build_type"].get<std::string>();
+                            if (thing_object["components"].is<picojson::array>())
+                            {
+                                picojson::array component_array = thing_object["components"].get<picojson::array>();
+                                Build::Buildable buildable;
+                                if (build_type == "tile_entity")
+                                {
+                                    buildable.type = Build::BuildableType::TILE;
+                                }
+                                else if (build_type == "entity")
+                                {
+                                    buildable.type = Build::BuildableType::ENTITY;
+                                }
+                                else
+                                {
+                                    printf("Load JSON Err: Buildable Thing in category %s has unrecognized type: %s\n", build_category.c_str(), build_type.c_str());
+                                    continue;
+                                }
+                                buildable.build_category = build_category;
+                                process_json_component_array(&buildable.entity, &component_array);
+                                things->buildables.push_back(buildable);
+                            }
+                            else
+                            {
+                                printf("Load JSON Err: Buildable Thing in category %s has no components array\n", build_category.c_str());
+                            }
                         }
                         else
                         {
-                            printf("Load JSON Err: Buildable Thing in category %s has no components array\n", build_category.c_str());
+                            printf("Load JSON Err: Buildable Thing in category %s has no build_type array\n", build_category.c_str());
                         }
                     }
                     else

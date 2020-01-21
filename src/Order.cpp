@@ -32,25 +32,22 @@ void Order::Manager::process_messages(ECS::Map *map)
 
             if (this->build_manager.state != Build::IDLE)
             {
-                this->build_manager.quit_structure_placement();
+                this->build_manager.quit_entity_placement();
             }
             break;
         }
-        case MBus::Type::BEGIN_STRUCTURE_PLACEMENT:
+        case MBus::Type::BEGIN_BUILDABLE_PLACEMENT:
         {
-            printf("Handling structure placement\n");
-            this->build_manager.begin_structure_placement();
-            if (this->zone_manager.state != Zone::IDLE)
+            printf("Handling buildable placement\n");
+            assert(m.data.bbp.entity != nullptr);
+            if (m.data.bbp.type == Build::BuildableType::TILE)
             {
-                this->zone_manager.quit_zone_placement();
+                this->build_manager.begin_tile_placement(m.data.bbp.entity);
             }
-            break;
-        }
-        case MBus::Type::BEGIN_FLOOR_PLACEMENT:
-        {
-            printf("Handling floor placement\n");
-            assert(m.data.bfp.entity != nullptr);
-            this->build_manager.begin_floor_placement(m.data.bfp.entity);
+            else
+            {
+                this->build_manager.begin_entity_placement(m.data.bbp.entity);
+            }
             if (this->zone_manager.state != Zone::IDLE)
             {
                 this->zone_manager.quit_zone_placement();
