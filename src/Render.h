@@ -24,13 +24,21 @@ enum Layer
 enum EventType
 {
     RENDER_RECTANGLE,
-    RENDER_TEXTURE
+    RENDER_TEXTURE,
+    RENDER_LINE
 };
 struct RenderRectangleEvent
 {
     Rect box;
     Color color;
     bool filled;
+};
+
+struct RenderLineEvent
+{
+    V2 start;
+    V2 end;
+    Color color;
 };
 
 struct RenderTextureEvent
@@ -51,6 +59,7 @@ struct Event
     union {
         Render::RenderRectangleEvent render_rectangle_event;
         Render::RenderTextureEvent render_texture_event;
+        Render::RenderLineEvent render_line_event;
     } data;
 };
 void render_texture(
@@ -73,6 +82,12 @@ void render_rectangle(
     const Rect &box,
     const Color &color,
     bool filled = false,
+    int z_index = 1);
+void render_line(
+    Render::Layer layer,
+    V2 *start,
+    V2 *end,
+    Color *color,
     int z_index = 1);
 void perform_render();
 }; // namespace Render

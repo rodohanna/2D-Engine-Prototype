@@ -62,6 +62,22 @@ void Render::render_rectangle(Render::Layer layer, const Rect &box, const Color 
     render_queue[render_queue_length++] = e;
 }
 
+void Render::render_line(
+    Render::Layer layer,
+    V2 *start,
+    V2 *end,
+    Color *color,
+    int z_index)
+{
+    Render::Event e;
+    e.layer = layer;
+    e.type = Render::EventType::RENDER_LINE;
+    e.has_overflow_clip = false;
+    e.z_index = z_index;
+    e.data.render_line_event = {*start, *end, *color};
+    render_queue[render_queue_length++] = e;
+}
+
 bool compare_render_events(Render::Event a, Render::Event b)
 {
     return a.z_index < b.z_index;
@@ -76,6 +92,22 @@ void _perform_render(SDL_Renderer *renderer, const Render::Event *render_events,
     {
         switch (e.type)
         {
+        case Render::EventType::RENDER_LINE:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                e.data.render_line_event.color.r,
+                e.data.render_line_event.color.g,
+                e.data.render_line_event.color.b,
+                e.data.render_line_event.color.a);
+            SDL_RenderDrawLine(
+                renderer,
+                e.data.render_line_event.start.x,
+                e.data.render_line_event.start.y,
+                e.data.render_line_event.end.x,
+                e.data.render_line_event.end.y);
+            break;
+        }
         case Render::EventType::RENDER_RECTANGLE:
         {
             if (e.has_overflow_clip)
@@ -179,20 +211,6 @@ void Render::perform_render()
     SDL_SetRenderDrawColor(renderer, 0x11, 0x11, 0x11, 0xFF);
     SDL_RenderClear(renderer);
 
-    {
-        // TODO: Don't do this in the renderer you big dummy, make a new draw_line render call.
-        // DEBUG
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x0F);
-        Rect *camera = Window::get_camera();
-        for (int i = 0; i <= 100; ++i)
-        {
-            SDL_RenderDrawLine(renderer, (i * 32) - camera->x, 0 - camera->y, (i * 32) - camera->x, (32 * 100) - camera->y);
-        }
-        for (int i = 0; i <= 100; ++i)
-        {
-            SDL_RenderDrawLine(renderer, 0 - camera->x, (i * 32) - camera->y, (32 * 100) - camera->x, (i * 32) - camera->y);
-        }
-    }
     _perform_render(renderer, world_layer_buffer, world_buffer_length);
     SDL_SetRenderTarget(renderer, nullptr);
     blank_texture->render(renderer, {0, 0}, world_render_scale);
