@@ -44,13 +44,13 @@ When the engine boots up it initializes SDL, figures out the monitor refresh rat
 
 - Input events are collected and buffered
 - The GUI manager processes new events and then updates (may generate new events)
-- The ECS processes events new events and then updates (may generate new events)
-- The frame rate is syncronized
+- The ECS processes new events and then updates (may generate new events)
+- The frame rate is synchronized
 - The render system performs a render of any queued render events
 
 ### Assets
 
-Assets are handled very simply. An `asset-manifest.json` is used to tell the asset loader where assets are and how they should be loaded. The supported asset types are `sprites` and `fonts`. They are turned into [textures](https://wiki.libsdl.org/SDL_Texture) and stored in an asset table to be used by the renderer. Entities never handle assets directly, they are only ever given a handle to an asset that they give to the renderer when they want to be drawn.
+Assets are handled very simply. An `asset-manifest.json` is used to tell the asset loader where assets are and how they should be loaded. The supported asset types are `sprites` and `fonts`. They are turned into [textures](https://wiki.libsdl.org/SDL_Texture) and stored in an asset table to be used by the renderer. Entities never handle assets directly; they are only ever given a handle to an asset that they give to the renderer when they want to be drawn.
 
 ### Entity Component System
 
@@ -67,7 +67,7 @@ Entites can't control when they are rendered. They can only buffer a render even
 
 - Separating events into a world buffer and a GUI buffer.
 - Initializing a blank texture and setting it as the render target.
-- Sorting world-render events by z-index
+- Sorting world-render events by z-index.
 - Retrieving their textures from the texture table.
 - Rendering them accordingly.
 - Doing the same thing for the GUI render events.
