@@ -6,7 +6,7 @@ Disclaimer: I use the term "engine" loosely because I've learned that the real e
 
 ![](level-editor.png)
 
-This is an example of a level created with the level editor.
+This is an example of a level created with the level editor. [Check out a video demo here.](https://www.youtube.com/watch?v=UN439ispSBw&feature=youtu.be)
 
 ### Tech
 
