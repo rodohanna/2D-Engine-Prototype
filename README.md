@@ -4,9 +4,9 @@ This project is the result of a rabbit hole I went down when I wanted to learn m
 
 Disclaimer: I use the term "engine" loosely because I've learned that the real engines that are used to ship complex games are lightyears more advanced than anything I have here.
 
-<video width="320" height="240" controls>
-  <source src="level-editor-demo.mp4" type="video/mp4">
-</video>
+![](level-editor.png)
+
+This is an example of a level created with the level editor.
 
 ### Tech
 
