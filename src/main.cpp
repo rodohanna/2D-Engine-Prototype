@@ -97,33 +97,36 @@ int main(int argc, char *argv[])
 
         {
             // DEBUG - Grid
-            Rect *camera = Window::get_camera();
-            Color line_color = {0xFF, 0xFF, 0xFF, 0x0F};
-            for (int i = 0; i <= 100; ++i)
+            if (gui.build_menu_shown)
             {
-                V2 vert_start = {(i * 32) - camera->x, 0 - camera->y};
-                V2 vert_end = {(i * 32) - camera->x, (32 * 100) - camera->y};
-                V2 horiz_start = {0 - camera->x, (i * 32) - camera->y};
-                V2 horiz_end = {(32 * 100) - camera->x, (i * 32) - camera->y};
-                Rect vert_line_rect = {(i * 32), 0, 1, std::abs(vert_start.y - vert_end.y)};
-                Rect horiz_line_rect = {0, (i * 32), std::abs(horiz_start.x - horiz_end.x), 1};
-                if (Physics::check_collision(&vert_line_rect, camera))
+                Rect *camera = Window::get_camera();
+                Color line_color = {0xFF, 0xFF, 0xFF, 0x0F};
+                for (int i = 0; i <= 100; ++i)
                 {
-                    Render::render_line(
-                        Render::WORLD_LAYER,
-                        &vert_start,
-                        &vert_end,
-                        &line_color,
-                        Render::Z_Index::TILE_BASE_LAYER);
-                }
-                if (Physics::check_collision(&horiz_line_rect, camera))
-                {
-                    Render::render_line(
-                        Render::WORLD_LAYER,
-                        &horiz_start,
-                        &horiz_end,
-                        &line_color,
-                        Render::Z_Index::TILE_BASE_LAYER);
+                    V2 vert_start = {(i * 32) - camera->x, 0 - camera->y};
+                    V2 vert_end = {(i * 32) - camera->x, (32 * 100) - camera->y};
+                    V2 horiz_start = {0 - camera->x, (i * 32) - camera->y};
+                    V2 horiz_end = {(32 * 100) - camera->x, (i * 32) - camera->y};
+                    Rect vert_line_rect = {(i * 32), 0, 1, std::abs(vert_start.y - vert_end.y)};
+                    Rect horiz_line_rect = {0, (i * 32), std::abs(horiz_start.x - horiz_end.x), 1};
+                    if (Physics::check_collision(&vert_line_rect, camera))
+                    {
+                        Render::render_line(
+                            Render::WORLD_LAYER,
+                            &vert_start,
+                            &vert_end,
+                            &line_color,
+                            Render::Z_Index::TILE_BASE_LAYER + 1);
+                    }
+                    if (Physics::check_collision(&horiz_line_rect, camera))
+                    {
+                        Render::render_line(
+                            Render::WORLD_LAYER,
+                            &horiz_start,
+                            &horiz_end,
+                            &line_color,
+                            Render::Z_Index::TILE_BASE_LAYER + 1);
+                    }
                 }
             }
         }

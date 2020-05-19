@@ -36,7 +36,7 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
     map.dimensions = *dimensions;
     map.cell_size = 32;
     map.pixel_dimensions = {map.dimensions.x * map.cell_size, map.dimensions.y * map.cell_size};
-    int texture_index = Assets::get_texture_index("tilesheet-colored");
+    int texture_index = Assets::get_texture_index("tilesheet-demo");
     for (int i = 0; i < dimensions->x; ++i)
     {
         for (int j = 0; j < dimensions->y; ++j)
@@ -46,13 +46,13 @@ ProcGen::Return ProcGen::generate_map(ProcGen::Rules *rules, V2 *dimensions)
             ECS::Entity tile_entity;
             ECS::Component render_component;
             render_component.type = ECS::RENDER;
-            render_component.strings.push_back("tilesheet-transparent");
+            render_component.strings.push_back("tilesheet-demo");
             render_component.data.r = {
-                {0, 0, 32, 32},
+                {0, 0, 16, 16},
                 Render::WORLD_LAYER,
                 texture_index,
                 static_cast<int>(render_component.strings.size() - 1),
-                1,
+                2,
                 Render::Z_Index::TILE_BASE_LAYER,
                 true};
             ECS::Component position_component;

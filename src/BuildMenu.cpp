@@ -102,18 +102,19 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
                 assert(render_component != nullptr);
                 ECS::RenderComponent render_data = render_component->data.r;
                 V2 render_position = {curr_x, curr_y};
+                int scale = render_data.scale * 2;
                 Render::render_texture(
                     Render::GUI_LAYER,
                     render_data.texture_index,
                     render_data.clip,
                     render_position,
                     nullptr,
-                    2,
+                    scale,
                     this->panel.z_index + 1);
-                curr_x += (render_data.clip.w * 2) + 5;
-                if (i % 3 == 0) // 3 per row
+                curr_x += (render_data.clip.w * scale) + 5;
+                if (i % 4 == 0) // 3 per row
                 {
-                    curr_y += render_data.clip.h + 5;
+                    curr_y += (render_data.clip.h * scale) + 5;
                     curr_x = this->panel.rect.x + 5;
                 }
                 ++i;
@@ -122,8 +123,8 @@ void BuildMenu::update(double ts, double bottom_y) // bottom_y is where this men
                 Rect render_rect = {
                     render_position.x,
                     render_position.y,
-                    render_data.clip.w * 2,
-                    render_data.clip.h * 2};
+                    render_data.clip.w * scale,
+                    render_data.clip.h * scale};
                 if (Physics::check_point_in_rect(mouse_position, &render_rect))
                 {
                     Color hover_color = {0x2E, 0xCC, 0x40, 0xFF};

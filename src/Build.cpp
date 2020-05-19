@@ -74,16 +74,13 @@ void Build::Manager::update(ECS::Map *map, double ts)
             {
                 for (int j = start_y; j <= end_y; ++j)
                 {
-                    if (map->grid[i][j].tile.empty)
-                    {
-                        Rect cell_to_render = {
-                            (static_cast<int>(i) * map->cell_size) - camera->x,
-                            (static_cast<int>(j) * map->cell_size) - camera->y,
-                            map->cell_size,
-                            map->cell_size};
-                        Color color = {0xFF, 0xFF, 0xFF, 0x6F};
-                        Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, 1);
-                    }
+                    Rect cell_to_render = {
+                        (static_cast<int>(i) * map->cell_size) - camera->x,
+                        (static_cast<int>(j) * map->cell_size) - camera->y,
+                        map->cell_size,
+                        map->cell_size};
+                    Color color = {0xFF, 0xFF, 0xFF, 0x6F};
+                    Render::render_rectangle(Render::Layer::WORLD_LAYER, cell_to_render, color, true, Render::Z_Index::FLOOR_LAYER);
                 }
             }
         }
@@ -123,14 +120,11 @@ void Build::Manager::save_tile_placement(ECS::Map *map)
         {
             for (int j = start_y; j <= end_y; ++j)
             {
-                if (map->grid[i][j].tile.empty)
-                {
-                    MBus::Message message;
-                    message.type = MBus::CREATE_TILE;
-                    message.data.ct.grid_position = {static_cast<int>(i), static_cast<int>(j)};
-                    message.data.ct.blueprint = this->blueprint;
-                    MBus::send_ecs_message(&message);
-                }
+                MBus::Message message;
+                message.type = MBus::CREATE_TILE;
+                message.data.ct.grid_position = {static_cast<int>(i), static_cast<int>(j)};
+                message.data.ct.blueprint = this->blueprint;
+                MBus::send_ecs_message(&message);
             }
         }
     }

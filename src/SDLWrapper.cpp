@@ -21,7 +21,7 @@ bool SDL::initialize_SDL(size_t screenWidth, size_t screenHeight, bool _vsync)
             printf("Warning: Linear texture filtering not enabled!");
         }
 
-        window = SDL_CreateWindow("Simulation Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        window = SDL_CreateWindow("2D Engine Prototype", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());

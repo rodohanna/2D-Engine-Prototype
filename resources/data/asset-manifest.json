@@ -1,24 +1,29 @@
 [
-    {
-        "texture_key": "tilesheet-colored",
-        "type": "sprite",
-        "path": "resources/assets/spritesheets/space-station.png"
-    },
-    {
-        "texture_key": "tilesheet-transparent",
-        "type": "sprite",
-        "path": "resources/assets/spritesheets/space-station.png"
-    },
-    {
-        "texture_key": "standard-font",
-        "type": "font",
-        "path": "resources/assets/fonts/m5x7.ttf",
-        "font_size": 32
-    },
-    {
-        "texture_key": "standard-font-small",
-        "type": "font",
-        "path": "resources/assets/fonts/m5x7.ttf",
-        "font_size": 16
-    }
+  {
+    "texture_key": "tilesheet-colored",
+    "type": "sprite",
+    "path": "resources/assets/spritesheets/space-station.png"
+  },
+  {
+    "texture_key": "tilesheet-transparent",
+    "type": "sprite",
+    "path": "resources/assets/spritesheets/space-station.png"
+  },
+  {
+    "texture_key": "standard-font",
+    "type": "font",
+    "path": "resources/assets/fonts/m5x7.ttf",
+    "font_size": 32
+  },
+  {
+    "texture_key": "standard-font-small",
+    "type": "font",
+    "path": "resources/assets/fonts/m5x7.ttf",
+    "font_size": 16
+  },
+  {
+    "texture_key": "tilesheet-demo",
+    "type": "sprite",
+    "path": "resources/assets/spritesheets/higher-res.png"
+  }
 ]

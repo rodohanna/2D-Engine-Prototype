@@ -1,118 +1,472 @@
 [
-    {
-        "type": "buildable",
-        "build_category": "Floor",
-        "build_type": "tile_entity",
-        "components": [
-            {
-                "type": "RENDER",
-                "clip": {
-                    "h": 32,
-                    "w": 32,
-                    "x": 32,
-                    "y": 0
-                },
-                "scale": 1,
-                "texture_key": "tilesheet-transparent",
-                "draw_layer": "WORLD_LAYER",
-                "z_index": "TILE_BASE_LAYER"
-            },
-            {
-                "type": "BUILD_COST",
-                "amount": 200
-            },
-            {
-                "type": "INFO",
-                "name": "Steel Floor",
-                "description": "A floor made out of steel."
-            }
-        ]
-    },
-    {
-        "type": "buildable",
-        "build_category": "Floor",
-        "build_type": "tile_entity",
-        "components": [
-            {
-                "type": "RENDER",
-                "clip": {
-                    "h": 32,
-                    "w": 32,
-                    "x": 0,
-                    "y": 0
-                },
-                "scale": 1,
-                "texture_key": "tilesheet-transparent",
-                "draw_layer": "WORLD_LAYER",
-                "z_index": "TILE_BASE_LAYER"
-            },
-            {
-                "type": "BUILD_COST",
-                "amount": 200
-            },
-            {
-                "type": "INFO",
-                "name": "Steel Floor",
-                "description": "A floor made out of steel."
-            }
-        ]
-    },
-    {
-        "type": "buildable",
-        "build_category": "Power",
-        "build_type": "entity",
-        "components": [
-            {
-                "type": "RENDER",
-                "clip": {
-                    "h": 32,
-                    "w": 32,
-                    "x": 32,
-                    "y": 32
-                },
-                "scale": 1,
-                "texture_key": "tilesheet-transparent",
-                "draw_layer": "WORLD_LAYER",
-                "z_index": "ENTITY_LAYER"
-            },
-            {
-                "type": "BUILD_COST",
-                "amount": 200
-            },
-            {
-                "type": "INFO",
-                "name": "Steel Floor",
-                "description": "A floor made out of steel."
-            }
-        ]
-    },
-    {
-        "type": "buildable",
-        "build_category": "Power",
-        "build_type": "entity",
-        "components": [
-            {
-                "type": "RENDER",
-                "clip": {
-                    "h": 32,
-                    "w": 32,
-                    "x": 64,
-                    "y": 32
-                },
-                "scale": 1,
-                "texture_key": "tilesheet-transparent",
-                "draw_layer": "WORLD_LAYER",
-                "z_index": "ENTITY_LAYER"
-            },
-            {
-                "type": "BUILD_COST",
-                "amount": 200
-            },
-            {
-                "type": "INFO",
-                "name": "Steel Floor",
-                "description": "A floor made out of steel."
-            }
-        ]
-    }
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 80,
+          "y": 32
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Grass",
+        "description": "Just some green grass"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 112,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Grass Variation 1",
+        "description": "Grass, but different."
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 128,
+          "y": 16
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "BUILD_COST",
+        "amount": 200
+      },
+      {
+        "type": "INFO",
+        "name": "Grass Variation 2",
+        "description": "Grass, but more different."
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 80,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "BUILD_COST",
+        "amount": 200
+      },
+      {
+        "type": "INFO",
+        "name": "Dirt",
+        "description": "Just some dirt"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 208,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "BUILD_COST",
+        "amount": 200
+      },
+      {
+        "type": "INFO",
+        "name": "Water Variation 1",
+        "description": "Good to drink"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 224,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "BUILD_COST",
+        "amount": 200
+      },
+      {
+        "type": "INFO",
+        "name": "Water Variation 2",
+        "description": "Water, but different."
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Floor",
+    "build_type": "tile_entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 256,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "TILE_BASE_LAYER"
+      },
+      {
+        "type": "BUILD_COST",
+        "amount": 200
+      },
+      {
+        "type": "INFO",
+        "name": "Stone",
+        "description": "Some stone flooring"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 160,
+          "y": 80
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Rock Variation 1",
+        "description": "Just a rock"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 144,
+          "y": 80
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Rock Variation 2",
+        "description": "Just another rock"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 176,
+          "y": 80
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Bucket",
+        "description": "To grab some water"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 144,
+          "y": 96
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Flower Variation 1",
+        "description": "Pretty"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 160,
+          "y": 96
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Flower Variation 2",
+        "description": "Pretty"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 176,
+          "y": 96
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Bucket Variation 2",
+        "description": "Another one"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 144,
+          "y": 112
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Shrub Variation 1",
+        "description": "A shrub"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 160,
+          "y": 112
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Shrub Variation 2",
+        "description": "Another shrub"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 176,
+          "y": 112
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Shrub Variation 3",
+        "description": "A final shrub"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 192,
+          "y": 112
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "Bean Pole",
+        "description": "Just because"
+      }
+    ]
+  },
+  {
+    "type": "buildable",
+    "build_category": "Decoration",
+    "build_type": "entity",
+    "components": [
+      {
+        "type": "RENDER",
+        "clip": {
+          "h": 16,
+          "w": 16,
+          "x": 0,
+          "y": 0
+        },
+        "scale": 2,
+        "texture_key": "tilesheet-demo",
+        "draw_layer": "WORLD_LAYER",
+        "z_index": "ENTITY_LAYER"
+      },
+      {
+        "type": "INFO",
+        "name": "???",
+        "description": "Where is your god now?"
+      }
+    ]
+  }
 ]

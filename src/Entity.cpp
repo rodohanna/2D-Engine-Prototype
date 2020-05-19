@@ -124,7 +124,11 @@ bool ECS::render_system(Entity *e)
             render_component.clip = {};
         }
         Rect *camera = Window::get_camera();
-        Rect entity_rect = {position_component.position.x, position_component.position.y, render_component.clip.w, render_component.clip.h};
+        Rect entity_rect = {
+            position_component.position.x,
+            position_component.position.y,
+            render_component.clip.w * render_component.scale,
+            render_component.clip.h * render_component.scale};
         if (Physics::check_collision(camera, &entity_rect))
         {
             V2 render_position = {position_component.position.x - camera->x, position_component.position.y - camera->y};
@@ -305,7 +309,7 @@ void ECS::Manager::process_messages()
             Entity entity = message.data.ce.blueprint->make_deep_copy();
             Component position_component;
             position_component.type = POSITION;
-            position_component.data.p = {message.data.ce.grid_position.x * 32, message.data.ce.grid_position.y * 32};
+            position_component.data.p = {message.data.ce.grid_position.x * this->map.cell_size, message.data.ce.grid_position.y * this->map.cell_size};
             entity.add_component(&position_component);
             this->map.grid[message.data.ce.grid_position.x][message.data.ce.grid_position.y].has_entity = true;
             this->map.grid[message.data.ce.grid_position.x][message.data.ce.grid_position.y].entity_id = this->entities.size();
