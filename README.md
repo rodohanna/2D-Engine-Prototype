@@ -2,7 +2,7 @@
 
 This project is the result of a rabbit hole I went down when I wanted to learn more about 2D graphics and game engines.
 
-Disclaimer: I use the term "engine" loosely because I've learned that the real engines that are used to ship complex games are lightyears more advanced than anything I have here.
+Disclaimer: I use the term "engine" loosely because real engines that are used to ship complex games are lightyears more advanced than anything I have here.
 
 ![](level-editor.png)
 
@@ -63,7 +63,7 @@ My system is set up as follows:
 
 ### Renderer
 
-Entites can't control when they are rendered. They can only buffer a render event telling the renderer where, how, and on which layer they want to be drawn. This allows for a lot of flexibility because render events can be preprocessed before rendering (like y and z-index sorting). The renderer processes buffered render events by:
+Entities can't control when they are rendered. They can only buffer a render event telling the renderer where, how, and on which layer they want to be drawn. This allows for a lot of flexibility because render events can be preprocessed before rendering (like y and z-index sorting). The renderer processes buffered render events by:
 
 - Separating events into a world buffer and a GUI buffer.
 - Initializing a blank texture and setting it as the render target.
